@@ -1,0 +1,21 @@
+typeset +g hours minutes seconds total elapsed
+
+total=$SECONDS
+seconds=$(( $total % 60 ))
+minutes=$(( ( $total / 60 ) % 60 ))
+hours=$((   $total / ( 60 * 60 ) ))
+
+if   [[ $hours   -gt 0 ]] ; then
+    elapsed="${hours}h. ${minutes}m."
+elif [[ $minutes -gt 0 ]] ; then
+    elapsed="${minutes}m. ${seconds}s."
+else
+    elapsed="${seconds}s."
+fi
+
+print "Shell uptime: $elapsed (${total}s.)"
+repeat $(( (($hours + $minutes + $seconds) % 8) + 1 )) ; do
+    print -nR '.'
+    sleep 1
+done
+print

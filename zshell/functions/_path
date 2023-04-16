@@ -1,0 +1,45 @@
+for envar in infopath manpath path ; do
+    ENVAR=$(echo $envar | tr 'a-z' 'A-Z')
+    export TEMP=$(/usr/bin/printenv $ENVAR)
+
+    typeset -xT $ENVAR $envar :
+    typeset -U $ENVAR $envar
+    eval $ENVAR="'$(/usr/bin/printenv TEMP)'"
+    unset TEMP
+done
+
+MANPATH=$(man -w)
+
+_update_path() {
+    KEY=$1 ; shift
+    pfx=$1 ; shift
+    val=$1 ; shift
+
+    if [ ! -d $val ] ; then
+        return
+    fi
+    if $pfx ; then
+        eval $KEY="'$val:$(/usr/bin/printenv $KEY)'"
+    else
+        eval $KEY="'$(/usr/bin/printenv $KEY):$val'"
+    fi
+}
+
+_path() {
+    local _i
+    if [ "x$1" = 'x-p' ] ; then
+        prefix=true
+        shift
+    else
+        prefix=false
+    fi
+
+    for _i in "$@" ; do
+        _update_path PATH     $prefix $_i/bin  
+        _update_path PATH     $prefix $_i/sbin
+        _update_path MANPATH  $prefix $_i/man
+        _update_path INFOPATH $prefix $_i/info
+    done
+}
+
+_path

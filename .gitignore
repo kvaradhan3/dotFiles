@@ -1,0 +1,36 @@
+#
+# Editor Cruft
+#
+
+*~
+.emacs-flc
+.*.sw*
+.#*
+\#*
+
+
+#
+# Mac stuff
+#
+.DS_Store
+
+#
+# zsh cruft
+#
+.zcompdump*
+
+#
+# Other stuff
+# 
+fonts.dir
+fonts.scale
+rc.xml
+.uuid
+oh-my-zsh
+
+#
+# Exercise care in pushing up ssh
+# 
+id_*
+known_hosts*
+.known_hosts*

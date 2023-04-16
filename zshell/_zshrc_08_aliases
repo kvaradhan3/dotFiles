@@ -1,0 +1,45 @@
+#
+unalias -m '*'
+
+# some useful aliases
+alias c='clear'
+alias h='fc -l'
+alias jo='jobs -l'
+alias m=$PAGER
+
+export CLICOLOR=
+alias ls='ls -F'
+alias ll='ls -laFo'
+alias l='ls -l'
+
+alias g='egrep -i'
+alias qlp='/usr/bin/qlmanage -p'
+
+alias p=pushd
+alias pop=popd
+
+alias rc='readlink current'
+alias mkrc='$(ln -sf "$(pf -d .values)" current)'
+
+alias tl='tmux list-sessions'
+alias ta='tmux attach -t'
+
+alias mv='nocorrect mv '
+alias cp='nocorrect cp '
+alias ln='nocorrect ln '
+
+alias de-vt100='sed '"'"'s/\x1b\[[0-9;]*[a-zA-Z]//g'"'"
+
+alias chrome='daemonize /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --auto-open-devtools-for-tabs'
+alias ji="~/go/bin/jira"
+
+
+#
+# Environment
+#
+export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,pickup_types='$"/?!=',boulder=Ö,name=Croesus,color
+
+#
+# Functions
+#
+catmd() { pandoc "$@" | lynx -stdin }
