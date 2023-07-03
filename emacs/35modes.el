@@ -12,6 +12,27 @@
 
 (use-package rust-mode)
 
+(use-package origami
+  :config
+  (define-prefix-command 'origami-mode-map)
+  (define-key mode-specific-map (kbd "z") 'origami-mode-map)
+  (global-origami-mode)
+  :bind (:map origami-mode-map
+	      ("o"   . origami-open-node)
+	      ("O"   . origami-open-node-recursively)
+	      ("c"   . origami-close-node)
+	      ("C"   . origami-close-node-recursively)
+	      ("C-o" . origami-open-all-nodes)
+	      ("C-c" . origami-close-all-nodes)
+	      ("t"   . origami-toggle-node)
+	      ("T"   . origami-recursively-toggle-node)
+	      ("v"   . origami-show-only-node)
+	      ("k"   . origami-previous-fold)
+	      ("j"   . origami-forward-fold)
+	      ("x"   . origami-reset)))
+
+(require 'origami)
+
 ;;;
 ;;; Local Variables:
 ;;; mode: Emacs-Lisp

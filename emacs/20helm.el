@@ -11,7 +11,6 @@
   :bind (("M-x"		. helm-M-x)
 	 ("C-x C-f"	. helm-find-files))
   :config
-  (require 'helm-config)
   (helm-mode 1)
   )
 

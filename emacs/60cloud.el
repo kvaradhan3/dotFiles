@@ -8,6 +8,9 @@
 (use-package kubernetes)
 (use-package kubernetes-helm)
 
+(use-package docker
+  :ensure t
+  :bind ("C-c d" . docker))
 
 (provide '60cloud)
 
