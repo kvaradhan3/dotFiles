@@ -27,6 +27,8 @@
   ;; (straight-check-for-modifications nil)
   (straight-use-package-by-default  t))
 
+(use-package sqlite3)
+
 ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lib/"))
 
 ;;; Local Variables:

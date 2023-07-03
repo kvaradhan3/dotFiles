@@ -9,12 +9,13 @@ alias ji=~/go/bin/jira
 jf() {
     JQF=
     ORD=" order by created"
-    while getopts :p:l:s:t:a:r:u:x arg ; do
+    while getopts :a:e:l:p:r:s:t:u:xA:R:S: arg ; do
         case $arg in
-            p)	JQF="$JQF AND project = $OPTARG" ;;
-            l)	JQF="$JQF AND labels in ( $OPTARG )" ;;
-            a)  JQF="$JQF AND assignee in ( $OPTARG )" ;;
-            r)  JQF="$JQF AND reporter in ( $OPTARG )" ;;
+            a)  JQF+=" AND assignee in ( $OPTARG )" ;;
+	    e)  JQF+=" AND ( key = $OPTARG or parent in ( $OPTARG ) )" ;;
+            l)	JQF+=" AND labels in ( $OPTARG )" ;;
+            p)	JQF+=" AND project = $OPTARG" ;;
+            r)  JQF+=" AND reporter in ( $OPTARG )" ;;
             s)  case $OPTARG in
                 all-open)   jstatus='Backlog, OPEN, Reopened, "TO Do", "In Progress"';;
                 backlog)    jstatus='Backlog' ;;
@@ -23,11 +24,16 @@ jf() {
                 inprogress) jstatus='"In Progress"';;
                 *)          jstatus="$OPTARG";
                 esac
-                JQF="$JQF AND status in ( $jstatus )" ;;
-            t)  JQF="$JQF AND issuetype = $OPTARG" ;;
-            u)  JQF="$JQF AND updated $OPTARG" ;;
+                JQF+=" AND status in ( $jstatus )" ;;
+            t)  JQF+=" AND issuetype = $OPTARG" ;;
+            u)  JQF+=" AND updated $OPTARG" ;;
             x)  ORD= ;;
-            \?) echo "Unknown filter type: $OPTARG" ;;
+	        A)	JQF+=" AND assignee=$OPTARG" ;;
+	        R)	JQF+=" AND reporter=$OPTARG" ;;
+	        S)	JQF+=" AND sprint in ${OPTARG}" ;;
+            \?) echo "Unknown filter type: $OPTARG" ;
+	        typeset -f $0
+		;;
         esac
     done
     printf "%s%s" "$(echo "$JQF" | sed 's/^ AND //')" "$ORD"
@@ -36,12 +42,27 @@ jf() {
 #
 # These zshisms expand globally.
 #
-alias -g .obs="-p obs"
+alias -g .obs="-p OBS"
 alias -g .open="-s all-open"
 alias -g .backlog="-s backlog"
 alias -g .epic="-t epic"
 alias -g .ng="-l new-obs-repo"
 alias -g .upd="-u '>='"
+alias -g .cs='-S "openSprints()"'
+alias -g .fs='-S "futureSprints()"'
+alias -g .mine="-A 'currentuser()'"
+alias -g .rmine="-R 'currentuser()'"
 
-alias new-obs-repo-all='jira list -q "$(jf .obs .open .ng) DESC" -t obs-list'
-alias new-obs-repo-epics='jira list -q "$(jf .obs .open .epic .ng) DESC" -t obs-list'
+# alias new-obs-repo-all='jira list -q "$(jf .obs .open .ng) DESC" -t obs-list'
+# alias new-obs-repo-epics='jira list -q "$(jf .obs .open .epic .ng) DESC" -t obs-list'
+
+#
+# Can this be done with a slack cli app?
+#
+spr() {
+  SIZE="$(echo "$1" | tr '[:lower:]' '[:upper:]')"
+  PRID=$2
+  printf '`PR/%s` %s %s\n' "$SIZE"                             \
+         "$(gh pr view --json title --jq '.title' "$PRID")"    \
+         "$(gh pr view --json url   --jq '.url'   "$PRID")"
+}
