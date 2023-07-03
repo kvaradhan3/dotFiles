@@ -1,0 +1,26 @@
+function vlc {
+    local VLC
+
+    if [ -x /usr/bin/vlc ] ; then
+        VLC=/usr/bin/vlc
+    elif [ -x /Applications/VLC.app/Contents/MacOS/VLC ] ; then
+        VLC=/Applications/VLC.app/Contents/MacOS/VLC
+    else
+        echo "vlc: executable not found" >&2
+	return 1
+    fi
+
+    FILE=$1 ; shift
+    if [[ "X$FILE" = 'X-r' ]] ; then
+        DIR=$1 ; shift
+        FILE=$DIR/$(ruby2.0 -e "puts Dir.entries('$DIR').select {|f| !File.directory? f}.sample")
+    fi
+
+    if [ ! -f "$FILE" ] ; then
+        echo "vlc: file $FILE does not exist" >&2
+        return 1
+    fi
+
+    $VLC "$FILE" 2>&-
+    return 0
+}

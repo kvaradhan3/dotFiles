@@ -1,0 +1,5 @@
+function bcharge() {
+    if [ -x "`whence ioreg`" ] ; then
+        echo `battery_charge zsh_prompt` 2>/dev/null
+    fi
+}

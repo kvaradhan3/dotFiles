@@ -1,0 +1,7 @@
+CHUCKSTER=$HOME/.oh-my-zsh/plugins/chucknorris/fortunes
+if [ -x /usr/games/fortune -o -x /opt/local/bin/games/fortune -o /usr/local/bin/fortune -a -d $CHUCKSTER ]
+then
+    f=$(fortune -a $CHUCKSTER)
+    cowthink $( perl -e 'print(qw(-b -d -g -p -s -t -w -y)[rand(8)])' )  $f
+    sleep $(( (( $(echo $f | wc -c) ) % 8) + 1 ))
+fi

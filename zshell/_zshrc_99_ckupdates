@@ -1,0 +1,38 @@
+if [ ! -t 0 ] ; then
+    return 0
+fi
+
+syst=$(uname -s | tr 'A-Z' 'a-z')
+if [ "x$syst" = 'xlinux' ] ; then
+    if   egrep -i 'ubuntu|debian'      /etc/os-release >/dev/null 2>&1 ; then
+        syst=debian-linux
+    elif egrep -i 'centos|rhel|fedora' /etc/os-release >/dev/null 2>&1 ; then
+        syst=redhat-linux
+    else
+        syst=unknown-linux
+    fi
+fi
+
+case $syst in
+darwin)
+    if [[ $(( $(/usr/bin/stat -Lf %m $0) + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
+        /usr/sbin/softwareupdate -l
+        brew update >/dev/null 2>&-
+        brew outdated
+    fi
+    ;;
+debian-linux)
+    if [[ $(( $(stat -c %Y  $0) + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
+        /usr/lib/update-notifier/apt-check -p
+    fi
+    ;;
+centos-linux)
+    if [[ $(( $(stat -c %Y  $0) + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
+        yum list upgradable
+    fi
+    ;;
+*)
+    print "$(basename $0): unknown system $syst, updates check not done\n" >&2
+    ;;
+esac
+touch -m $0

@@ -1,0 +1,9 @@
+#
+# Options that we care about
+#
+setopt PUSHD_IGNORE_DUPS
+setopt NO_NOMATCH 
+: setopt TYPESET_SILENT
+setopt RM_STAR_SILENT
+setopt AUTO_CONTINUE NOTIFY CLOBBER
+setopt SH_NULLCMD
