@@ -1,4 +1,9 @@
 repos:
+  - repo: meta
+    hooks:
+      - id: identity
+      - id: check-hooks-apply
+      - id: check-useless-excludes
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.17.0
     hooks:
@@ -10,3 +15,10 @@ repos:
         args:
           - --shell=ksh
           - --external-sources
+          - --exclude=SC1091        # ignore `Not following` in container
+        types: []
+        files: |
+          (?x)^(
+            dot\.z.*|
+            zshell/_z.*
+          )
