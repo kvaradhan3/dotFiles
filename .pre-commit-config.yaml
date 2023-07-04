@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.17.0
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.9.0
+    hooks:
+      - id: shellcheck
+        args:
+          - --shell=ksh
+          - --external-sources
