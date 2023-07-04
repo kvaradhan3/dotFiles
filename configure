@@ -35,22 +35,22 @@ SYS="$(uname)"
 #
 case "$SYS" in
     Linux)
-	if [ "$(stat -c %d "$HOME")" -ne "$(stat -c %d "$HERE")" ]
-	then
-	    error repo needs to install in the same file system
-	fi
-	getInode() { stat -c %i "$1" 2>&- ; }
-	;;
+        if [ "$(stat -c %d "$HOME")" -ne "$(stat -c %d "$HERE")" ]
+        then
+            error repo needs to install in the same file system
+        fi
+        getInode() { stat -c %i "$1" 2>&- ; }
+        ;;
     Darwin)
-	if [ "$(stat -f %d "$HOME")" -ne "$(stat -f %d "$HERE")" ]
-	then
-	    error repo needs to install in the same file system
-	fi
-	getInode() { stat -f %i "$1" 2>&- ; }
-	;;
+        if [ "$(stat -f %d "$HOME")" -ne "$(stat -f %d "$HERE")" ]
+        then
+            error repo needs to install in the same file system
+        fi
+        getInode() { stat -f %i "$1" 2>&- ; }
+        ;;
     *)
-	error "Unknown system $SYS"
-	;;
+        error "Unknown system $SYS"
+        ;;
 esac
 
 install() {
@@ -72,7 +72,7 @@ uninstall() {
         if [ -e "$2".ORIG ] ; then
             mv "$2".ORIG "$2"
         fi
-	log "unlink $2 from $1"
+        log "unlink $2 from $1"
     fi
 }
 
@@ -100,17 +100,17 @@ done
 #
 case "$INSTALLOP" in
     install)
-	printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" >"$HOME/.emacs-rc-dir.el"
+        printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" >"$HOME/.emacs-rc-dir.el"
 
-	{
-	    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$HOME"}"
+        {
+            printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$HOME"}"
 
-	    # shellcheck disable=SC2016
-	    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-		   "${HERE}/zshell"
+            # shellcheck disable=SC2016
+            printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+                   "${HERE}/zshell"
 
-	    printf 'setopt NO_NOMATCH;'
-	} > "$HOME/.zinit"
+            printf 'setopt NO_NOMATCH;'
+        } > "$HOME/.zinit"
         ;;
 
     uninstall)
@@ -123,20 +123,20 @@ esac
 #
 case "$SYS" in
     Linux)
-	${INSTALLOP} "$HERE"/fonts "$HOME"/.fonts
-	sudo fc-cache -f -v
-	;;
+        ${INSTALLOP} "$HERE"/fonts "$HOME"/.fonts
+        sudo fc-cache -f -v
+        ;;
     Darwin)
-	FCDIR="$HOME"/Library/Fonts
-	for i in "$HERE"/fonts/*/*.ttf
-	do
-	    if [ ! -f "$i" ]
-	    then
-		break
-	    fi
-	    ${INSTALLOP} "$i" "$FCDIR"/"$(basename "$i")"
-	done
-	;;
+        FCDIR="$HOME"/Library/Fonts
+        for i in "$HERE"/fonts/*/*.ttf
+        do
+            if [ ! -f "$i" ]
+            then
+                break
+            fi
+            ${INSTALLOP} "$i" "$FCDIR"/"$(basename "$i")"
+        done
+        ;;
 esac
 
 #

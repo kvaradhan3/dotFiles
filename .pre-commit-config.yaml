@@ -20,5 +20,6 @@ repos:
         files: |
           (?x)^(
             dot\.z.*|
-            zshell/_z.*
+            zshell/_z.*|
+            configure
           )
