@@ -1,9 +1,31 @@
+#! /bin/zsh
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
 OMZ_BASE="$(antibody list | awk '/ohmyzsh/ { print $NF }')"
 CHUCKSTER=${OMZ_BASE}/plugins/chucknorris
-if [ -x /usr/games/fortune -o -x /opt/local/bin/games/fortune -o /usr/local/bin/fortune -a -d $CHUCKSTER ]
+
+#
+# Check that OM and chuckster exists
+#
+if [ -d "$CHUCKSTER" ]
 then
-    f=$(fortune -a $CHUCKSTER/fortunes)
-    cowthink $( perl -e 'print(qw(-b -d -g -p -s -t -w -y)[rand(8)])' )  $f
-    sleep $(( (( $(echo $f | wc -c) ) % 8) + 1 ))
+    f=$(fortune -a "$CHUCKSTER"/fortunes)
+
+    ##
+    # switch up the cow, say
+    # There are several provided modes which change the appearance of
+    # the cow depending on its particular emotional/physical state.
+    # The -b option initiates Borg mode; -d causes the cow to appear
+    # dead; -g invokes greedy mode; -p causes a state of paranoia to
+    # come over the cow; -s makes the cow appear thoroughly stoned; -t
+    # yields a tired cow; -w is somewhat the opposite of -t, and
+    # initiates wired mode; -y brings on the cow's youthful
+    # appearance.
+    ##
+
+    cowthink "$( perl -e 'print(qw(-b -d -g -p -s -t -w -y)[rand(8)])' )"  "$f"
+    sleep $(( ($#f % 8) + 1 ))
 fi
 

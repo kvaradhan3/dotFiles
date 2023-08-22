@@ -1,21 +1,26 @@
+#! /bin/zsh
+
 typeset +g hours minutes seconds total elapsed
 
 total=$SECONDS
-seconds=$(( $total % 60 ))
-minutes=$(( ( $total / 60 ) % 60 ))
-hours=$((   $total / ( 60 * 60 ) ))
+seconds=$((   total % 60          ))
+minutes=$(( ( total / 60 ) % 60   ))
+hours=$((     total / ( 60 * 60 ) ))
 
-if   [[ $hours   -gt 0 ]] ; then
-    elapsed="${hours}h. ${minutes}m."
-elif [[ $minutes -gt 0 ]] ; then
-    elapsed="${minutes}m. ${seconds}s."
+if   [[ $hours   -gt 0 ]]
+then
+    elapsed="$(printf "%3.2fh. %3.2fm." $hours $minutes)"
+elif [[ $minutes -gt 0 ]]
+then
+    elapsed="$(printf "%3.2fm. $3.2fs." $minutes $seconds)"
 else
     elapsed="${seconds}s."
 fi
 
-print "Shell uptime: $elapsed (${total}s.)"
-repeat $(( (($hours + $minutes + $seconds) % 8) + 1 )) ; do
-    print -nR '.'
+printf "Shell uptime: %s (%.2fs.) " "$elapsed" "$total"
+repeat $(( ((hours + minutes + seconds) % 8) + 1 ))
+do
+    print -n '.\b'
     sleep 1
 done
 print
