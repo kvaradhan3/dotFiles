@@ -1,12 +1,15 @@
+#! /bin/zsh
+
 function deviceHasBattery {
     case $(uname -s) in
     Darwin)
-        return $(ioreg -i | grep "AppleSmartBattery " >/dev/null)
+        ioreg -i | grep "AppleSmartBattery " >/dev/null
         ;;
     Linux)
-        return $(test -d /sys/class/power_supply/BAT0)
+        test -d /sys/class/power_supply/BAT0
         ;;
     esac
+	return $?
 }
 
 function _bat {
@@ -32,7 +35,8 @@ function _bat {
             fi
             ;;
         ExternalConnected|ExternalChargeCapable)
-            if [ -f $PWR/AC/online -a "x$(cat $PWR/AC/online 2>&-)" != 'x0' ] ; then
+            if [ -f $PWR/AC/online ] && 
+			   [ "$(cat $PWR/AC/online 2>&-)" != '0' ] ; then
                 print Yes
             else
                 print No
@@ -56,14 +60,15 @@ function bcharge {
     yel='%F{yellow}'
     reset='%f'
 
-    pwrArrF='\u25b8'	# ▸
-    pwrArrE='\u25b9'	# ▹
-    pwrBlkF='\u25Ae'	# ▮
-    pwrBlkE='\u25AF'	# ▯
-    pwrblkF='\u25A0'	# ■
-    pwrblkE='\u25A1'	# □
-    pwrSymF=$pwrblkF
-    pwrSymE=$pwrblkE
+	declare -A powerSym
+	powerSym["arrow-empty"]='\u25b9'	# ▹
+	powerSym["arrow-full"]='\u25b8'	    # ▸
+	powerSym["block-empty"]='\u25AF'	# ▯
+	powerSym["block-full"]='\u25Ae'	    # ▮
+	powerSym["BLOCK-empty"]='\u25A1'	# □
+	powerSym["BLOCK-full"]='\u25A0'	    # ■
+    pwrSymF=${powerSym["block-full"]}
+    pwrSymE=${powerSym["block-empty"]}
 
     bars=10
 
@@ -75,7 +80,7 @@ function bcharge {
         acEnded="%2G%}"
     fi
 
-    while getopts ia:f:e:b: o
+    while getopts ia:s:b: o
     do  case "$o" in
         i)
             red="\033[31m"
@@ -88,17 +93,15 @@ function bcharge {
         a)  : ac symbol
             acChar_="$OPTARG"
             ;;
-        e)  : power Symbol EMPTY
-            pwrSymE="$OPTARG"
-            ;;
-        f)  : power Symbol FULL
-            pwrSymF="$OPTARG"
+        s)  : power Symbol 
+            pwrSymE=${powerSym["$OPTARG"-"empty"]}
+            pwrSymF=${powerSym["$OPTARG"-"full"]}
             ;;
         b)  : #bars
             bars="$OPTARG"
             ;;
         *)
-            echo "bcharge [-i] [-e SYM] [-f SYM] [-a SYM] [-b #]" >&2
+            echo "bcharge [-i] [-s arrow|block}|BLOCK] [-a SYM] [-b #]" >&2
             return
             ;;
         esac
@@ -112,15 +115,15 @@ function bcharge {
     charge=$(echo "$bars * ${curCap:-0} / ${maxCap:-1}" | bc)
     if   [[ "$charge" -gt $((6 * bars / 10)) ]] ; then
         colour="$grn"		# green  if charge > 60% of bars
-    elif [[ $charge -ge $( expr 4 \* $bars / 10 ) ]] ; then
+    elif [[ $charge -ge $(( 4 * bars / 10 )) ]] ; then
         colour="$yel"		# yellow if charge < 60% of bars and
                                 #           charge > 40% of bars
     else
         colour="$red"		# red    if charge < 40% of bars
     fi
 
-    if [[ $extConn = 'Yes' && $extCharging = 'Yes' ]] ; then
-        ac="${acStart}$(printf $acChar_)${acEnded}"
+    if [[ "$extConn" = 'Yes' && "$extCharging" = 'Yes' ]] ; then
+        ac="${acStart}$(printf "%s" "$acChar_")${acEnded}"
     else
         ac=''
     fi
@@ -131,7 +134,7 @@ function bcharge {
         fmt=$fmt$( printf "%s" "$pwrSymF" )
         i=$((i + 1))
     done
-    while test $i -ne $bars ; do	# fill fmt to rest
+    while test $i -ne "$bars" ; do	# fill fmt to rest
         fmt=$fmt$( printf "%s" "$pwrSymE" )
         i=$((i + 1))
     done
@@ -142,9 +145,12 @@ function bcharge {
  
 if deviceHasBattery ; then
     setopt promptsubst
-    if echo "$RPROMPT" | grep '$(bcharge) ' >/dev/null 2>&1 ; then
-        :
-    else
+
+	# shellcheck disable=SC2016
+	if ! grep '$(bcharge) ' <<<"$RPROMPT" >/dev/null 2>&1
+	then
+
+	    # shellcheck disable=SC2016
         export RPROMPT='$(bcharge) '"$RPROMPT"
     fi
 fi

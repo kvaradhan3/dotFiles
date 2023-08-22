@@ -1,3 +1,5 @@
+#! /bin/zsh
+
 typeset -F SECONDS
 
 prtiming() {
@@ -17,21 +19,21 @@ prtiming() {
     #      'data' using ($3):($0):2 with labels right offset -1
     # pause -1
     #
-    e=$3
-    e=${e:-$SECONDS}
+    e="$3"
+    e="${e:-$SECONDS}"
     if [ -t 0 ] ; then
-        print -f ": %25s\t%8.6f -- %8.6f\t%8.6f\n" $1 $2 $e $(( $e - $2))
+        print -f ": %25s\t%8.6f -- %8.6f\t%8.6f\n" "$1" "$2" "$e" $(( e - $2))
     fi
 }
 
 #
 fpath=(
-        $ZDOTDIR
-        $ZDOTDIR_LOCAL
-        $ZDOTDIR_LOCAL/functions 
-        $HOME/src/zsh-completions/src
-        /usr/local/share/zsh-completions
-        $fpath
+        "$ZDOTDIR"
+        "$ZDOTDIR_LOCAL"
+        "$ZDOTDIR_LOCAL/functions"
+        "$HOME/src/zsh-completions/src"
+        "/usr/local/share/zsh-completions"
+        "${fpath[@]}"
     )
 
 typeset -xTU FPATH fpath :
@@ -41,14 +43,14 @@ autoload -Uz _cdpath
 
 _path    . ..
 _path -p /usr/local
-_path -p $HOME
-# _path -p $(brew --prefix)/opt/python/libexec
-_path -p $(brew --prefix)/opt/ruby
+_path -p "$HOME"
+# _path -p "$(brew --prefix)"/opt/python/libexec
+_path -p "$(brew --prefix)"/opt/ruby
 
 _cdpath
-_cdpath -p . .. $HOME
-_cdpath $HOME/Desktop $HOME/Documents
-_cdpath $HOME/Drives/* $HOME/Drives
+_cdpath -p . .. "$HOME"
+_cdpath "$HOME"/Desktop  "$HOME"/Documents
+_cdpath "$HOME"/Drives/* "$HOME"/Drives
 _cdpath / /Volumes
 
 umask 022

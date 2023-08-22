@@ -1,3 +1,4 @@
+#! /bin/zsh
 #
 # prereqs:
 #   brew install go-jira
@@ -32,11 +33,11 @@ jf() {
 	        R)	JQF+=" AND reporter=$OPTARG" ;;
 	        S)	JQF+=" AND sprint in ${OPTARG}" ;;
             \?) echo "Unknown filter type: $OPTARG" ;
-	        typeset -f $0
+	        typeset -f "$0"
 		;;
         esac
     done
-    printf "%s%s" "$(echo "$JQF" | sed 's/^ AND //')" "$ORD"
+    printf "%s%s" "${JQF/ AND /}" "$ORD"
 }
 
 #
@@ -62,6 +63,7 @@ alias -g .rmine="-R 'currentuser()'"
 spr() {
   SIZE="$(echo "$1" | tr '[:lower:]' '[:upper:]')"
   PRID=$2
+  # shellcheck disable=SC2016
   printf '`PR/%s` %s %s\n' "$SIZE"                             \
          "$(gh pr view --json title --jq '.title' "$PRID")"    \
          "$(gh pr view --json url   --jq '.url'   "$PRID")"
