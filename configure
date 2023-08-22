@@ -1,7 +1,6 @@
 #! /bin/sh
 
 PROGNAME="$(basename "$0")"
-HOME=/tmp/x
 
 usage() {
     printf "Usage: %s [-u]" "$PROGNAME" >&2
@@ -18,44 +17,38 @@ error() {
 }
 
 INSTALLOP=install
-while getopts "u" o; do
+DESTDIR=$HOME
+while getopts "ud:" o; do
     case "${o}" in
         u)  INSTALLOP=uninstall   ;;
+	d)  DESTDIR=$OPTARG       ;;
         *)  usage                 ;;
     esac
 done
 shift $((OPTIND-1))
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-INSTALL=${INSTALL:-install}
 SYS="$(uname)"
 
 #
-# Check
+# Basic checks
 #
 case "$SYS" in
-    Linux)
-	if [ "$(stat -c %d "$HOME")" -ne "$(stat -c %d "$HERE")" ]
-	then
-	    error repo needs to install in the same file system
-	fi
-	getInode() { stat -c %i "$1" 2>&- ; }
-	;;
-    Darwin)
-	if [ "$(stat -f %d "$HOME")" -ne "$(stat -f %d "$HERE")" ]
-	then
-	    error repo needs to install in the same file system
-	fi
-	getInode() { stat -f %i "$1" 2>&- ; }
-	;;
-    *)
-	error "Unknown system $SYS"
-	;;
+    Linux)  STATFMT='--format' ;;
+    Darwin) STATFMT='-format'  ;;
+    *)      error Unknown system "$SYS" ;;
 esac
+if [ "$(stat $STATFMT %d "$DESTDIR")" -ne "$(stat $STATFMT %d "$HERE")" ]
+then
+    error repo needs to install in the same file system
+fi
+getInode() { stat $STATFMT %i "$1" 2>&- ; }
 
+#
+# Utilities to (un)install
+#
 install() {
-    test -e "$2" && mv "$2" "$2".ORIG
-
+    test -e "$2" && mv "$2" "$2".ORIG # backup existing
     if [ -d "$1" ] ; then
         ln -s -f "$1" "$2"
     else
@@ -79,8 +72,8 @@ uninstall() {
 #
 # make shellcheck happy
 #
-install   "$HERE"/no-op "$HOME"/.no-op
-uninstall "$HERE"/no-op "$HOME"/.no-op
+install   "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
+uninstall "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
 
 #
 # Protect the repo first
@@ -90,44 +83,40 @@ pre-commit install --install-hooks
 #
 # dotFiles
 #
+# setup defaults initilization
+printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
+{
+    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
+    # shellcheck disable=SC2016
+    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+	   "${HERE}/zshell"
+    printf 'setopt NO_NOMATCH;'
+} > dot.zinit
+
+mkdir -p "$DESTDIR"
 for i in ./dot.* ; do
-    test ! -e "$i" && break
-    ${INSTALLOP} "$HERE"/"$i" "$HOME"/"${i/dot/}"
+    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/dot/}"
 done
 
 #
-# dot file Initializers
+# binaries
 #
-case "$INSTALLOP" in
-    install)
-	printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" >"$HOME/.emacs-rc-dir.el"
-
-	{
-	    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$HOME"}"
-
-	    # shellcheck disable=SC2016
-	    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-		   "${HERE}/zshell"
-
-	    printf 'setopt NO_NOMATCH;'
-	} > "$HOME/.zinit"
-        ;;
-
-    uninstall)
-        rm -f  "$HOME"/.emacs-rc-dir.el "$HOME"/.zinit
-        ;;
-esac
+mkdir -p "$DESTDIR"/bin
+for i in "$HERE"/bin/*
+do
+    ${INSTALLOP} "$i" "$DESTDIR"/bin/"$(basename "$i")"
+done
 
 #
 # Fonts
 #
 case "$SYS" in
     Linux)
-	${INSTALLOP} "$HERE"/fonts "$HOME"/.fonts
+	${INSTALLOP} "$HERE"/fonts "$DESTDIR"/.fonts
 	sudo fc-cache -f -v
 	;;
     Darwin)
-	FCDIR="$HOME"/Library/Fonts
+	FCDIR="$DESTDIR"/Library/Fonts
 	for i in "$HERE"/fonts/*/*.ttf
 	do
 	    if [ ! -f "$i" ]
@@ -137,15 +126,7 @@ case "$SYS" in
 	    ${INSTALLOP} "$i" "$FCDIR"/"$(basename "$i")"
 	done
 	;;
+    *) : ;;
 esac
-
-#
-# binaries
-#
-mkdir -p "$HOME"/bin
-for i in "$HERE"/bin/*
-do
-    ${INSTALLOP} "$i" "$HOME"/bin/"$(basename "$i")"
-done
 
 exit
