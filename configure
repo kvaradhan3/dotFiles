@@ -65,7 +65,7 @@ uninstall() {
         if [ -e "$2".ORIG ] ; then
             mv "$2".ORIG "$2"
         fi
-	log "unlink $2 from $1"
+        log "unlink $2 from $1"
     fi
 }
 
