@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;; 
 ;; https://dr-knz.net/a-tour-of-emacs-as-go-editor.html
-;; https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
+;; https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
 ;;
 
 ;;; Code:
@@ -66,25 +66,25 @@
                       :weight 'bold)
   )
 
-(use-package go-flymake)
-(use-package go-flycheck)
-(use-package go-errcheck)
+;; (use-package go-flymake)
+;; (use-package go-flycheck)
+;; (use-package go-errcheck)
 
-(use-package flycheck
-  ;;
-  ;; https://www.flycheck.org/en/latest/user/quickstart.html
-  ;;
-  :bind (("C-c ! n"	. flycheck-next-error)
-	 ("C-c ! p"	. flycheck-previous-error)
-	 ("C-c ! l"	. flycheck-list-errors))
-  :config
-  (global-flycheck-mode 1))
+;; (use-package flycheck
+;;   ;;
+;;   ;; https://www.flycheck.org/en/latest/user/quickstart.html
+;;   ;;
+;;   :bind (("C-c ! n"	. flycheck-next-error)
+;; 	 ("C-c ! p"	. flycheck-previous-error)
+;; 	 ("C-c ! l"	. flycheck-list-errors))
+;;   :config
+;;   (global-flycheck-mode 1))
 
-(use-package go-errcheck
-  ;;
-  ;; https://github.com/dominikh/go-errcheck.el
-  ;;
-  )
+;; (use-package go-errcheck
+;;   ;;
+;;   ;; https://github.com/dominikh/go-errcheck.el
+;;   ;;
+;;   )
 
 ;; (use-package lsp-mode
 ;;   :after    go-mode
