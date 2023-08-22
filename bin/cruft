@@ -1,0 +1,69 @@
+#! /bin/sh
+
+CRUFTERS='tenber|gerd|-achin|achin-|kvarad|kannan|pran|hegde|santo|sangu|^b-|^f-|\*-[0-9][0-9]+-\*'
+
+usage() { echo "Usage: $0 [-q] [-x <op>]" 1>&2; exit 1; }
+
+quiet=false
+acton=null
+while getopts ":qx:" o; do
+    case "${o}" in
+        q)  quiet=true      ;;
+        x)  acton=${OPTARG} ;;
+        *)   usage          ;;
+    esac
+done
+shift $((OPTIND-1))
+
+printf ": '>>>' Working on cluster %s\n" $(kubectl config current-context)
+trace() {
+    if $quiet ; then
+        printf "\r: '>>>' %-60s" "$@"
+    else
+        printf ": '>>>' %s\n" "$@"
+    fi
+}
+
+for i in $(kubectl api-resources --namespaced=true -o name 2>&-) ; do
+    if [[ "$i" = 'events' ]] || [[ "$i" = 'events.events.k8s.io' ]] ; then
+        continue # skip events
+    fi
+    trace $i
+    kubectl get $i --all-namespaces 2>&- | awk '
+      BEGIN { 
+          if ("'"$quiet"'" == "true") {
+              println = "\n"
+          } else {
+              println = ""
+          }
+      }
+      /'"$CRUFTERS"'/ { 
+        printf "%s", println
+        println = ""
+        if ("'"$acton"'" != "null") {
+            printf "kubectl -n %-25s %s %s/%s\n", $1, "'"$acton"'", "'"$i"'", $2
+        } else {
+            print $0
+        }
+      }'
+done
+for i in $(kubectl api-resources --namespaced=false -o name 2>&-) ; do
+    trace $i
+    kubectl get $i 2>&- | awk '
+      BEGIN { 
+          if ("'"$quiet"'" == "true") {
+              println = "\n"
+          } else {
+              println = ""
+          }
+      }
+      /"'"$CRUFTERS"'"/ { 
+        printf "%s", println
+        println = ""
+        if ("'"$acton"'" != "null") {
+            printf "kubectl %s %s/%s\n", "'"$acton"'", "'"$i"'", $1
+        } else {
+            print $0
+        }
+      }'
+done

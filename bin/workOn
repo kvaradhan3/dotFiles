@@ -1,0 +1,54 @@
+#! /bin/sh
+
+JIRA="$1" ; shift
+
+master=develop  # the master branch
+
+debug() {
+    echo "$(basename "$0"): " "$@" >&2
+}
+
+#
+# check that we are in the master branch
+#
+if [ "$(git symbolic-ref --short HEAD)" != "$master" ] ; then
+    debug "workspace is not in the $master branch"
+    if [ -z "$(git status --porcelain --untracked-files=no | tail -n 1)" ]; then
+        debug "switching to $master"
+        git co "$master"
+    else
+        debug "stash your changes and switch to $master to start this work"
+        exit 1
+    fi
+fi
+
+if [ $# -eq 0 ] ; then
+    brname="$(jira view --gjq='fields.summary' "$JIRA" | cut -c 1-30 | tr ' .' '--')"
+else
+    brname="$(echo "$*" | tr ' .' '--')"
+fi
+
+#
+# cleanup the branch name.
+#
+brname="$(echo "$brname" | tr -cd '[a-zA-Z0-9]._-')"
+
+#
+# move from backlog
+# 
+debug "$JIRA" ' -> ' "To Do"
+jira todo "$JIRA"
+
+#
+# setup your branch
+#
+debug "Create $JIRA-$brname"
+git co -b "$JIRA"-"$brname"
+
+#
+# move to starting
+#
+debug "$JIRA -> Starting"
+jira start "$JIRA"
+
+exit

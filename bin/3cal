@@ -1,0 +1,26 @@
+#! /bin/sh
+
+mm="$(date +%m)"
+yy="$(date +%G)"
+if [ x$1 = "x-1" ] ; then
+    if [ "$mm" = "01" ] ; then
+        mm=12
+        yy=$(expr $yy - 1)
+    else
+        mm=$(expr $mm - 1)
+        yy=$yy
+    fi
+    shift
+elif [ x$1 = "x+1" ] ; then
+    if [ "$mm" = "12" ] ; then
+        mm=01
+        yy=$(expr $yy + 1)
+    else
+        mm=$(expr $mm + 1)
+        yy=$yy
+    fi
+    shift
+else
+    : nothing
+fi
+ncal -w "$@" $mm $yy

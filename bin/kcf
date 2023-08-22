@@ -1,0 +1,328 @@
+#! /usr/bin/env python3
+
+"""
+kcf
+~~~~~~~~~~~~~~~~
+Maintain kubeConfigs
+
+With no arguments, list all contexts.
+
+Usage:
+    kcf [-f kubeconfig-file] [-w]
+    kcf [-f kubeconfig-file] [-F] -a <file>...
+    kcf [-f kubeconfig-file]      -d <name>...
+    kcf [-f kubeconfig-file]      -s <name>
+    kcf [-f kubeconfig-file] [-r] -x <name>...
+    kcf [-f kubeconfig-file] [-r] -z
+    kcf  -h | --help
+    kcf  -v | --version
+
+Options:
+    -f --file file  Specify alternate kubeconfig file
+                    (default: env[KUBECONFIG] or ~/.kube/config)
+    -a              Add contexts from each file specified
+    -F --Force      force, add even if context is already present.
+    -d              delete contexts by name(s)
+    -s name         set current-context to named context.
+    -x              Extract named contexts into a separate file.
+    -z              Santize contexts for validity
+    -r --remove     Remove extracted or broken contexts from file.
+    -w              List raW
+"""
+import sys
+import os
+
+from pathlib    import Path
+from copy       import deepcopy
+from kubernetes import client, config
+from docopt     import docopt
+
+import yaml
+
+
+VERSION  = '0.2.0'
+progname = Path(sys.argv[0]).stem
+
+class kubeConfigFileError(Exception):
+    def __init__(self, file):
+        self.message = f"kubeconfig file {file} not found"
+
+class kubeConfigContextsError(Exception):
+    def __init__(self, config, context, err=None):
+        self.config  = config
+        self.context = context
+        self.err     = err
+        
+class kubeConfigClustersError(Exception):
+    def __init__(self, config, cluster, err=None):
+        self.config  = config
+        self.cluster = cluster
+        self.err     = err
+        
+class kubeConfigUsersError(Exception):
+    def __init__(self, config, user, err=None):
+        self.config  = config
+        self.user    = user
+        self.err     = err
+        
+def print_in_color(*args, **kwargs):
+    ttyColors = {
+        'red':          "[31m",
+        'grn':          "[32m",
+        'green':        "[32m",
+        'yel':          "[33m",
+        'yellow':       "[33m",
+        'rst':          "[00m",
+        'reset':        "[00m",
+        }
+
+    color = kwargs.pop('color', 'reset')
+    print(ttyColors[color],
+          *args,
+          ttyColors['reset'], **kwargs)
+    
+class kubeConfig:
+    configFile  = f"{ os.getenv('HOME') }/.kube/config"
+    dummyConfig = {
+        'apiVersion':   'v1',
+        'clusters':     [],
+        'contexts':     [],
+        'kind':         'Config',
+        'users':        [],
+        }
+    
+    def __init__(self, cfFile = None, config=None):
+        if not cfFile:
+            cfFile = os.getenv('KUBECONFIG')
+        if not cfFile:
+            cfFile = kubeConfig.configFile
+
+        if not Path(cfFile).is_file():
+            open(cfFile, 'w').close()
+
+        if config is None:
+            with open(cfFile, "r") as fd:
+                config = yaml.safe_load(fd)
+
+        self.configFile     = Path(cfFile)
+        self.Config         = config or kubeConfig.dummyConfig
+        self.currentContext = None
+        
+        self.Context()
+
+    def __iter__(self):
+        self.__contexts = iter(self.Config['contexts'])
+        return self
+
+    def __next__(self):
+        try:
+            c = next(self.__contexts)
+            self.context = c['context']
+            return c['name']
+        except StopIteration:
+            raise
+
+    def Context(self, ctx=None):
+        if self.currentContext is None:
+            self.currentContext = 'current-context' in self.Config and \
+                                  self.Config['current-context']
+        
+        old = self.currentContext
+        if ctx is not None:
+            self.getContext(ctx)
+            self.currentContext = self.Config['current-context'] = ctx
+        return self
+
+    def contexts(self):
+        return [ c['name'] for c in self.Config['contexts'] ]
+    def getContext(self, name):
+        for c in self.Config['contexts']:
+            if c['name'] == name:
+                return c
+        raise kubeConfigContextsError(self.configFile, name)
+
+    def users(self):
+        return [ c['name'] for c in self.Config['users'] ]
+    def getUser(self, name):
+        for c in self.Config['users']:
+            if c['name'] == name:
+                return c
+        raise kubeConfigUsersError(self.configFile, name)
+    
+    def clusters(self):
+        return [ c['name'] for c in self.Config['clusters'] ]
+    def getCluster(self, name):
+        for c in self.Config['clusters']:
+            if c['name'] == name:
+                return c
+        raise kubeConfigClustersError(self.configFile, name)
+
+    def fullContextState(self, name):
+        context = self.getContext(name)
+        ctx     = context['context']
+        user    = self.getUser(ctx['user'])
+        cluster = self.getCluster(ctx['cluster'])
+        return context, cluster, user
+    
+    def list(self, raw):
+        for name in self:
+            if raw:
+                print(name)
+                continue
+            if name == self.currentContext:
+                c = 'green'
+            else:
+                c = 'reset'
+            print_in_color(name, color=c)
+
+    def addEntry(self, context, cluster, user):
+        self.Config['users'].append(deepcopy(user))
+        self.Config['clusters'].append(deepcopy(cluster))
+        self.Config['contexts'].append(deepcopy(context))
+
+    def delEntry(self, name):
+        context, cluster, user = self.fullContextState(name)
+        self.Config['clusters'].remove(cluster)
+        self.Config['users'].remove(user)
+        self.Config['contexts'].remove(context)
+
+    def add(self, *newfs, force=None):
+        """
+            Add contexts passed in the newfs objects
+        """
+        for cfg in newfs:
+            for cname in cfg:
+                if cname in self.contexts():
+                    if not force:
+                        raise kubeConfigContextsError(self.configFile,
+                                                      self.getContext(cname),
+                                                      "duplicate context")
+                    self.delEntry(cname)
+                ctx = cfg.getContext(cname)['context']
+                self.addEntry(cfg.getContext(cname),
+                              cfg.getCluster(ctx['cluster']),
+                              cfg.getUser(ctx['user']))
+        return self
+
+    def delete(self, *contexts):
+        """
+        Delete specified contexts
+        """
+        for cname in contexts:
+            if self.currentContext == cname:
+                self.currentContext = None
+                self.Config.pop('current-context', None)
+            if cname in self.contexts():
+                self.delEntry(cname)
+        return self
+
+    def write(self):
+        fBak = self.configFile.with_suffix('.bak')
+        fNew = self.configFile.with_suffix(".new")
+        
+        try:
+            with fNew.open("w") as fd:
+                yaml.safe_dump(self.Config, stream=fd)
+        except:
+            fNew.unlink()
+            return
+
+        self.configFile.rename(fBak)
+        fNew.rename(self.configFile)
+        self.configFile = fNew
+        return self
+
+    def extract(self, *contexts):
+        """
+        Remove the specified contexts as a separate structure
+        """
+        kConfig = {}
+        for k, v in self.Config.items():
+            if k not in [ 'clusters', 'users', 'contexts', 'current-context']:
+                kConfig[k] = v
+                next
+
+        kConfig['clusters'] = []
+        kConfig['users']    = []
+        kConfig['contexts'] = []
+
+        kConfigNew = kubeConfig(cfFile=self.configFile, config=kConfig)
+        for name in self:
+            if name in contexts:
+                context, cluster, user = self.fullContextState(name)
+                kConfigNew.addEntry(context, cluster, user)
+
+        return kConfigNew
+    
+    def sanitize(self):
+        failed = []
+        for name in self:
+            config.load_kube_config_from_dict(self.Config,
+                                              context=name)
+            v1 = client.CoreV1Api()
+            color='green'
+            try:
+                ret = v1.list_namespace()
+            except KeyboardInterrupt:
+                count = -1
+            except:
+                count = 0
+            else:
+                count = len(ret.items)
+
+            if count < 0:
+                print_in_color(name, color='yellow')
+            elif count:
+                print_in_color(name, color='green')
+            else:
+                failed.append(name)
+                print_in_color(name, color='red')
+        return failed
+
+def main(args):
+    os.umask(0o077)
+    ctx = kubeConfig(cfFile=args['--file'])
+    removeList = []
+    if args['-v'] or args['--version']:
+        print(f'  {progname}: Version {VERSION}')
+        
+#    elif args['-l']:
+#        ctx.list(args['-w'])
+#        
+    elif args['-a']:
+        ctx.add( *[ kubeConfig(cfFile=f) for f in args['<file>'] ],
+                 force=args['--Force'],
+                ).write()
+        
+    elif args['-d']:
+        try:
+            ctx.delete(*args['<name>']).write()
+        except kubeConfigContextsError as e:
+            print(f'Error {e.err} processing context {e.context} in {e.config}')
+            
+    elif args['-s']:
+        try:
+            ctx.Context(ctx=args['-s']).write()
+        except kubeConfigContextsError as e:
+            print(f'Error {e.err} setting context {e.context} in {e.config}')
+            
+    elif args['-x']:
+        kConfigNew = None
+        try:
+            kConfigNew = ctx.extract(*args['<name>'])
+        except kubeConfigContextsError as e:
+            print(f'Error {e.err} processing context {e.context} in {e.config}')
+        yaml.safe_dump(kConfigNew.Config, stream=sys.stdout)
+        removeList = args['<name>']
+        
+    elif args['-z']:
+        removeList = ctx.sanitize()
+        
+    else:
+        ctx.list(args['-w'])
+
+    if args['--remove'] and len(removeList):
+        ctx.delete(*removeList).write()
+        
+if __name__ == "__main__":
+    main(docopt(__doc__, version=VERSION))

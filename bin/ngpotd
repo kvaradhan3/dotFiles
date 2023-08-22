@@ -1,0 +1,46 @@
+#! /usr/bin/env sh
+
+exec 2>&1
+
+# set -x
+
+export PATH=/usr/local/bin:$PATH
+URL=https://www.nationalgeographic.com/photography/photo-of-the-day/
+DATE=$(date +%F)
+
+mkdir -p $HOME/Pictures/potd
+cd $HOME/Pictures/potd
+# rm -f *
+
+eval curl $(curl $URL 2>&- | grep showTitles | jq .endpoint) -o $DATE.json 2>&-
+
+d='[0-9]'
+yyyy='\([0-9][0-9][0-9][0-9]\)'
+yy='\([0-9][0-9]\)'
+mm='\([0-9][0-9]\)'
+dd='\([0-9][0-9]\)'
+
+URI=$(eval echo $(jq .items\[0].image.uri $DATE.json))
+FN=$(basename $URI | sed                                         \
+          -e "s/^pod-$dd-$mm-$yyyy\(.*\)$/pod-\3-\2-\1\4/"    \
+          -e "s/^pod-$yy-$mm-$dd-\(.*\)$/pod-20\1-\2-\3-\4/"  \
+          -e "s/^$yyyy-$mm-$dd\(.*\)$/pod-\1-\2-\3\4/"        \
+          -e "s/^$dd-$mm-$yyyy\(.*\)$/pod-\3-\2-\1\4/")
+
+eval curl $URI -o $FN 2>&-
+CAPTION=$(jq '.items[0].image.caption' $DATE.json)
+mv $DATE.json $(basename $FN .jpg).json
+
+case $(uname -s) in
+Darwin)
+    osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$HOME/Pictures/potd/$FN\""
+    killall Dock
+    ;;
+Linux)
+    gsettings set org.gnome.desktop.background picture-uri "file:///$HOME/Pictures/potd/$FN"
+    ;;
+esac
+echo URI  $(dirname $URI)
+echo FN $FN
+eval echo CAPTION $CAPTION | fmt -w60
+
