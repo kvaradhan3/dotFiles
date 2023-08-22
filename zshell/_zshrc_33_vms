@@ -21,7 +21,7 @@ _vboxlist() {
         for i in "$@" ; do
             args="$args|$i"
         done
-        VBoxManage list vms | egrep -i $args | sed 's/.*{\(.*\)}/\1/'
+        VBoxManage list vms | grep -E -i "$args" | sed 's/.*{\(.*\)}/\1/'
         ;;
     esac
 }
@@ -33,12 +33,12 @@ _vboxuninstalluser() {
 _vboxuninstallroot() {
     sudo rm -rf /Applications/VirtualBox.app
     sudo rm -rf /Library/Applications\ Support/VirtualBox
-    kextstat | awk '/virtualbox/ { print $6 }' | while read x ; do 
-        sudo kextunload -b $x
+    kextstat | awk '/virtualbox/ { print $6 }' | while read -r x ; do
+        sudo kextunload -b "$x"
     done
     sleep 1
-    kextstat | awk '/virtualbox/ { print $6 }' | while read x ; do 
-        sudo kextunload -b $x
+    kextstat | awk '/virtualbox/ { print $6 }' | while read -r x ; do
+        sudo kextunload -b "$x"
     done
     sudo kextcache -prune-staging
 }
@@ -50,7 +50,7 @@ vb() {
         ;;
     .list)  
         shift;
-        _vboxlist $*
+        _vboxlist "$*"
         ;;
     .destroyall)
         _vboxuninstalluser
@@ -61,7 +61,7 @@ vb() {
         VBoxManage internalcommands sethduuid "$@"
         ;;
     *)
-        VBoxManage $*
+        VBoxManage "$*"
         ;;
     esac
 }

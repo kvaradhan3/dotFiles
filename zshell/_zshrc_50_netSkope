@@ -1,60 +1,3 @@
-alias rbi-curl='CURL_CA_BUNDLE=~/.certs /usr/local/opt/curl/bin/curl -v \
-        		-H "X-authenticated-user: cert-validator" 	\
-        		-H "X-ns-ext-tenant-id: borkborkbork" 		\
-        		-H "X-ns-ext-browser-id: cheese"'
-
-homebrew() {
-    echo export HOMEBREW_GITHUB_API_TOKEN=$(1p-getpass                   \
-                                            -a netskope                  \
-                                            GITHUB:HOMEBREW_GITHUB_API_TOKEN
-                                           )
-}
-
-
-prod() {
-    NSK=$HOME/.nsk
-    if [ x$1 == 'x-k' ] ; then
-        NSK=$HOME/.kube
-        shift
-    fi
-    kubeconfig=
-    listconfig=
-    if [ x$1 != 'x' ] ; then
-        if [ $NSK/*$1* ] 2>/dev/null ; then
-            kubeconfig=$(echo $NSK/*$1*)
-        else
-            for i in "$@" ; do
-                listconfig="$listconfig $(eval echo $NSK/*${i}*)"
-            done
-        fi
-    elif  [ -f "$KUBECONFIG" ] 2>/dev/null ; then
-        kubeconfig=$KUBECONFIG
-    # elif [ -f $NSK/config ] 2>/dev/null ; then
-    #     kubeconfig=$NSK/config
-    else
-        listconfig="$(eval echo $NSK/*.yaml)"
-    fi
-
-    if [ x$kubeconfig != x ] ; then
-        if [ $# -gt 1 ] ; then
-            shift
-            KUBECONFIG=$kubeconfig "$@"
-        else
-            export KUBECONFIG=$kubeconfig
-            kcf
-            exec $SHELL
-        fi
-    elif [ x$listconfig != x ] ; then
-        for i in $(eval echo $listconfig) ; do
-            echo $i | sed "s^$NSK/\(.*\).yaml^\t\1^g"
-        done
-    else
-        for i in $NSK/*.yaml ; do
-            echo $i | sed "s^$NSK/\(.*\).yaml^\t\1^g"
-        done
-    fi
-}
-
 vpn() {
     if [ "x$1" != 'x' ] ; then
         vpn="NetSkope $1 CLI"
@@ -81,19 +24,22 @@ vpn() {
                 "
     echo -n "Connecting to $vpn "
     networksetup -connectpppoeservice "$vpn"
+    cnt=0
+    # shellcheck disable=SC2034
     for i in 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 ; do
         vpnint=$(scutil --nc status "$vpn" | awk '/InterfaceName/ {print $3}')
-        if echo $vpnint | grep -q "ppp"; then
+        if echo "$vpnint" | grep -q "ppp"; then
             echo
-            for net in $(eval echo $officenets); do
-                sudo route add -net $net -interface $vpnint
+            for net in $(eval echo "$officenets"); do
+                sudo route add -net "$net" -interface "$vpnint"
             done
             return
         fi
         echo -n "."
         sleep 1
+	cnt=$(( cnt + 1 ))
     done
-    echo -e "\nCould not establish VPN in $cnt seconds: $vpn"
+    echo -e "\nCould not establish VPN in ${cnt}s.: $vpn"
 }
 
 export GOPRIVATE=github.com/netskope,github.com/netSkopePlatformEng,github.com/netskope-qe

@@ -1,11 +1,12 @@
-#
+#! /bin/zsh
+
 unalias -m '*'
 
 # some useful aliases
 alias c='clear'
 alias h='fc -l'
 alias jo='jobs -l'
-alias m=$PAGER
+alias m='$PAGER'
 
 export CLICOLOR=
 alias ls='ls -F'
@@ -42,4 +43,4 @@ export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,
 #
 # Functions
 #
-catmd() { pandoc "$@" | lynx -stdin }
+catmd() { pandoc "$@" | lynx -stdin ; }
