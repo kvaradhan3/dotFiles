@@ -45,6 +45,8 @@ then
         zsh-users/zsh-autosuggestions
         zsh-users/zsh-syntax-highlighting
         zsh-users/zsh-history-substring-search
+
+        kvaradhan3/dotFiles path:zshell/plugins/nskc
 PLUGINS_LIST
 fi
 
