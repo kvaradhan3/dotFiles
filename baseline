@@ -1,0 +1,51 @@
+#! /bin/sh
+
+log() { echo $(date +%FT%T) "$(basename $0):" "$@" >&2 ; }
+
+# make sure you are home
+cd $HOME
+
+log install homebrew and basic tools
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# chicken, meet egg.
+git clone git@github.com:kvaradhan3/dotFiles.git .rc &&
+    ( cd .rc ; ./configure )
+
+# move brew to Brewfile, generated as 
+#
+# % brew bundle dump --force
+#
+brew bundle 
+brew bundle cleanup
+
+rm -f -r /Library/Caches/Homebrew/*
+
+# this work is partial
+log os defaults
+defaults write com.apple.finder AppleShowAllFiles   -string YES
+defaults write com.apple.finder QuitMenuItem        -bool true
+
+defaults write com.apple.dock   autohide                         -bool true
+defaults write com.apple.dock   magnification                    -bool true
+defaults write com.apple.dock   minimize-to-application          -bool true
+defaults write com.apple.dock   largesize                        -float 72
+defaults write com.apple.dock   showMissionControlGestureEnabled -bool true
+defaults write com.apple.dock   wvous-bl-corner			 -int  5
+defaults write com.apple.dock   wvous-br-corner			 -int  6
+
+defaults write com.apple.AppleMultitouchTrackpad                    \
+                                Clicking                         -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad   \
+                                Clicking                         -bool true
+defaults write org.cups.PrintingPrefs UseLastPrinter             -bool False
+
+/Applications/RDM.app/Contents/MacOS/SetResX -w 2880 -h 1800 -s 2.0
+
+killall Finder
+killall Dock
+
+nvram boot-args='-v'
+
+
+exit
