@@ -1,0 +1,266 @@
+endpoint: https://netskope.atlassian.net
+user: kvaradhan
+login: kvaradhan@netskope.com
+password-source: keyring
+editor: /usr/local/bin/emacsclient -c -n -t -a ''
+source: https://github.com/go-jira/jira
+api-source: https://id.atlassian.com/manage-profile/security/api-tokens
+
+queries:
+  todo: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND status = 'To Do'
+    order by created ASC
+  open: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND status = 'Open'
+    order by created ASC
+  mine: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND assignee=currentuser()
+    order by created ASC
+  myOpened: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND reporter=currentuser()
+    order by created ASC
+  curSprint: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND sprint in openSprints()
+    order by created ASC
+  nextSprint: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND sprint in futureSprints()
+    order by created ASC
+  ngIssues: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND labels in (new-obs-repo)
+    order by created ASC
+  ngEpics: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND labels in (new-obs-repo)
+    AND issueType = Epic
+    order by created ASC
+  inactive: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND updated <= "-300d"
+    order by created ASC
+  watching: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND watcher = currentUser()
+    ORDER BY priority DESC, updated DESC
+
+custom-commands:
+  - name: info
+    help: print the JIRA envorinment variables available to custom commands
+    options:
+      - name: project
+        short: p
+        default: $JIRA_PROJECT
+    script: |
+      env | grep JIRA | grep -v -E 'JIRA_CUSTOM_COMMANDS|JIRA_QUERIES' | sort
+      jq . <<<$JIRA_QUERIES
+      if [ "{{options.project}}" != '' ] && [ "{{options.project}}" != '<no value>' ]
+      then
+        boardJson=$({{jira}} req \
+                    "/rest/agile/1.0/board?projectKeyOrId={{options.project}}" \
+                    --gjq values.0)
+        boardId=$(echo "$boardJson" | jq -r '.id')
+        jq -r '[ .location.projectKey, .name, .location.name, .id ] |
+               @csv' <<<$boardJson                                  | \
+          column -s, -t
+        sprintJson=$({{jira}} req \
+                     "/rest/agile/1.0/board/$boardId/sprint?state=active" \
+                     --gjq values.0)
+        if [ -n "$sprintJson" ] ; then
+          printf "* %-20s start: %s end: %s\t%s\n"         \
+            "$(jq .name      <<<$sprintJson)"              \
+            "$(jq .startDate <<<$sprintJson | cut -c1-11)" \
+            "$(jq .endDate   <<<$sprintJson | cut -c1-11)" \
+            "$(jq .id        <<<$sprintJson)"
+        fi
+        sprintJson=$({{jira}} req \
+                     "/rest/agile/1.0/board/$boardId/sprint?state=future" \
+                     --gjq values.0)
+        if [ -n "$sprintJson" ] ; then
+          printf "  %-20s start: %s end: %s\t%d\n"         \
+            "$(jq .name      <<<$sprintJson)"              \
+            "$(jq .startDate <<<$sprintJson | cut -c1-11)" \
+            "$(jq .endDate   <<<$sprintJson | cut -c1-11)" \
+            "$(jq .id        <<<$sprintJson)"
+
+        fi
+      fi
+
+  - name: fixed
+    help: Transition issue to 'Problem fixed & merged' state (OBS specific)
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    script: >-
+      {{range args.ISSUE}}
+      {{jira}} transition 'Problem fixed & merged' {{.}} --noedit
+      {{end}}
+
+  - name: closed
+    help: Transition issue to close state (OBS specific)
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    script: >-
+      {{range args.ISSUE}}
+      {{jira}} transition 'Fix accepted by reporter' {{.}} --noedit
+      {{end}}
+
+  - name: no
+    help: Transition issue to wont-do state (OBS specific)
+    aliases: [ nix, wontdo, wont-do, wontfix, wont-fix ]
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    script: >-
+      {{range args.ISSUE}}
+      {{jira}} transition "WON'T FIX" {{.}} --noedit
+      {{end}}
+
+  - name: sprint add
+    help: add issue to active sprint for project
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    options:
+      - name: project
+        short: p
+        default: $JIRA_PROJECT
+      - name: future
+        short: f
+        default: false
+        type: BOOL
+    script: |
+      board_id=$({{jira}} req                                                \
+                 "/rest/agile/1.0/board?projectKeyOrId={{options.project}}"  \
+                 --gjq values.0.id)
+      if {{options.future}} ; then
+        sprint_id=$({{jira}} req                                             \
+                  "/rest/agile/1.0/board/$board_id/sprint?state=future"      \
+                  --gjq values.0.id)
+      else
+        sprint_id=$({{jira}} req                                             \
+                  "/rest/agile/1.0/board/$board_id/sprint?state=active"      \
+                  --gjq values.0.id)
+      fi
+      {{jira}} req -M POST "/rest/agile/1.0/sprint/$sprint_id/issue"         \
+          '{"issues":[{{range $idx, $issue := args.ISSUE -}}
+                      {{if $idx}},{{end}} "{{$issue}}"
+                      {{- end }} ]}'
+
+  - name: sprint list
+    help: list issues in a sprint (default active)
+    default: true
+    options:
+      - name: project
+        short: p
+        default: $JIRA_PROJECT
+      - name: future
+        short: f
+        type: BOOL
+        default: false
+      - name: all
+        short: a
+        type: BOOL
+    script: |
+      {{with options}}
+      if {{.future}} ; then
+        {{jira}} list {{if .project}}-p {{.project}}{{end}} -n nextSprint
+      else
+        {{jira}} list {{if .project}}-p {{.project}}{{end}} -n curSprint
+      fi
+      {{end}}
+
+  - name: sprint delete
+    help: delete issue from active sprint for project
+    aliases:
+      - mv
+      - move
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    script: |
+      {{jira}} req -M POST "/rest/agile/1.0/backlog/issue"            \
+          '{"issues":[{{range $idx, $issue := args.ISSUE -}}
+                      {{if $idx}},{{end}} "{{$issue}}"
+                      {{- end }} ]}'
+
+  - name: mine
+    help: list issues that are are assigned to me
+    options:
+      - name: project
+        short: p
+    script: |
+      {{with options}}
+      {{jira}} list {{if .project}}-p {{.project}}{{end}} -n mine
+      {{end}}
+
+  - name: reporter-is-me
+    help: list issues that are are reported by me
+    options:
+      - name: project
+        short: p
+    script: |
+      {{with options}}
+      {{jira}} list {{if .project}}-p {{.project}}{{end}} -n myOpened
+      {{end}}
+
+  - name: history
+    help: show the issue history for a ticket
+    aliases:
+      - h
+    args:
+      - name: ISSUE
+        required: true
+    options:
+      - name: count
+        short: c
+    script: |
+      {{jira}} req "/rest/api/2/issue/{{args.ISSUE}}?expand=changelog" \
+      --template history
+
+  - name: ls-named-query-fzf
+    aliases:
+      - lf
+    help: ls with named queries using fzf interface
+    args:
+      - name: query
+    script: |
+      {{jira}} ls -n {{args.query}}     | \
+        fzf --header-lines=1              \
+            --preview="echo {1} | xargs -I % sh -c 'jira view %'"
+
+  - name: ls-by-key
+    aliases:
+      - lk
+    help: ls using simply keys
+    args:
+      - name: ISSUE
+        required: true
+        repeat: true
+    script: |
+      {{jira}} ls -q "key in ( 
+        {{- range $idx, $issue := args.ISSUE -}}
+        {{- if $idx}},{{end -}}
+        {{- $issue }} {{end -}}
+        )"

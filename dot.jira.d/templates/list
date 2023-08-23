@@ -1,0 +1,10 @@
+_Ticket_  Type   Status {{ "    __ Summary __" | printf "%-50s"}}   {{ "__ Owner __" }}
+{{ range .issues -}}
+  {{ .key | printf "%8s" }}{{ "  " -}}
+  {{ .fields.issuetype.name | fit 5 }}{{ "  " -}}
+  {{ if .fields.status }}{{ .fields.status.name | fit 6 -}}
+  {{ else }}{{ "      " }}{{ end }}{{ " " -}}
+  {{ .fields.summary | fit 50 }}{{ "  " -}}
+  {{ if .fields.assignee }}{{ .fields.assignee.displayName | fit 12 -}}
+  {{ else }}{{ "  ---  " }}{{ end }}
+{{ end }}

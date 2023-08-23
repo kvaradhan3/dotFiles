@@ -1,0 +1,30 @@
+The config here requires installing go-jira, found here:
+
+https://github.com/go-jira/jira
+
+You also need to get and install an API key for yourself, from here:
+https://id.atlassian.com/manage-profile/security/api-tokens
+
+
+# New Experiments TBD
+sprints:
+
+- name: cstory
+  help: creates a story in the given project
+  options:
+    - name: project
+      short: p
+      default: $JIRA_PROJECT
+    - name: description
+      short: d
+      default: ""
+  args:
+    - name: summary
+      required: true
+  script: |-
+    {{jira}} create --issuetype=Story \
+	  -o summary="{{args.summary}}" \
+	    -o description="{{options.description}}" \
+		  --noedit --saveFile /tmp/cstory.yml
+    issue=$(grep issue /tmp/cstory.yml | awk '{print $2}')
+    {{jira}} assign $issue $USER

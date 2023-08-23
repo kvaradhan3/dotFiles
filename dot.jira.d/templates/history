@@ -1,0 +1,7 @@
+{{range .changelog.histories -}}
+{{.created | fit 16 -}}
+{{" "}}{{.author.displayName | fit 12 -}}
+{{" "}}{{range .items -}}
+{{" "}} {{.field | printf "%12s"}} {{.fromString | printf "%10s" | fit 10 }} -> {{.toString -}}
+{{end}}
+{{end}}

@@ -1,0 +1,50 @@
+{{/* view template */ -}}
+issue: {{ .key }} {{ .fields.summary | fit 60 }}
+{{if .fields.parent -}}
+    {{ "    Parent Epic:" }}
+    {{- " " }}{{ .fields.parent.key }}
+    {{- " " }}{{ .fields.parent.fields.summary | fit 60 }}
+{{end -}}
+{{if or .fields.issuetype .fields.status -}}
+status:{{ if .fields.issuetype -}}
+{{ " " }}{{ .fields.issuetype.name -}}
+{{ end }}{{ if .fields.status -}}
+{{ " " }}{{ .fields.status.name }}
+{{end -}}
+{{end -}}
+{{if .fields.created -}}
+created: {{ .fields.created | age }} ago
+{{end -}}
+{{if .fields.components -}}
+components: {{ range .fields.components }}{{ .name }} {{end}}
+{{end -}}
+{{if .fields.assignee -}}
+assignee: {{ .fields.assignee.displayName }}
+{{end -}}
+reporter: {{ if .fields.reporter }}{{ .fields.reporter.displayName }}{{end}}
+{{if .fields.customfield_10110 -}}
+watchers: {{ range .fields.customfield_10110 }}{{ .displayName }} {{end}}
+{{end -}}
+{{if .fields.issuelinks -}}
+blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
+depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
+{{end -}}
+{{if .fields.priority -}}
+priority: {{ .fields.priority.name }}
+{{end -}}
+{{if .fields.labels -}}
+labels: [ {{ join " " .fields.labels }} ]
+{{end -}}
+{{/* if .fields.customfield_14200 -}}
+{{ .fields.customfield_14200 | .pullrequest.state: , .pullrequest.stateCount }}
+{{end */ -}}
+description: |
+  {{ or .fields.description "" | regReplace "\n\n+" "\n\n" | wrap 70 | indent 2 }}
+
+{{if .fields.comment.comments}}
+comments:
+{{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
+    {{ or .body "" | regReplace "\n\n+" "\n\n" | wrap 60 | indent 4}}
+
+{{end}}
+{{end -}}
