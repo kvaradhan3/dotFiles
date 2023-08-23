@@ -6,10 +6,12 @@ fi
 
 syst=$(uname -s | tr '[:upper:]' '[:lower:]')
 if [ "$syst" = 'linux' ] ; then
-    if   grep -E -i 'ubuntu|debian'      /etc/os-release >/dev/null 2>&1 ; then
+    if   grep -E -i 'ubuntu|debian'  /etc/os-release >/dev/null 2>&1 ; then
         syst=debian-linux
     elif grep -E -i 'centos|rhel|fedora' /etc/os-release >/dev/null 2>&1 ; then
         syst=redhat-linux
+    elif grep -E -i 'archlinux'      /etc/os-release >/dev/null 2>&1 ; then
+        syst=arch-linux
     else
         syst=unknown-linux
     fi
@@ -23,18 +25,24 @@ darwin)
         brew outdated
     fi
     ;;
-debian-linux)
+*-linux)
     if [[ $(( $(stat --format %Y  "$0") + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
-        /usr/lib/update-notifier/apt-check -p
+        case $syst in
+            debian-*)
+                /usr/lib/update-notifier/apt-check -p
+                ;;
+            centos-*)
+                yum list upgradable
+                ;;
+            arch-*)
+                paclist AUR | aur vercmp
+                checkupdates
+                ;;
+            *)
+                print "$(basename "$0"): unknown system $syst, updates check not done\n" >&2
+                ;;
+        esac
     fi
-    ;;
-centos-linux)
-    if [[ $(( $(stat --format %Y  "$0") + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
-        yum list upgradable
-    fi
-    ;;
-*)
-    print "$(basename "$0"): unknown system $syst, updates check not done\n" >&2
     ;;
 esac
 touch -m "$0"
