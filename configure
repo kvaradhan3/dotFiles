@@ -3,7 +3,9 @@
 PROGNAME="$(basename "$0")"
 
 usage() {
-    printf "Usage: %s [-u]" "$PROGNAME" >&2
+    printf "Usage: %s [-r] [-u]" "$PROGNAME"                      >&2
+    print  "  -r    refresh contents, dont mess with .ORIG files" >&2
+    print  "  -u    uninstall"                                    >&2
     exit 1
 }
 
@@ -18,14 +20,19 @@ error() {
 
 INSTALLOP=install
 DESTDIR=$HOME
-while getopts "ud:" o; do
+DEBUG=false
+REFRESH=false
+while getopts "Drud:" o; do
     case "${o}" in
         u)  INSTALLOP=uninstall   ;;
-	d)  DESTDIR=$OPTARG       ;;
+        d)  DESTDIR=$OPTARG       ;;
+        r)  REFRESH=true          ;;
+        D)  DEBUG=true            ;;
         *)  usage                 ;;
     esac
 done
 shift $((OPTIND-1))
+$DEBUG && INSTALLOP='echo'
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SYS="$(uname)"
@@ -48,7 +55,13 @@ getInode() { stat $STATFMT %i "$1" 2>&- ; }
 # Utilities to (un)install
 #
 install() {
-    test -e "$2" && mv "$2" "$2".ORIG # backup existing
+    if [ -e "$2" ] ; then
+        $REFRESH && {
+            log skip "$2"
+            return
+        }
+        mv "$2" "$2".ORIG # backup existing
+    fi
     if [ -d "$1" ] ; then
         ln -s -f "$1" "$2"
     else
@@ -89,13 +102,34 @@ printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
     printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
     # shellcheck disable=SC2016
     printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-	   "${HERE}/zshell"
+           "${HERE}/zshell"
     printf 'setopt NO_NOMATCH;'
 } > dot.zinit
 
 mkdir -p "$DESTDIR"
 for i in ./dot.* ; do
-    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/dot/}"
+    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/.\/dot/}"
+done
+
+mkdir -p "$DESTDIR/.config"
+for i in ./dotConfig/* ; do
+    ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
+done
+
+#
+# This is a one-off
+#
+mkdir -p "$DESTDIR"/.emacs.d/lib
+${INSTALLOP} "$HERE"/dotEmacs.d/lib/fonts "$DESTDIR"/.emacs.d/lib/fonts
+
+#
+# These dot files contain configs and secrets.  Only link the 
+# configs individually.
+#
+find ./safeLink/dot.* -type f | while read -r fil ; do
+    rfil="${fil/.\/safeLink\/dot/}"
+    mkdir -p "$(dirname "$DESTDIR/$rfil")"
+    ${INSTALLOP} "$HERE/${fil/.\//}" "$DESTDIR/$rfil"
 done
 
 #
@@ -110,23 +144,25 @@ done
 #
 # Fonts
 #
+# brew install
+#   font-alegreya
+#   font-alegreya-sans-sc
+#   font-alegreya-sans
+#   font-alegreya-sc
+#   font-anonymous-pro
+#   font-atkinson-hyperlegible
+#   font-awesome-terminal-fonts
+#   font-fontawesome
+#   font-hack-nerd-font
+#   font-lato
+#   font-source-sans-3
+#   font-source-serif-4
+#   font-source-code-pro
+#
+
 case "$SYS" in
-    Linux)
-	${INSTALLOP} "$HERE"/fonts "$DESTDIR"/.fonts
-	sudo fc-cache -f -v
-	;;
-    Darwin)
-	FCDIR="$DESTDIR"/Library/Fonts
-	for i in "$HERE"/fonts/*/*.ttf
-	do
-	    if [ ! -f "$i" ]
-	    then
-		break
-	    fi
-	    ${INSTALLOP} "$i" "$FCDIR"/"$(basename "$i")"
-	done
-	;;
-    *) : ;;
+    Linux)  ;;
+    Darwin) brew bundle install ;;
 esac
 
 exit

@@ -28,9 +28,10 @@ rc.xml
 .uuid
 oh-my-zsh
 
+dot.emacs-rc-dir.el
+dot.zinit
+
 #
 # Exercise care in pushing up ssh
 # 
 id_*
-known_hosts*
-.known_hosts*
