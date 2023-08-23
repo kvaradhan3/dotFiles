@@ -1,0 +1,52 @@
+#!
+
+
+Partitions:
+- EFI 1G
+- /   128G
+- /var 128G
+- /home 512G
+- /data rest (162.5G)
+
+On boot, link:
+iwctl
+# station wlan0 scan
+# station wlan0 get-networks
+# station wlan0 connect "idli vadai sambhar"
+
+timedatectl
+
+format all partitions and mount them
+
+# mkfs.fat -F 32 /dev/efi_system_partition
+# mkfs.ext4 /dev/root_partition
+
+# dd if=/dev/zero of=/swapfile bs=1M count=8k status=progress
+# chmod 0600 /swapfile
+# mkswap -U clear /swapfile
+# swapon /swapfile
+
+# mount --mkdir /dev/efi_system_partition /mnt/boot
+
+
+BASE INSTALL
+# pacstrap -K /mnt base linux linux-firmware git sudo refind
+
+# genfstab -U /mnt >> /mnt/etc/fstab
+# arch-chroot /mnt
+# ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+# hwclock --systohc
+
+refind-install
+hostname
+passwd
+user
+
+
+
+
+swapoff -a
+cd /
+umount -R /mnt
+reboot
+

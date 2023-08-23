@@ -35,3 +35,7 @@ dot.zinit
 # Exercise care in pushing up ssh
 # 
 id_*
+
+
+Brewfile.lock*
+
