@@ -1,0 +1,10 @@
+[container]
+cluster = gke-observability-prod-us-west1
+
+[core]
+account = kvaradhan@goskope.com
+project = obs-prism-prod
+
+[compute]
+region = us-west1
+

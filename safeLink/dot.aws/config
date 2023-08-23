@@ -1,0 +1,5 @@
+[profile wootcloud-prism-stg]
+region = us-west-2
+output = json
+role_arn = arn:aws:iam::286501683088:role/prism-migration-sa
+source_profile = prism

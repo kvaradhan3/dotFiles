@@ -1,0 +1,11 @@
+[core]
+project = observability
+disable_usage_reporting = False
+account = kvaradhan@netskope.com
+
+[compute]
+region = us-central1
+
+[container]
+cluster = xrayprism
+
