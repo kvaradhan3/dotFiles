@@ -1,0 +1,8 @@
+PS1 ('\t \! >> ')
+#
+# mac aquaterm plotting crashes octave.  Use X instead.
+#
+setenv ("GNUTERM", "qt")
+set(gca, 'fontname', 'SF Mono,12')
+gnuplot_binary("/usr/local/bin/gnuplot")
+graphics_toolkit('gnuplot')
