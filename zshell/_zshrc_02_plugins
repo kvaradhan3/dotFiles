@@ -1,0 +1,104 @@
+#! /bin/zsh
+# shellcheck disable=SC2086,SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+# shellcheck disable=SC2034
+COMPLETION_WAITING_DOTS="true"
+
+autoload -Uz compaudit compinit zrecompile
+compinit
+
+source /usr/local/opt/antidote/share/antidote/antidote.zsh
+if ! [[ -f ~/.zsh_plugins.zsh ]] ||
+   ! antidote path ohmyzsh/ohmyzsh >/dev/null 2>&1
+then
+    antidote bundle <<PLUGINS_LIST >~/.zsh_plugins.zsh
+    	ohmyzsh/ohmyzsh path:lib/git.zsh
+        ohmyzsh/ohmyzsh path:lib/correction.zsh
+        ohmyzsh/ohmyzsh path:lib/completion.zsh
+        ohmyzsh/ohmyzsh path:lib/compfix.zsh
+
+        ohmyzsh/ohmyzsh path:plugins/git
+    	ohmyzsh/ohmyzsh path:plugins/brew
+        ohmyzsh/ohmyzsh path:plugins/aws
+    	ohmyzsh/ohmyzsh path:plugins/gcloud
+    	ohmyzsh/ohmyzsh path:plugins/tmux
+    	ohmyzsh/ohmyzsh path:plugins/docker
+    	ohmyzsh/ohmyzsh path:plugins/vagrant
+    	ohmyzsh/ohmyzsh path:plugins/chucknorris
+    	ohmyzsh/ohmyzsh path:plugins/helm
+    	ohmyzsh/ohmyzsh path:plugins/kubectl
+    	ohmyzsh/ohmyzsh path:plugins/1password
+
+    	wting/autojump  path:bin/autojump.sh
+
+        zsh-users/zsh-completions
+        zsh-users/zsh-autosuggestions
+        zsh-users/zsh-syntax-highlighting
+        zsh-users/zsh-history-substring-search
+PLUGINS_LIST
+fi
+
+# Initialize a few things that OMZ did for you nicely...
+ZSH="$(antidote path ohmyzsh/ohmyzsh)"
+ZSH_CACHE_DIR=~/Library/Caches/zshell
+
+# ensure completions dir
+mkdir -p $ZSH_CACHE_DIR/completions
+
+(( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || \
+    fpath=("$ZSH_CACHE_DIR/completions" "${fpath[@]}")
+
+# source <(antibody init)
+
+#shellcheck source=/Users/kvaradhan/.zsh_plugins.zsh
+source ~/.zsh_plugins.zsh
+
+# shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
+source "${0:h}"/themes/gitsy.zsh-theme
+
+# Save the location of the current completion dump file.
+if [[ "$OSTYPE" = darwin* ]]; then
+  # macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
+  SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST="${HOST/.*/}"
+else
+  SHORT_HOST="${HOST/.*/}"
+fi
+
+if [[ -z "$ZSH_COMPDUMP" ]]; then
+  ZSH_COMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
+fi
+
+# Construct zcompdump OMZ metadata
+zcompdump_revision="#omz revision: $(builtin cd -q "$ZSH" || true; git rev-parse HEAD 2>/dev/null)"
+zcompdump_fpath="#omz fpath: ${fpath[*]}"
+if ! command grep -q -Fx "$zcompdump_revision" "$ZSH_COMPDUMP" 2>/dev/null \
+   || ! command grep -q -Fx "$zcompdump_fpath" "$ZSH_COMPDUMP" 2>/dev/null; then
+  command rm -f "$ZSH_COMPDUMP"
+  zcompdump_refresh=1
+fi
+
+compinit -i -d "$ZSH_COMPDUMP"
+
+# Append zcompdump metadata if missing
+if (( zcompdump_refresh )) \
+  || ! command grep -q -Fx "$zcompdump_revision" "$ZSH_COMPDUMP" 2>/dev/null; then
+  # Use `tee` in case the $ZSH_COMPDUMP filename is invalid, to silence the error
+  # See https://github.com/ohmyzsh/ohmyzsh/commit/dd1a7269#commitcomment-39003489
+  tee -a "$ZSH_COMPDUMP" &>/dev/null <<EOF
+
+$zcompdump_revision
+$zcompdump_fpath
+EOF
+fi
+unset zcompdump_revision zcompdump_fpath zcompdump_refresh
+
