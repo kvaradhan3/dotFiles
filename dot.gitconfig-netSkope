@@ -1,0 +1,9 @@
+[user]
+	name = Kannan Varadhan
+	email = kvaradhan@netskope.com
+
+[github]
+	user = ns-kvaradhan
+
+[core]
+    sshCommand = "ssh -i ~/.ssh/id_ed25519_netSkope"

@@ -1,0 +1,22 @@
+[user]
+	name = Kannan Varadhan
+
+[push]
+	default = simple
+
+[alias]
+	lo = log --oneline --decorate --graph
+	co = checkout
+	sw = switch
+    br = branch
+	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+[includeIf "gitdir:~/src/netSkope/"]
+    path = ~/.gitconfig-netSkope
+
+[includeIf "gitdir:~/src/Personal/"]
+    path = ~/.gitconfig-personal
+

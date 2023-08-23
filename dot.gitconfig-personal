@@ -1,0 +1,12 @@
+[user]
+	name = Kannan Varadhan
+	email = kannan@ieee.org
+
+[github]
+	user = kvaradhan3
+
+[core]
+	sshCommand = "ssh -i ~/.ssh/id_ed25519_personal"
+
+[push]
+	autoSetupRemote = "true"
