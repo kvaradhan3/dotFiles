@@ -21,50 +21,50 @@ function _nskc_cluster_list {
                 nsk cluster list -n "$i"
             done
         fi | sed 's/  *,/g' | cut -d, -f1-4
-	)}"
+        )}"
     return _ncl
 }
 
 function _nskc_cluster_kubeconfig {
     if ! (( $# )) ; then
-	set -- `kcf`
+        set -- `kcf`
     fi
 
     for i in "$@" ; do
-	OUTFILE=$(mktemp /tmp/"$i"-XXXXXX)
-	nsk cluster kubeconfig -n "$i" --dest $OUTFILE
-	kcf -a -F $OUTFILE
-	rm -f $OUTFILE
+        OUTFILE=$(mktemp /tmp/"$i"-XXXXXX)
+        nsk cluster kubeconfig -n "$i" --dest $OUTFILE
+        kcf -a -F $OUTFILE
+        rm -f $OUTFILE
     done
 }
 
-function _nskc {
+function nskc {
     if [[ $# == 0 ]]; then
-	cmd=usage
+        cmd=usage
     else
-	cmd=$1 ; shift
+        cmd=$1 ; shift
     fi
 
     if [ "$1" = "prod" ] ; then
-	export NSK_PROFILE=prod
-	shift
+        export NSK_PROFILE=prod
+        shift
     fi
 
     case $cmd in
-	l|ls|list)
-	    echo $(_nskc_cluster_list "$@") | tv
-	    ;;
+        l|ls|list)
+            echo $(_nskc_cluster_list "$@") | tv
+            ;;
 
-	c|kc|config|kubeconfig)
-	    _nskc_cluster_kubeconfig "$@"
-	    kcf
-	    ;;
+        c|kc|config|kubeconfig)
+            _nskc_cluster_kubeconfig "$@"
+            kcf
+            ;;
 
-	*)
-	    _nskc_usage
-	    return 2
-	    ;;
+        *)
+            _nskc_usage
+            return 2
+            ;;
     esac
 }
 
-_nskc
+nskc "$@"
