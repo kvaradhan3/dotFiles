@@ -12,17 +12,10 @@ function _nskc_usage {
 }
 
 function _nskc_cluster_list {
-    typeset -a _ncl
-    _ncl="${(@f)$(
-        if ! (( $# )) ; then
-            nsk cluster list
-        else
-            for i in "$@" ; do
-                nsk cluster list -n "$i"
-            done
-        fi | sed 's/  */,/g' | cut -d, -f1-4
-        )}"
-    return _ncl
+    if ! (( $# )) ; then
+        set -- '.'
+    fi
+    nsk cluster list | grep -i -E "${(j:|:)@}" | sed 's/  */,/g' | cut -d, -f1-4
 }
 
 function _nskc_cluster_kubeconfig {
@@ -48,11 +41,13 @@ function nskc {
     if [ "$1" = "prod" ] ; then
         export NSK_PROFILE=prod
         shift
+    else
+        export NSK_PROFILE=npe
     fi
 
     case $cmd in
         l|ls|list)
-            echo $(_nskc_cluster_list "$@") | tv
+            _nskc_cluster_list "$@"
             ;;
 
         c|kc|config|kubeconfig)
