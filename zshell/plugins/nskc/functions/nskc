@@ -20,7 +20,7 @@ function _nskc_cluster_list {
             for i in "$@" ; do
                 nsk cluster list -n "$i"
             done
-        fi | sed 's/  *,/g' | cut -d, -f1-4
+        fi | sed 's/  */,/g' | cut -d, -f1-4
         )}"
     return _ncl
 }
