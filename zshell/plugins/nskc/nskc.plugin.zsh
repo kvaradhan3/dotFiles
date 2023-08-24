@@ -17,4 +17,4 @@ if [[ ${zsh_loaded_plugins[-1]} != */nskc && -z ${fpath[(r)${0:h}/functions]} ]]
 
 # plugin unload https://github.com/agkozak/zsh-z/blob/16fba5e9d5c4b650358d65e07609dda4947f97e8/zsh-z.plugin.zsh#L680-L698
 
-autoload -Uz ${0:A:h}/functions/__nskc
+autoload -Uz ${0:A:h}/functions/nskc
