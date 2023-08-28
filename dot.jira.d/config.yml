@@ -37,6 +37,11 @@ queries:
     {{if .project}}AND project = '{{.project}}'{{end}}
     AND sprint in futureSprints()
     order by created ASC
+  inSprint: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND sprint in ( {{.id}} )
+    order by created ASC
   ngIssues: >-
     resolution = unresolved
     {{if .project}}AND project = '{{.project}}'{{end}}
@@ -88,17 +93,17 @@ custom-commands:
             "$(jq .endDate   <<<$sprintJson | cut -c1-11)" \
             "$(jq .id        <<<$sprintJson)"
         fi
-        sprintJson=$({{jira}} req \
-                     "/rest/agile/1.0/board/$boardId/sprint?state=future" \
-                     --gjq values.0)
-        if [ -n "$sprintJson" ] ; then
-          printf "  %-20s start: %s end: %s\t%d\n"         \
-            "$(jq .name      <<<$sprintJson)"              \
-            "$(jq .startDate <<<$sprintJson | cut -c1-11)" \
-            "$(jq .endDate   <<<$sprintJson | cut -c1-11)" \
-            "$(jq .id        <<<$sprintJson)"
-
-        fi
+        for id in $({{jira}} req \
+                    "/rest/agile/1.0/board/$boardId/sprint?state=future" | \
+                    jq '.values[].id');
+        do
+            sprintJson=$({{jira}} req "/rest/agile/1.0/sprint/$id")
+            printf "  %-20s start: %s end: %s\t%d\n"              \
+                   "$(jq .name      <<<$sprintJson)"              \
+                   "$(jq .startDate <<<$sprintJson | cut -c1-11)" \
+                   "$(jq .endDate   <<<$sprintJson | cut -c1-11)" \
+                   "$(jq .id        <<<$sprintJson)"
+        done
       fi
 
   - name: fixed
@@ -145,6 +150,8 @@ custom-commands:
       - name: project
         short: p
         default: $JIRA_PROJECT
+      - name: id
+        short: i
       - name: future
         short: f
         default: false
@@ -153,7 +160,9 @@ custom-commands:
       board_id=$({{jira}} req                                                \
                  "/rest/agile/1.0/board?projectKeyOrId={{options.project}}"  \
                  --gjq values.0.id)
-      if {{options.future}} ; then
+      if [[ -n "{{options.id}}" ]] ; then
+        sprint_id={{options.id}}
+      elif {{options.future}} ; then
         sprint_id=$({{jira}} req                                             \
                   "/rest/agile/1.0/board/$board_id/sprint?state=future"      \
                   --gjq values.0.id)
@@ -178,12 +187,19 @@ custom-commands:
         short: f
         type: BOOL
         default: false
+      - name: id
+        short: i
       - name: all
         short: a
         type: BOOL
     script: |
       {{with options}}
-      if {{.future}} ; then
+      if [[ -n "{{.id}}" ]] ; then
+        {{jira}} list {{if .project}}-p {{.project}}{{end}} -q " \
+                    resolution = unresolved \
+                    AND sprint in ( {{options.id}} ) \
+                    order by created ASC"
+      elif {{.future}} ; then
         {{jira}} list {{if .project}}-p {{.project}}{{end}} -n nextSprint
       else
         {{jira}} list {{if .project}}-p {{.project}}{{end}} -n curSprint
