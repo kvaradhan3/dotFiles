@@ -99,15 +99,13 @@ bindsym {
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg $background fill
+# output * bg $background fill
 
 # Output HDMI-A-1 'LG Electronics LG HDR WQHD 0x0000E191' (focused)
 #   Current mode: 3440x1440 @ 49.987 Hz
 #   Position: 0,0
 #   Scale factor: 1.000000
 #   Scale filter: nearest
-
-output eDP-1 disable
 
 ### Input configuration
 #
@@ -226,3 +224,4 @@ bar {
 }
 
 # include /etc/sway/config.d/*
+include "$(cat /etc/hostname).conf"
