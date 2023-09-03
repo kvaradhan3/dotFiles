@@ -6,7 +6,9 @@ alias v=vagrant
 #
 # multipass
 #
-source /usr/local/etc/bash_completion.d/multipass
+if [ -f /usr/local/etc/bash_completion.d/multipass ] ; then
+    source /usr/local/etc/bash_completion.d/multipass
+fi
 
 #
 # VirtualBox
@@ -66,4 +68,4 @@ vb() {
     esac
 }
 
-source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
+source "$(gcloud info --format json | jq -r .installation.sdk_root)"/path.zsh.inc

@@ -116,6 +116,11 @@ for i in ./dotConfig/* ; do
     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
 done
 
+# mkdir -p "$DESTDIR/.local/share"
+# for i in ./dotLocal/* ; do
+#     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotLocal/.local\/share}"
+# done
+
 #
 # This is a one-off
 #
@@ -161,7 +166,7 @@ done
 #
 
 case "$SYS" in
-    Linux)  ;;
+    Linux)  ./baseline-arch     ;;
     Darwin) brew bundle install ;;
 esac
 

@@ -1,52 +1,347 @@
-#!
+#! /bin/sh -x
+
+set -eu
+
+#
+# Prep Steps:
+#
+# Partitions:
+# - EFI 1G
+# - /   128G
+# - /var 128G
+# - /home 512G
+# - /data rest (162.5G)
+# 
+# On boot, link:
+# iwctl
+# # station wlan0 scan
+# # station wlan0 get-networks
+# # station wlan0 connect "idli vadai sambhar"
+# 
+# timedatectl
+# 
+# format all partitions and mount them
+# 
+# # mkfs.fat -F 32 /dev/efi_system_partition
+# # mkfs.ext4 /dev/root_partition
+# 
+# # dd if=/dev/zero of=/swapfile bs=1M count=8k status=progress
+# # chmod 0600 /swapfile
+# # mkswap -U clear /swapfile
+# # swapon /swapfile
+# 
+# # mount --mkdir /dev/efi_system_partition /mnt/boot
+# 
+# 
+# BASE INSTALL
+# # pacstrap -K /mnt base linux linux-firmware git sudo refind iwd zsh
+# 
+# # genfstab -U /mnt >> /mnt/etc/fstab
+# # arch-chroot /mnt
+# # ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+# # hwclock --systohc
+# 
+# refind-install
+# echo {{hostname}} > /etc/hostname
+# passwd root
+# 
+# : For AUR :
+# groupadd pacman
+# useradd --base-dir /home \
+#         --home-dir /home/kannan \
+#         --create-home \
+#         --comment 'Kannan Varadhan' \
+#         --groups pacman,wheel \
+#         --shell /bin/zsh \
+#    kannan
+#
+# git clone https://github.com/kvaradhan3/dotFiles.git /home/kannan/sysinit
+#
+# --- /etc/security/faillock.bak	2023-08-29 20:51:41.409772012 -0700
+# +++ /etc/security/faillock.conf	2023-08-29 20:51:28.313105617 -0700
+# @@ -29,7 +29,7 @@
+#  # Deny access if the number of consecutive authentication failures
+#  # for this user during the recent interval exceeds n tries.
+#  # The default is 3.
+# -# deny = 3
+# +deny = 30
+#  #
+#  # The length of the interval during which the consecutive
+#  # authentication failures must happen for the user account
+# 
+# swapoff -a
+# cd /
+# umount -R /mnt
+# reboot
+#
+
+####
+#
+# Upgrade live system
+#
+WIFI_SSID='idli vadai sambhar'
+
+aur_install() {
+    aur sync --no-view --no-confirm "$@"
+}
+
+pac_install() {
+    sudo pacman -S --noconfirm "$@"
+}
+
+block_exists_in_file() {
+    grep -E "$1" "$2" >/dev/null 2>&-
+}
+
+add_block_to() {
+    FILE=$1
+    shift
+
+    for i in "$@" ; do
+        echo "$i" 
+    done | sudo tee -a "$FILE" >/dev/null 2>&1
+}
 
 
-Partitions:
-- EFI 1G
-- /   128G
-- /var 128G
-- /home 512G
-- /data rest (162.5G)
+##
+#
+# Base Network
+#
 
-On boot, link:
-iwctl
-# station wlan0 scan
-# station wlan0 get-networks
-# station wlan0 connect "idli vadai sambhar"
+echo 'Network'
+sudo mkdir -p /etc/iwd
+if ! block_exists_in_file '^# INIT:' /etc/iwd/main.conf ; then
+    add_block_to /etc/iwd/main.conf          \
+        "# INIT: $(date) #"                  \
+        "[General]"                          \
+        "EnableNetworkConfiguration=true"    \
+        ""                                   \
+        "[Network]"                          \
+        "NameResolvingService=systemd"       \
+        ""
+fi
 
-timedatectl
+sudo iwctl station wlan0 connect "$WIFI_SSID"
+sudo systemctl start  iwd.service
+sudo systemctl enable iwd.service
+sudo systemctl start  systemd-resolved.service
+sudo systemctl enable systemd-resolved.service
 
-format all partitions and mount them
+if ! block_exists_in_file '^\[AUR]$' /etc/pacman.conf ; then
+    echo 'bootstrap AUR'
+    add_block_to /etc/pacman.conf          \
+        ''                                 \
+        '[AUR]'                            \
+        'SigLevel = Optional TrustAll'     \
+        'Server = file:///var/pacman/AUR'
 
-# mkfs.fat -F 32 /dev/efi_system_partition
-# mkfs.ext4 /dev/root_partition
+    sudo mkdir -p /var/pacman/AUR
+    sudo chmod -R 02770  /var/pacman
+    sudo chgrp -R pacman /var/pacman
 
-# dd if=/dev/zero of=/swapfile bs=1M count=8k status=progress
-# chmod 0600 /swapfile
-# mkswap -U clear /swapfile
-# swapon /swapfile
+    repo-add /var/pacman/AUR/AUR.db.tar.xz 
+    pac_install base-devel
 
-# mount --mkdir /dev/efi_system_partition /mnt/boot
+    git clone https://github.com/AladW/aurutils /tmp/aurutils
+    cd /tmp/aurutils
+    makepkg --install --syncdeps --asdeps --needed --noconfirm 
+    rm -rf /tmp/aurutils
+fi
+
+export AURDEST=/var/pacman/packages
+export AUR_PACMAN_AUTH="sudo --askpass"
+export AUR_REPO=AUR
+
+aur_install aurutils
+pac_install --overwrite '*' aurutils
+
+##
+# Essentials
+#
+pac_install gnupg
+
+# 1password
+curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
+aur_install 1password 1password-cli 1passord-beta
+pac_install 1password-cli
+# pac_install 1password
+pac_install 1password-beta
+
+# aur_install emacs-gcc-wayland-devel-bin
+# pac_install emacs-gcc-wayland-devel-bin
+pac_install emacs-wayland
+pac_install cups-pdf
+
+pac_install man-db
+
+aur_install autojump
+pac_install autojump
+
+aur_install python-fangfrisch 
+pac_install python-fangfrisch 
+pac_install bc 
+pac_install fzf
+pac_install ranger
+pac_install bluez
+pac_install bluez-utils
+pac_install rsync
+pac_install shellcheck
+pac_install python-docutils
+pac_install util-linux
+pac_install openssh
+
+##
+# Tools
+#
+pac_install ethtool
+pac_install iw
+pac_install htop
+pac_install neofetch
+pac_install nethogs
+pac_install tmux
+pac_install github-cli
+pac_install python-pre-commit
+pac_install usbutils
+pac_install fprintd
+pac_install jq
+
+##
+# Personalizations
+#
+pac_install zsh-antidote
+
+## 
+# window management
+#
+# aur_install vlc-git vlc-pause-click-plugin
+# pac_install vlc-git vlc-pause-click-plugin
+
+pac_install sway
+pac_install swaylock swayidle swaybg
+pac_install waybar
+pac_install foot
+pac_install qt6-wayland glfw-wayland
+pac_install wofi
+pac_install xorg-xeyes
+pac_install electron25
+
+aur_install wev
+pac_install wev
+pac_install xorg-xlsclients
+
+pac_install ttf-inconsolata-nerd
+pac_install ttf-nerd-fonts-symbols-mono
+pac_install ttf-anonymous-pro
+
+aur_install ttf-meslo
+aur_install ttf-monaco
+pac_install ttf-meslo
+pac_install ttf-monaco
+
+pac_install adobe-source-code-pro-fonts
+
+pac_install adobe-source-sans-fonts
+
+# cask "font-alegreya"
+# cask "font-alegreya-sans"
+# cask "font-fontawesome"
+# cask "font-humor-sans"
+# cask "font-lato"
+# cask "font-sf-compact"
+# cask "font-sf-mono"
+# cask "font-sf-pro"
+# cask "font-source-serif-pro"
 
 
-BASE INSTALL
-# pacstrap -K /mnt base linux linux-firmware git sudo refind
+aur_install slack-desktop-wayland
+pac_install slack-desktop-wayland
+pac_install firefox
+pac_install firefox-developer-edition
 
-# genfstab -U /mnt >> /mnt/etc/fstab
-# arch-chroot /mnt
-# ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
-# hwclock --systohc
+##
+# sound
+#
+pac_install alsa-plugins
+pac_install alsa-utils
+pac_install pipewire
+pac_install wireplumber
+pac_install pipewire-alsa
+pac_install pipewire-alsa
+pac_install pipewire-pulse
 
-refind-install
-hostname
-passwd
-user
+##
+# Games
+#
+pac_install cowsay
+pac_install fortune-mod
+pac_install nethack
 
 
+##
+# Extras
+#
+pac_install go
+
+aur_install google-cloud-cli
+pac_install google-cloud-cli
+pac_install pacman-contrib
+
+##
+# Virtualization
+#
+pac_install docker
+
+sudo systemctl start  docker.service
+sudo systemctl enable docker.service
+usermod --append		\
+        --groups docker		\
+	$USER
+
+pac_install kubectl
+# pac_install kubeadm
+##
+## https://wiki.archlinux.org/title/Kubernetes
+##
+# aur_install etcd
+# pac_install etcd
+# pac_install kubernetes-control-plane # includes kubernetes-node
+#
+# pac_install containerd
+# {
+#     add_block_to /etc/modules-load.d/k8s.conf \
+#         "# INIT: $(date) #"                   \
+#         'overlay'                             \
+#         'br_netfilter'
+# 
+#     add_block_to /etc/sysctl.d/k8s.conf            \
+#         "# INIT: $(date) #"                        \
+#         'net.bridge.bridge-nf-call-iptables  = 1'  \
+#         'net.bridge.bridge-nf-call-ip6tables = 1'  \
+#         'net.ipv4.ip_forward                 = 1'
+# 
+#     sysctl --system
+# }
+#
+# pac_install helm
+
+cat <<PACKAGE_LIST >/dev/null
+
+gpick 0.3-1
+mate-control-center 1.26.0-3
+mupdf 1.23.0-1
+netsniff-ng 0.6.8-4
+nwg-icon-picker 0.1.0-2
+openresolv 3.13.2-1
+openswan 3.0.0-1
+qpwgraph 0.5.2-1
+speedtest-cli 2.1.3-7
+udisks2 2.9.4-4
+wl-clipboard 1:2.2.0-1
+xl2tpd 1.3.18-1
+xpdf 4.04-2
+youtube-dl 2021.12.17-2
+
+PACKAGE_LIST
 
 
-swapoff -a
-cd /
-umount -R /mnt
-reboot
-
+sudo pacman -Syu --noconfirm
