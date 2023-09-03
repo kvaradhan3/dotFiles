@@ -26,7 +26,7 @@
 ;;
 ;; Variables
 ;;
-(defvar fonts-default-font 'menlo-14)
+(defvar fonts-default-font 'monaco-14)
 (defvar fonts-current-font nil)
 (defvar fonts-all-fonts-alist
   '((fixed   . "fixed")
@@ -64,29 +64,30 @@
 
   (if (not font-name)
       (setq font-name fonts-default-font))
-  (setq font-name-internal-guess
-	(cdr (assq font-name fonts-all-fonts-alist)))
-  (setq font-name-internal
-	(cond
-	 ((not font-name-internal-guess)
-	  (let* ((tokens (split-string (symbol-name font-name) "-"))
-		 (fp (car (last tokens)))
-		 (fn (butlast tokens)))
-	    (if (or (not fp) (not fn))
-		(error "Invalid font spec %s" font-name))
-	    (setq fn (mapconcat 'identity fn "-"))
-	    (if (assq fn fonts-expansion)
-		(setq fn (assq fn fonts-expansion)))
-	    (fonts-get-font-name fn (string-to-number fp))))
-	 ((listp font-name-internal-guess)
-	  (eval font-name-internal-guess))
-	 (t font-name-internal-guess)))
+  (let* ((font-name-internal-guess
+	  (cdr (assq font-name fonts-all-fonts-alist)))
+	 font-name-internal)
+    (setq font-name-internal
+	  (cond
+	   ((not font-name-internal-guess)
+	    (let* ((tokens (split-string (symbol-name font-name) "-"))
+		   (fp (car (last tokens)))
+		   (fn (butlast tokens)))
+	      (if (or (not fp) (not fn))
+		  (error "Invalid font spec %s" font-name))
+	      (setq fn (mapconcat 'identity fn "-"))
+	      (if (assq fn fonts-expansion)
+		  (setq fn (assq fn fonts-expansion)))
+	      (fonts-get-font-name fn (string-to-number fp))))
+	   ((listp font-name-internal-guess)
+	    (eval font-name-internal-guess))
+	   (t font-name-internal-guess)))
 
-  (message "Set Font to %s [%s]" font-name font-name-internal)
-  (set-frame-font font-name-internal)
-  (setq default-frame-alist (assq-delete-all 'font default-frame-alist))
-  (add-to-list 'default-frame-alist (cons 'font font-name-internal))
-  (setq fonts-current-font font-name))
+    (message "Set Font to %s [%s]" font-name font-name-internal)
+    (set-frame-font font-name-internal)
+    (setq default-frame-alist (assq-delete-all 'font default-frame-alist))
+    (add-to-list 'default-frame-alist (cons 'font font-name-internal))
+    (setq fonts-current-font font-name)))
 
 (defun fonts-get-font-name (font-name &optional point)
   "Construct font-name using FONT-NAME and (optional) POINT."
