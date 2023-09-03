@@ -17,7 +17,14 @@ COMPLETION_WAITING_DOTS="true"
 autoload -Uz compaudit compinit zrecompile
 compinit
 
-source /usr/local/opt/antidote/share/antidote/antidote.zsh
+if [ -d /usr/local/opt/antidote ] ; then
+    source /usr/local/opt/antidote/share/antidote/antidote.zsh
+elif [ -d /usr/share/zsh-antidote ] ; then
+    source /usr/share/zsh-antidote/antidote.zsh
+else
+    echo 'ANTIDOTE not found' >&2
+fi
+
 if ! [[ -f ~/.zsh_plugins.zsh ]] ||
    ! antidote path ohmyzsh/ohmyzsh >/dev/null 2>&1
 then

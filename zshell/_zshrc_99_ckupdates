@@ -35,6 +35,11 @@ darwin)
                 yum list upgradable
                 ;;
             arch-*)
+		export AURDEST=/var/pacman/packages
+		export AUR_PACMAN_AUTH="sudo --askpass"
+		export AUR_PAGER=ranger
+		export AUR_REPO=AUR
+
                 paclist AUR | aur vercmp
                 checkupdates
                 ;;
