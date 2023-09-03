@@ -6,9 +6,9 @@ Host github.com
   User                  git
   PreferredAuthentications publickey
   ForwardX11            no
+  IdentityFile          ~/.ssh/id_ed25519_github
 
 Host *
   User          kannan
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
   ForwardAgent  yes
   ForwardX11    yes
