@@ -12,7 +12,7 @@ export PATH
 #
 # kubernetes Aliases
 #
-source /usr/local/share/zsh/site-functions/_kubectl
+#source /usr/local/share/zsh/site-functions/_kubectl
 alias ka='kubeadm'
 
 alias ks='kubectl -n kube-system'
