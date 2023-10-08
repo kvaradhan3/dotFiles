@@ -5,7 +5,8 @@
     "modules-left": [
         "sway/mode",
         "sway/workspaces",
-        "custom/arrow10",
+        "custom/left-ws-end",
+
         "sway/window"
     ],
 
@@ -19,18 +20,23 @@
         "custom/rt-memory-network",
         "memory",
 
-        "custom/arrow6",
+        "custom/rt-cpu-memory",
         "cpu",
-        "custom/arrow5",
+
+        "custom/rt-temp-cpu",
         "temperature",
-        "custom/arrow4",
+
+        "custom/rt-battery-temp",
         "battery",
-        "custom/arrow3",
+
+        "custom/rt-keyb-battery",
         "sway/language",
-        "custom/arrow2",
+
+        "custom/rt-tray-keyb",
         "tray",
         "clock#date",
-        "custom/arrow1",
+
+        "custom/rt-time-date",
         "clock#time",
         "idle_inhibitor"
     ],
@@ -176,28 +182,28 @@
         "tooltip": false
     },
 
-    "custom/arrow2": {
+    "custom/rt-tray-keyb": {
         "format": "",
         "tooltip": false
     },
 
 
-    "custom/arrow3": {
+    "custom/rt-keyb-battery": {
         "format": "",
         "tooltip": false
     },
 
-    "custom/arrow4": {
+    "custom/rt-battery-temp": {
         "format": "",
         "tooltip": false
     },
 
-    "custom/arrow5": {
+    "custom/rt-temp-cpu": {
         "format": "",
         "tooltip": false
     },
 
-    "custom/arrow6": {
+    "custom/rt-cpu-memory": {
         "format": "",
         "tooltip": false
     },

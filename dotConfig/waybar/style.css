@@ -223,7 +223,7 @@
     padding: 0px 0px 0px 0px;
 }
 
-#custom-arrow2 {
+#custom-rt-tray-keyb {
     font-size: 15pt;
     color: @date;
     background: @layout;
@@ -231,7 +231,7 @@
     padding: 0px 0px 0px 0px;
 }
 
-#custom-arrow3 {
+#custom-rt-keyb-battery {
     font-size: 15pt;
     color: @layout;
     background: @battery;
@@ -239,7 +239,7 @@
     padding: 0px 0px 0px 0px;
 }
 
-#custom-arrow4 {
+#custom-rt-battery-temp {
     font-size: 15pt;
     color: @battery;
     background: @temp;
@@ -247,7 +247,7 @@
     padding: 0px 0px 0px 0px;
 }
 
-#custom-arrow5 {
+#custom-rt-temp-cpu {
     font-size: 15pt;
     color: @temp;
     background: @cpu;
@@ -255,7 +255,7 @@
     padding: 0px 0px 0px 0px;
 }
 
-#custom-arrow6 {
+#custom-rt-cpu-memory {
     font-size: 15pt;
     color: @cpu;
     background: @memory;
