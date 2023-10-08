@@ -49,4 +49,7 @@ jira transition 'Fix accepted by reporter' "$ticket" --noedit
 # update master branch in workspace.
 #
 git pull
+
+git br -d $branch
+
 exit
