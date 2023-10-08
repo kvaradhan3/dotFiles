@@ -10,7 +10,7 @@ usage() {
 }
 
 log() {
-    printf "%s: %s\n" "$PROGNAME" "$@"
+    printf "%s: %s\n" "$PROGNAME" "$*"
 }
 
 error() {
