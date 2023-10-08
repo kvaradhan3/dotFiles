@@ -1,8 +1,0 @@
-if uname -r | grep -i arch >/dev/null 2>&1 ; then
-    export AURDEST=/home/kannan/aur-packages
-    export AUR_PACMAN_AUTH="sudo --askpass"
-    export AUR_PAGER=ranger
-    export AUR_REPO=custom
-
-    export MANPATH=$MANPATH:/usr/share/man
-fi

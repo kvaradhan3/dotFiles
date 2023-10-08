@@ -4,50 +4,42 @@ if [ ! -t 0 ] ; then
     return 0
 fi
 
-syst=$(uname -s | tr '[:upper:]' '[:lower:]')
-if [ "$syst" = 'linux' ] ; then
-    if   grep -E -i 'ubuntu|debian'  /etc/os-release >/dev/null 2>&1 ; then
-        syst=debian-linux
-    elif grep -E -i 'centos|rhel|fedora' /etc/os-release >/dev/null 2>&1 ; then
-        syst=redhat-linux
-    elif grep -E -i 'archlinux'      /etc/os-release >/dev/null 2>&1 ; then
-        syst=arch-linux
-    else
-        syst=unknown-linux
-    fi
+TWODAYS=$(( 2 * 24 * 60 * 60 ))
+if /usr/bin/stat --format %Y "$0" >/dev/null 2>&-
+then
+    # Linux
+    test $(( $(/usr/bin/stat --format %Y  "$0") + TWODAYS ))	\
+       -lt "$(date +%s)" || return 0
+else
+    # Darwin
+    test $(( $(/usr/bin/stat -Lf %m "$0")       + TWODAYS ))	\
+       -lt "$(date +%s)" || return 0
 fi
 
-case $syst in
-darwin)
-    if [[ $(( $(/usr/bin/stat -Lf %m "$0") + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
+case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
+    *darwin*)
         /usr/sbin/softwareupdate -l
         brew update >/dev/null 2>&-
         brew outdated
-    fi
-    ;;
-*-linux)
-    if [[ $(( $(stat --format %Y  "$0") + 2 * 24 * 60 * 60 )) -lt $(date +%s) ]] ; then
-        case $syst in
-            debian-*)
-                /usr/lib/update-notifier/apt-check -p
-                ;;
-            centos-*)
-                yum list upgradable
-                ;;
-            arch-*)
-		export AURDEST=/var/pacman/packages
-		export AUR_PACMAN_AUTH="sudo --askpass"
-		export AUR_PAGER=ranger
-		export AUR_REPO=AUR
+	;;
+    *ubuntu*|*debian*)
+        /usr/lib/update-notifier/apt-check -p
+	;;
+    *centos*|*rhel*|*fedora*)
+	yum list upgradable
+	;;
+    *arch*)
+        export AURDEST=/var/pacman/packages
+        export AUR_PACMAN_AUTH="sudo --askpass"
+        export AUR_PAGER=ranger
+        export AUR_REPO=AUR
 
-                paclist AUR | aur vercmp
-                checkupdates
-                ;;
-            *)
-                print "$(basename "$0"): unknown system $syst, updates check not done\n" >&2
-                ;;
-        esac
-    fi
-    ;;
+        paclist AUR | aur vercmp
+        checkupdates
+        ;;
+    *)
+	printf "%s: unknown system %s (%s), updates check not done.\n"	\
+               "$(basename "$0")" "$(uname -s)" "$(uname -r)"
+	;;
 esac
 touch -m "$0"
