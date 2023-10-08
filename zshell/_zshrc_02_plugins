@@ -46,7 +46,7 @@ then
     	ohmyzsh/ohmyzsh path:plugins/kubectl
     	ohmyzsh/ohmyzsh path:plugins/1password
 
-    	wting/autojump  path:bin/autojump.sh
+    	wting/autojump  path:bin/autojump.zsh
 
         zsh-users/zsh-completions
         zsh-users/zsh-autosuggestions
