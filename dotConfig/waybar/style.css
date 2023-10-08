@@ -176,6 +176,16 @@
 	color: @white;
 }
 
+#idle_inhibitor {
+	background: @time;
+	color: @black;
+}
+
+#idle_inhibitor.activated {
+	background: @time;
+	color: @red;
+}
+
 #temperature {
 	background: @temp;
 	color: @black;
