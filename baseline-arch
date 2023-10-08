@@ -86,7 +86,7 @@ aur_install() {
 }
 
 pac_install() {
-    sudo pacman -S --noconfirm "$@"
+    sudo pacman -S --noconfirm --needed "$@"
 }
 
 block_exists_in_file() {
@@ -146,6 +146,8 @@ if ! block_exists_in_file '^\[AUR]$' /etc/pacman.conf ; then
     cd /tmp/aurutils
     makepkg --install --syncdeps --asdeps --needed --noconfirm 
     rm -rf /tmp/aurutils
+
+    sudo pacman -Syu --noconfirm --needed
 fi
 
 export AURDEST=/var/pacman/packages
@@ -177,9 +179,9 @@ pac_install man-db
 aur_install autojump
 pac_install autojump
 
-aur_install python-fangfrisch 
-pac_install python-fangfrisch 
-pac_install bc 
+aur_install python-fangfrisch
+pac_install python-fangfrisch
+pac_install bc
 pac_install fzf
 pac_install ranger
 pac_install bluez
@@ -208,9 +210,10 @@ pac_install jq
 ##
 # Personalizations
 #
+aur_install zsh-antidote
 pac_install zsh-antidote
 
-## 
+##
 # window management
 #
 # aur_install vlc-git vlc-pause-click-plugin
@@ -293,9 +296,9 @@ pac_install docker
 
 sudo systemctl start  docker.service
 sudo systemctl enable docker.service
-usermod --append		\
-        --groups docker		\
-	$USER
+sudo usermod --append		        \
+             --groups docker		\
+	     $USER
 
 pac_install kubectl
 # pac_install kubeadm
@@ -325,7 +328,6 @@ pac_install kubectl
 # pac_install helm
 
 cat <<PACKAGE_LIST >/dev/null
-
 gpick 0.3-1
 mate-control-center 1.26.0-3
 mupdf 1.23.0-1
@@ -344,4 +346,4 @@ youtube-dl 2021.12.17-2
 PACKAGE_LIST
 
 
-sudo pacman -Syu --noconfirm
+sudo pacman -Syu --noconfirm --needed
