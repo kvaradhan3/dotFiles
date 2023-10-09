@@ -1,4 +1,20 @@
 {{/* transition template */ -}}
+{{/* create template
+   *
+   * option:      sets                values/defaults
+   * comment      comment.add.body
+   * assignee     assignee.emailAddress
+   * components   components.name
+   * fixVersions  fixVersions.name
+   * issuetype    issuetype.name      Bug, Task, Story, Subtask. Epic
+   * labels       [ labels ]
+   * priority     priority.name
+   * reporter     reporter.emailAddress
+   * resolution   resolution.name
+   * defaultResolution                Fixed
+   * summary      summary
+   * versions     versions.name
+   */ -}}
 {{- if .meta.fields.comment }}
 update:
   comment:

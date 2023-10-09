@@ -1,4 +1,18 @@
-{{/* create template */ -}}
+{{/* create template 
+   *
+   * option:      sets                values/defaults
+   * project      project.key         
+   * issuetype    issuetype.name      Bug, Task, Story, Subtask. Epic
+   * summary      summary
+   * components   components
+   * epic         parent.key
+   * labels       labels
+   * description  description
+   * assignee     assignee.emailAddress
+   * reporter     reporter.emailAddress
+   * login        reporter.emailAddress
+   * watchers     nskp specific customField
+   */ -}}
 fields:
   project:
     key: {{ or .overrides.project "" }}

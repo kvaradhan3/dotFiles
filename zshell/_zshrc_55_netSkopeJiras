@@ -31,7 +31,7 @@ jf() {
             x)  ORD= ;;
 	        A)	JQF+=" AND assignee=$OPTARG" ;;
 	        R)	JQF+=" AND reporter=$OPTARG" ;;
-	        S)	JQF+=" AND sprint in ${OPTARG}" ;;
+	        S)	JQF+=" AND sprint in ( ${OPTARG} )" ;;
             \?) echo "Unknown filter type: $OPTARG" ;
 	        typeset -f "$0"
 		;;
