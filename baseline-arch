@@ -152,6 +152,8 @@ if ! block_exists_in_file '^\[AUR]$' /etc/pacman.conf ; then
     cd /tmp/aurutils
     makepkg --install --syncdeps --asdeps --needed --noconfirm 
     rm -rf /tmp/aurutils
+
+    sudo pacman -Syu --noconfirm --needed
 fi
 
 export AURDEST=/var/pacman/packages
@@ -183,9 +185,9 @@ pac_install man-db
 aur_install autojump
 pac_install autojump
 
-aur_install python-fangfrisch 
-pac_install python-fangfrisch 
-pac_install bc 
+aur_install python-fangfrisch
+pac_install python-fangfrisch
+pac_install bc
 pac_install fzf
 pac_install ranger
 pac_install bluez
@@ -220,9 +222,10 @@ pac_install laptop-mode-tools
 ##
 # Personalizations
 #
+aur_install zsh-antidote
 pac_install zsh-antidote
 
-## 
+##
 # window management
 #
 # aur_install vlc-git vlc-pause-click-plugin
@@ -302,9 +305,9 @@ pac_install docker
 
 sudo systemctl start  docker.service
 sudo systemctl enable docker.service
-sudo usermod --append		\
-        --groups docker		\
-	$USER
+sudo usermod --append		        \
+             --groups docker		\
+	     $USER
 
 pac_install kubectl
 # pac_install kubeadm
@@ -369,4 +372,4 @@ if false; then
 fi
 
 
-sudo pacman -Syu --noconfirm
+sudo pacman -Syu --noconfirm --needed
