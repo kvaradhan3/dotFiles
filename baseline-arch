@@ -75,6 +75,12 @@ set -eu
 # reboot
 #
 
+#
+# Things that shoudl work with sway/wayland but dont seem to:
+#
+# - zoom
+# - 1password
+#
 ####
 #
 # Upgrade live system
@@ -199,13 +205,19 @@ pac_install ethtool
 pac_install iw
 pac_install htop
 pac_install neofetch
+pac_install laptop-detect
 pac_install nethogs
 pac_install tmux
 pac_install github-cli
 pac_install python-pre-commit
 pac_install usbutils
-pac_install fprintd
 pac_install jq
+
+pac_install fprintd         # fingerprint read
+sudo usermod --append --group input $USER
+
+aur_install laptop-mode-tools
+pac_install laptop-mode-tools
 
 ##
 # Personalizations
@@ -255,15 +267,13 @@ pac_install adobe-source-sans-fonts
 # cask "font-sf-pro"
 # cask "font-source-serif-pro"
 
-
-aur_install slack-desktop-wayland
-pac_install slack-desktop-wayland
 pac_install firefox
 pac_install firefox-developer-edition
 
 ##
 # sound
 #
+pac_install sof-firmware
 pac_install alsa-plugins
 pac_install alsa-utils
 pac_install pipewire
@@ -285,12 +295,11 @@ pac_install nethack
 #
 pac_install go
 
-aur_install google-cloud-cli
-pac_install google-cloud-cli
 pac_install pacman-contrib
 
+
 ##
-# Virtualization
+# Cloud and Virtualization...
 #
 pac_install docker
 
@@ -326,24 +335,41 @@ pac_install kubectl
 # }
 #
 # pac_install helm
+aur_install google-cloud-cli
+pac_install google-cloud-cli
 
-cat <<PACKAGE_LIST >/dev/null
-gpick 0.3-1
-mate-control-center 1.26.0-3
-mupdf 1.23.0-1
-netsniff-ng 0.6.8-4
-nwg-icon-picker 0.1.0-2
-openresolv 3.13.2-1
-openswan 3.0.0-1
-qpwgraph 0.5.2-1
-speedtest-cli 2.1.3-7
-udisks2 2.9.4-4
-wl-clipboard 1:2.2.0-1
-xl2tpd 1.3.18-1
-xpdf 4.04-2
-youtube-dl 2021.12.17-2
+##
+# Teleconferencing tools
+aur_install zoom
+aur_install whatsapp-for-linux
+aur_install zulip-desktop-electron
+aur_install slack-desktop-wayland
 
-PACKAGE_LIST
+pac_install zoom
+pac_install whatsapp-for-linux
+pac_install zulip-desktop-electron
+pac_install slack-desktop-wayland
+
+##
+# Cloud SYnc
+pac_install rclone
+
+if false; then
+  pac_install gpick 
+  pac_install mate-control-center 
+  pac_install mupdf 
+  pac_install netsniff-ng 
+  pac_install nwg-icon-picker 
+  pac_install openresolv 
+  pac_install openswan 
+  pac_install qpwgraph
+  pac_install speedtest-cli 
+  pac_install udisks2 
+  pac_install wl-clipboard 
+  pac_install xl2tpd 
+  pac_install xpdf 
+  pac_install youtube-dl 
+fi
 
 
 sudo pacman -Syu --noconfirm --needed
