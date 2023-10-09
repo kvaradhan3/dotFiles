@@ -1,1 +1,4 @@
-{{ . | toJson}}
+ID,NAME,statusCategory.NAME,statusCategory.key
+{{ range .transitions -}}
+{{ .id }},{{ .name }},{{ .to.statusCategory.name }},{{ .to.statusCategory.key }}
+{{ end -}}

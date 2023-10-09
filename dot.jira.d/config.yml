@@ -63,6 +63,11 @@ queries:
     {{if .project}}AND project = '{{.project}}'{{end}}
     AND watcher = currentUser()
     ORDER BY priority DESC, updated DESC
+  lastWeek: >-
+    assignee = currentuser()
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND updated > -10d
+    order by created ASC
 
 custom-commands:
   - name: info
@@ -106,15 +111,30 @@ custom-commands:
         done
       fi
 
+  # OBS transition states...
+  # Backlog -> To Do -> In Progress -> FIXED -> CLOSED
+  #        todo    start          fixed    closed
+  #
   - name: fixed
     help: Transition issue to 'Problem fixed & merged' state (OBS specific)
     args:
       - name: ISSUE
         required: true
         repeat: true
-    script: >-
+    script: |
       {{range args.ISSUE}}
-      {{jira}} transition 'Problem fixed & merged' {{.}} --noedit
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "Backlog" ]] 
+      then
+          {{jira}} todo {{.}} --noedit
+      fi
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "To Do" ]] 
+      then
+          {{jira}} start {{.}} --noedit
+      fi
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "In Progress" ]] 
+      then
+          {{jira}} transition 'Problem fixed & merged' {{.}} --noedit
+      fi
       {{end}}
 
   - name: closed
@@ -123,9 +143,24 @@ custom-commands:
       - name: ISSUE
         required: true
         repeat: true
-    script: >-
+    script: |
       {{range args.ISSUE}}
-      {{jira}} transition 'Fix accepted by reporter' {{.}} --noedit
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "Backlog" ]] 
+      then
+          {{jira}} todo {{.}} --noedit
+      fi
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "To Do" ]] 
+      then
+          {{jira}} start {{.}} --noedit
+      fi
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "In Progress" ]] 
+      then
+          {{jira}} transition 'Problem fixed & merged' {{.}} --noedit
+      fi
+      if [[ "$( {{jira}} {{.}} -t debug | jq -r .fields.status.name )" = "FIXED" ]] 
+      then
+          {{jira}} transition 'Fix accepted by reporter' {{.}} --noedit
+      fi
       {{end}}
 
   - name: no
@@ -189,12 +224,13 @@ custom-commands:
         default: false
       - name: id
         short: i
+        type: INT
       - name: all
         short: a
         type: BOOL
     script: |
       {{with options}}
-      if [[ -n "{{.id}}" ]] ; then
+      if [[ -n '{{.id}}' ]] && [[ "{{.id}}" =~ ^[0-9]+$ ]] ; then
         {{jira}} list {{if .project}}-p {{.project}}{{end}} -q " \
                     resolution = unresolved \
                     AND sprint in ( {{options.id}} ) \
