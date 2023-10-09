@@ -110,6 +110,10 @@ bindsym {
 ### Input configuration
 #
 input <identifier> xkb_model "pc101" 
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+}
 
 ### Key bindings
 #
