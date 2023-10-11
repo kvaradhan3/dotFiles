@@ -38,4 +38,4 @@ prompt() {
 }
 
 PROMPT='$(prompt) '
-RPROMPT='%*'
+RPROMPT="${RPROMPT/'%*'}"'%*'
