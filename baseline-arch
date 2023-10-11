@@ -197,6 +197,7 @@ pac_install shellcheck
 pac_install python-docutils
 pac_install util-linux
 pac_install openssh
+pac_install doas
 
 ##
 # Tools
@@ -302,6 +303,7 @@ pac_install pacman-contrib
 # Cloud and Virtualization...
 #
 pac_install docker
+pac_install docker-compose
 
 sudo systemctl start  docker.service
 sudo systemctl enable docker.service
@@ -371,5 +373,15 @@ if false; then
   pac_install youtube-dl 
 fi
 
+if false; then
+  # other
+  pac_install postgresql
+  aur_install paperless-ngx
+fi
+
+if [[ -f ./baseline.d/baseline-$(uname -n) ]]
+then
+    source ./baseline.d/baseline-$(uname -n)
+fi
 
 sudo pacman -Syu --noconfirm --needed

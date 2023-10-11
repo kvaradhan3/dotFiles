@@ -1,0 +1,27 @@
+#! /bin/zsh
+
+PWR=/sys/class/power_supply
+case $1 in
+MaxCapacity)
+    if [ -f $PWR/BAT0/charge_full_design ] ; then
+        cat $PWR/BAT0/charge_full_design
+    else
+        echo 1
+    fi
+    ;;
+CurrentCapacity)
+    if [ -f $PWR/BAT0/charge_full_design ] ; then
+        cat $PWR/BAT0/charge_now
+    else
+        echo 0
+    fi
+    ;;
+ExternalConnected|ExternalChargeCapable)
+    if [[ -f $PWR/AC/online ]] &&
+	   [[ "$(cat $PWR/AC/online 2>&-)" != '0' ]] ; then
+        print Yes
+    else
+        print No
+    fi
+    ;;
+esac

@@ -1,0 +1,3 @@
+#! /bin/zsh
+
+ioreg -rc AppleSmartBattery | awk '/''"'"$1"'"''/ { print $3 }'

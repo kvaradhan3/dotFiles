@@ -54,6 +54,7 @@ then
         zsh-users/zsh-history-substring-search
 
         kvaradhan3/dotFiles path:zshell/plugins/nskc
+        kvaradhan3/dotFiles path:zshell/plugins/batteryCharge
 PLUGINS_LIST
 fi
 

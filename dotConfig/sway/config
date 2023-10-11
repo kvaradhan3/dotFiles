@@ -1,6 +1,6 @@
 ###
 # slack only runon X.
-# xwayland disable
+xwayland disable
 
 ### Variables
 
