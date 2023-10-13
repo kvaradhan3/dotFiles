@@ -1,5 +1,5 @@
 #! /bin/zsh
-# shellcheck disable=SC2086,SC2278,SC2298,SC2296,SC2299
+# shellcheck disable=SC2278,SC2298,SC2296,SC2299
 # SC2086 (info): Double quote to prevent globbing and word splitting.
 # SC2296 (error): Parameter expansions can't start with (. Double check syntax.
 # SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
@@ -17,12 +17,14 @@ COMPLETION_WAITING_DOTS="true"
 autoload -Uz compaudit compinit zrecompile
 compinit
 
+# zstyle ':antidote:bundle' use-friendly-names 'yes'
+
 if [ -d /usr/local/opt/antidote ] ; then
     source /usr/local/opt/antidote/share/antidote/antidote.zsh
 elif [ -d /usr/share/zsh-antidote ] ; then
     source /usr/share/zsh-antidote/antidote.zsh
 else
-    echo 'ANTIDOTE not found' >&2
+    echo 'antidote not found' >&2
 fi
 
 if ! [[ -f ~/.zsh_plugins.zsh ]] ||
@@ -59,11 +61,10 @@ PLUGINS_LIST
 fi
 
 # Initialize a few things that OMZ did for you nicely...
-ZSH="$(antidote path ohmyzsh/ohmyzsh)"
-ZSH_CACHE_DIR=~/Library/Caches/zshell
+ZSH_CACHE_DIR="$(dirname "$(antidote home)")"/zshell
 
 # ensure completions dir
-mkdir -p $ZSH_CACHE_DIR/completions
+mkdir -p "$ZSH_CACHE_DIR"/completions
 
 (( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || \
     fpath=("$ZSH_CACHE_DIR/completions" "${fpath[@]}")
@@ -75,40 +76,4 @@ source ~/.zsh_plugins.zsh
 
 # shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
 source "${0:h}"/themes/gitsy.zsh-theme
-
-# Save the location of the current completion dump file.
-if [[ "$OSTYPE" = darwin* ]]; then
-  # macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
-  SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST="${HOST/.*/}"
-else
-  SHORT_HOST="${HOST/.*/}"
-fi
-
-if [[ -z "$ZSH_COMPDUMP" ]]; then
-  ZSH_COMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
-fi
-
-# Construct zcompdump OMZ metadata
-zcompdump_revision="#omz revision: $(builtin cd -q "$ZSH" || true; git rev-parse HEAD 2>/dev/null)"
-zcompdump_fpath="#omz fpath: ${fpath[*]}"
-if ! command grep -q -Fx "$zcompdump_revision" "$ZSH_COMPDUMP" 2>/dev/null \
-   || ! command grep -q -Fx "$zcompdump_fpath" "$ZSH_COMPDUMP" 2>/dev/null; then
-  command rm -f "$ZSH_COMPDUMP"
-  zcompdump_refresh=1
-fi
-
-compinit -i -d "$ZSH_COMPDUMP"
-
-# Append zcompdump metadata if missing
-if (( zcompdump_refresh )) \
-  || ! command grep -q -Fx "$zcompdump_revision" "$ZSH_COMPDUMP" 2>/dev/null; then
-  # Use `tee` in case the $ZSH_COMPDUMP filename is invalid, to silence the error
-  # See https://github.com/ohmyzsh/ohmyzsh/commit/dd1a7269#commitcomment-39003489
-  tee -a "$ZSH_COMPDUMP" &>/dev/null <<EOF
-
-$zcompdump_revision
-$zcompdump_fpath
-EOF
-fi
-unset zcompdump_revision zcompdump_fpath zcompdump_refresh
 
