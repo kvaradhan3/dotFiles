@@ -4,29 +4,40 @@ if [ ! -t 0 ] ; then
     return 0
 fi
 
-TWODAYS=$(( 2 * 24 * 60 * 60 ))
+local TWODAYS=$(( 2 * 24 * 60 * 60 ))
+local do_checkupdates=skip
+
 if /usr/bin/stat --format %Y "$0" >/dev/null 2>&-
 then
     # Linux
-    test $(( $(/usr/bin/stat --format %Y  "$0") + TWODAYS ))	\
-       -lt "$(date +%s)" || return 0
+    if [[ $(( $(/usr/bin/stat --format %Y  "$0") + TWODAYS ))	\
+       -lt "$(date +%s)" ]]
+    then
+        do_checkupdates=run
+    fi
 else
     # Darwin
-    test $(( $(/usr/bin/stat -Lf %m "$0")       + TWODAYS ))	\
-       -lt "$(date +%s)" || return 0
+    if [[ $(( $(/usr/bin/stat -Lf %m "$0") + TWODAYS ))	\
+       -lt "$(date +%s)" ]]
+    then
+        do_checkupdates=run
+    fi
 fi
+
+skip() { :    ; } 
+run()  { "$@" ; }
 
 case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
     *darwin*)
-        /usr/sbin/softwareupdate -l
-        brew update >/dev/null 2>&-
-        brew outdated
+        $do_checkupdates /usr/sbin/softwareupdate -l
+        $do_checkupdates brew update >/dev/null 2>&-
+        $do_checkupdates brew outdated
 	;;
     *ubuntu*|*debian*)
-        /usr/lib/update-notifier/apt-check -p
+        $do_checkupdates /usr/lib/update-notifier/apt-check -p
 	;;
     *centos*|*rhel*|*fedora*)
-	yum list upgradable
+	$do_checkupdates yum list upgradable
 	;;
     *arch*)
         export AURDEST=/var/pacman/packages
@@ -34,12 +45,13 @@ case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
         export AUR_PAGER=ranger
         export AUR_REPO=AUR
 
-        paclist AUR | aur vercmp
-        checkupdates
+        $do_checkupdates paclist AUR | aur vercmp
+        $do_checkupdates checkupdates
         ;;
     *)
 	printf "%s: unknown system %s (%s), updates check not done.\n"	\
                "$(basename "$0")" "$(uname -s)" "$(uname -r)"
 	;;
 esac
-touch -m "$0"
+$do_checkupdates touch -m "$0"
+unfunction skip run
