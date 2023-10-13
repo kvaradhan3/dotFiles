@@ -1,0 +1,80 @@
+#! /bin/zsh
+
+declare -A _bat
+#
+# The driver
+#
+_bat[_bat]=_bat_$(uname -s)
+autoload -Uz $_bat[_bat]
+
+#
+# Colors
+#
+_bat[red]='%F{red}'		# "\033[31m"
+_bat[grn]='%F{green}'		# "\033[32m"
+_bat[yel]='%F{yellow}'		# "\033[33m"
+_bat[rst]='%f'			# "\033[00m"
+
+#
+# Font Choices
+#
+_bat[empty]='\u25AF'		# ▯
+_bat[full_]='\u25Ae'		# ▮
+_bat[acSym]='\u26A1'		# ⚡
+
+#
+# alternates
+#
+_bat["arrow-empty"]='\u25b9'	# ▹
+_bat["arrow-full_"]='\u25b8'	# ▸
+_bat["block-empty"]='\u25A1'	# □
+_bat["block-full_"]='\u25A0'	# ■
+
+_bat[bars]=10
+
+function _bat_charge {
+    local maxCap=$(      $_bat[_bat] MaxCapacity           )
+    local curCap=$(      $_bat[_bat] CurrentCapacity       )
+    local extConn=$(     $_bat[_bat] ExternalConnected     )
+    local extCharging=$( $_bat[_bat] ExternalChargeCapable )
+
+    local bars=$_bat[bars]
+    local prt=
+
+    # Colour
+    charge=$(( bars * ${curCap:-0} / ${maxCap:-1} ))
+    if   [[ "$charge" -gt $(( 6 * bars / 10 )) ]]
+    then
+	prt+="$_bat[grn]"	#       charge > 60% of bars
+    elif [[ $charge -ge $(( 4 * bars / 10 )) ]]
+    then
+	prt+="$_bat[yel]"	# 40% < charge < 60%
+    else
+	prt+="$_bat[red]"	# 40% < charge
+    fi
+
+    # AC
+    if [[ "$extConn" = 'Yes' && "$extCharging" = 'Yes' ]] ; then
+	prt+="$(printf "%s%s%s" "%{" "$_bat[acSym]" "%2G%}")"
+    fi
+
+    # Bars
+    i=0
+    while [[ $i -ne "$charge" ]] # fill to charge
+    do
+	prt+="$_bat[full_]"
+        i=$((i + 1))
+    done
+    while [[ $i -ne "$bars" ]]	# fill fmt to rest
+    do
+	prt+="$_bat[empty]"
+        i=$((i + 1))
+    done
+
+    # Reset
+    prt+="$_bat[rst]"
+
+    print "$prt"
+}
+
+_bat_charge

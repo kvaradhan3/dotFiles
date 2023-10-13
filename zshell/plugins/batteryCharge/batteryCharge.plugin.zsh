@@ -37,9 +37,18 @@ esac
 
 if $deviceHasBattery
 then
+
     # if we were run multiple times, remove earlier instances
     # and set the bcharge again.
     #
-    autoload -Uz _bcharge
-    export RPROMPT='$(_bcharge) '"${RPROMPT/'$(_bcharge) '/}"
+    autoload -Uz _bat_charge
+    export RPROMPT='$(_bat_charge) '"${RPROMPT/'$(_bat_charge) '/}"
+
+    batteryCharge_plugin_unload() {
+        emulate -L zsh
+
+	unfunction _bat_charge
+	unfunction $0
+    }
+
 fi
