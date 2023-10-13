@@ -45,7 +45,7 @@ _path    . ..
 _path -p /usr/local
 _path -p "$HOME"
 # _path -p "$(brew --prefix)"/opt/python/libexec
-_path -p "$(brew --prefix)"/opt/ruby
+# _path -p "$(brew --prefix)"/opt/ruby
 
 _cdpath
 _cdpath -p . .. "$HOME"
