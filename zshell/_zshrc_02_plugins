@@ -17,7 +17,7 @@ COMPLETION_WAITING_DOTS="true"
 autoload -Uz compaudit compinit zrecompile
 compinit
 
-# zstyle ':antidote:bundle' use-friendly-names 'yes'
+zstyle ':antidote:bundle' use-friendly-names 'yes'
 
 if [ -d /usr/local/opt/antidote ] ; then
     source /usr/local/opt/antidote/share/antidote/antidote.zsh
