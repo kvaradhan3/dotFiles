@@ -1,4 +1,7 @@
-#! /bin/sh
+#! /bin/zsh
+#
+# shellcheck disable=SC2296
+#
 
 PROGNAME="$(basename "$0")"
 
@@ -10,12 +13,28 @@ usage() {
 }
 
 log() {
-    printf "%s: %s\n" "$PROGNAME" "$*"
-}
-
-error() {
-    printf "%s: %s\n" "$PROGNAME" "$@"
-    exit 1
+    local pre=
+    local post=
+    case $1 in
+        '--error') 
+            pre="${(%):-%B%F{red}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--warn')
+            pre="${(%):-%B%F{yellow}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--info')
+            pre="${(%):-%F{green}"
+            post="${(%):-%f}"
+            shift
+            ;;
+        *)
+            ;;
+    esac
+    printf "%s%s: %s%s\n" "$pre" "$PROGNAME" "$*" "$post"
 }
 
 INSTALLOP=install
@@ -35,21 +54,6 @@ shift $((OPTIND-1))
 $DEBUG && INSTALLOP='echo'
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-SYS="$(uname)"
-
-#
-# Basic checks
-#
-case "$SYS" in
-    Linux)  STATFMT='--format' ;;
-    Darwin) STATFMT='-f'       ;;
-    *)      error Unknown system "$SYS" ;;
-esac
-if [ "$(stat $STATFMT %d "$DESTDIR")" -ne "$(stat $STATFMT %d "$HERE")" ]
-then
-    error repo needs to install in the same file system
-fi
-getInode() { stat $STATFMT %i "$1" 2>&- ; }
 
 #
 # Utilities to (un)install
@@ -57,28 +61,27 @@ getInode() { stat $STATFMT %i "$1" 2>&- ; }
 install() {
     if [ -e "$2" ] ; then
         $REFRESH && {
-            log skip "$2"
+            log --warn skip "$2"
             return
         }
         mv "$2" "$2".ORIG # backup existing
+        log --warn save "$2"
     fi
-    if [ -d "$1" ] ; then
-        ln -s -f "$1" "$2"
-    else
-        ln -f "$1" "$2"
-    fi
-    log "link $2 to $1"
+    ln -s -f "$1" "$2"
+    log --info link "$2" to "$1"
 }
 
 uninstall() {
-    if { [ -f "$2" ] && [ "$(getInode "$2")" = "$(getInode "$1")"  ] ; } ||
-       { [ -d "$2" ] && [ "$(readlink "$2")" = "$1" ] ; }
+    if [[ "$(readlink "$2")" = "$1" ]]
     then
         rm -f "$2"
         if [ -e "$2".ORIG ] ; then
             mv "$2".ORIG "$2"
+            log --warn restore "$2"
         fi
-        log "unlink $2 from $1"
+        log --info unlink "$2" from "$1"
+    else
+        log --warn skip "$2"
     fi
 }
 
@@ -165,7 +168,7 @@ done
 #   font-source-code-pro
 #
 
-case "$SYS" in
+case "$(uname)" in
     Linux)  ./baseline-arch     ;;
     Darwin) brew bundle install ;;
 esac
