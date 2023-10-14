@@ -26,31 +26,38 @@ prtiming() {
     fi
 }
 
-#
-fpath=(
-        "$ZDOTDIR"
-        "$ZDOTDIR_LOCAL"
-        "$ZDOTDIR_LOCAL/functions"
-        "$HOME/src/zsh-completions/src"
-        "/usr/local/share/zsh-completions"
-        "${fpath[@]}"
-    )
+typeset -xT INFOPATH infopath :
+typeset -U PATH     path
+typeset -U CDPATH   cdpath
 
-typeset -xTU FPATH fpath :
+# shellcheck disable=SC2034	# implicit zshism here
+typeset -U MANPATH  manpath
+typeset -U INFOPATH infopath
 
-autoload -Uz _path
-autoload -Uz _cdpath
+path+=( . .. ./bin ./sbin ../bin ../sbin )
+infopath+=( ./info )
 
-_path    . ..
-_path -p /usr/local
-_path -p "$HOME"
-# _path -p "$(brew --prefix)"/opt/python/libexec
-# _path -p "$(brew --prefix)"/opt/ruby
+for i in /usr/local     \
+         /opt           \
+         $HOME
+do
+    test -d "$i"       || continue
+    test -d "$i/bin"   && path+=(     "$i/bin"  )
+    test -d "$i/sbin"  && path+=(     "$i/sbin" )
+    test -d "$i/man"   && manpath+=(  "$i/man"  )
+    test -d "$/info"   && infopath+=( "$i/info" )
+done
+manpath+=( "" )
 
-_cdpath
-_cdpath -p . .. "$HOME"
-_cdpath "$HOME"/Desktop  "$HOME"/Documents
-_cdpath "$HOME"/Drives/* "$HOME"/Drives
-_cdpath / /Volumes
+# shellcheck disable=SC2034	# implicit zshism here
+cdpath=( . .. 
+         "$HOME"
+         "$HOME/Desktop"
+         "$HOME/Documents"
+         "$HOME/Drives"
+         /
+         /Volumes
+         /mnt
+)
 
 umask 022

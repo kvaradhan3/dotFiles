@@ -6,8 +6,7 @@ eval "$(gh completion -s zsh)"
 #
 # golang 
 #
-PATH+=:/usr/local/go/bin:"$(go env GOPATH)"/bin
-export PATH
+path+=( "$(go env GOPATH)"/bin )
 
 #
 # kubernetes Aliases
@@ -31,6 +30,4 @@ kln() {
     kubectl -n "$ns" logs -f "$@"
 }
 
-_path "${HOME}/.krew"
-PATH+=":${HOME}/bin/kplugins"
-export PATH
+path+=( "$HOME/.krew" )
