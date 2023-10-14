@@ -43,4 +43,9 @@ export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,
 #
 # Functions
 #
-catmd() { pandoc "$@" | lynx -stdin ; }
+catmd() {
+    pandoc "$@" | lynx -stdin
+}
+record() {
+    time "$@" 2>&1 | tee "$(date +%FT%T%Z)"-"$(basename "$0")".out
+}
