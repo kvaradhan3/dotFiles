@@ -1,19 +1,6 @@
-#
-# Vagrant
-#
-alias v=vagrant
+#! /bin/zsh
 
-#
-# multipass
-#
-if [ -f /usr/local/etc/bash_completion.d/multipass ] ; then
-    source /usr/local/etc/bash_completion.d/multipass
-fi
-
-#
-# VirtualBox
-#
-alias vbox='VBoxManage'
+emulate -L zsh
 
 _vboxlist() {
     case $# in
@@ -67,5 +54,3 @@ vb() {
         ;;
     esac
 }
-
-source "$(gcloud info --format json | jq -r .installation.sdk_root)"/path.zsh.inc
