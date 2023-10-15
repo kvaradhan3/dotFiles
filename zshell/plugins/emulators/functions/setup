@@ -1,0 +1,22 @@
+#! /bin/zsh
+
+emulate -L zsh
+
+case "$1" in
+    vagrant)
+        alias v=vagrant
+        ;;
+    multipass)
+        if [[ -f /usr/local/etc/bash_completion.d/multipass ]]
+        then
+            source /usr/local/etc/bash_completion.d/multipass
+        fi
+        ;;
+    virtualbox|vbox|vb)
+        alias vbox='VBoxManage'
+        autoload -Uz vbInit
+        ;;
+    gcloud)
+        source "$(gcloud info --format json | jq -r .installation.sdk_root)"/path.zsh.inc
+        ;;
+esac

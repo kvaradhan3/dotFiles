@@ -20,30 +20,9 @@ then
 fi
 
 emulators_plugin_unload() {
+    unfunction setup
     fpath=("${(@)fpath:#${0:A:h}}")
     unfunction $0
 }
 
-#
-# Vagrant
-#
-alias v=vagrant
-
-#
-# multipass completions
-#
-if [ -f /usr/local/etc/bash_completion.d/multipass ] ; then
-    source /usr/local/etc/bash_completion.d/multipass
-fi
-
-#
-# VirtualBox
-#
-alias vbox='VBoxManage'
-autoload -Uz vbInit
-
-
-#
-# gcloud completions
-#
-source "$(gcloud info --format json | jq -r .installation.sdk_root)"/path.zsh.inc
+autoload -Uz setup
