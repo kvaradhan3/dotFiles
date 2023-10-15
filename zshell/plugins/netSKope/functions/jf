@@ -1,0 +1,34 @@
+#! /bin/zsh
+
+emulate -L zsh
+
+JQF=
+ORD=" order by created"
+while getopts :a:e:l:p:r:s:t:u:xA:R:S: arg ; do
+    case $arg in
+        a)  JQF+=" AND assignee in ( $OPTARG )" ;;
+        e)  JQF+=" AND ( key = $OPTARG or parent in ( $OPTARG ) )" ;;
+        l)  JQF+=" AND labels in ( $OPTARG )" ;;
+        p)  JQF+=" AND project = $OPTARG" ;;
+        r)  JQF+=" AND reporter in ( $OPTARG )" ;;
+        s)  case $OPTARG in
+            all-open)   jstatus='Backlog, OPEN, Reopened, "TO Do", "In Progress"';;
+            backlog)    jstatus='Backlog' ;;
+            moving)     jstatus='"To Do", "In Progress"';;
+            todo)       jstatus='"To Do"';;
+            inprogress) jstatus='"In Progress"';;
+            *)          jstatus="$OPTARG";
+            esac
+            JQF+=" AND status in ( $jstatus )" ;;
+        t)  JQF+=" AND issuetype = $OPTARG" ;;
+        u)  JQF+=" AND updated $OPTARG" ;;
+        x)  ORD= ;;
+        A)  JQF+=" AND assignee=$OPTARG" ;;
+        R)  JQF+=" AND reporter=$OPTARG" ;;
+        S)  JQF+=" AND sprint in ( ${OPTARG} )" ;;
+        \?) echo "Unknown filter type: $OPTARG" ;
+            typeset -f "$0"
+            ;;
+    esac
+done
+printf "%s%s" "${JQF/ AND /}" "$ORD"

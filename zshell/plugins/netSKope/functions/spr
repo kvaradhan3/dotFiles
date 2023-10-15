@@ -1,0 +1,11 @@
+#! /bin/zsh
+
+emulate -L zsh
+
+SIZE="$(echo "$1" | tr '[:lower:]' '[:upper:]')"
+PRID=$2
+
+# shellcheck disable=SC2016
+printf '`PR/%s` %s %s\n' "$SIZE"                             \
+       "$(gh pr view --json title --jq '.title' "$PRID")"    \
+       "$(gh pr view --json url   --jq '.url'   "$PRID")"

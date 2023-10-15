@@ -1,45 +1,27 @@
-vpn() {
-    if [ "x$1" != 'x' ] ; then
-        vpn="NetSkope $1 CLI"
-    else
-        vpn="NetSkope US CLI"
-    fi
-
-    officenets="10.50.0.0/16        \
-                10.60.0.0/16        \
-                10.68.66.0/24       \
-                10.68.68.0/22       \
-                10.128.6.0/24       \
-                10.136.4.0/24       \
-                10.136.8.0/24       \
-                10.136.2.0/24       \
-                104.198.10.0/24     \
-                163.116.128.0/24    \
-                172.16.39.0/24      \
-                172.16.254.0/24     \
-                172.18.36.0/22      \
-                172.18.245.0/24     \
-                172.18.38.0/24      \
-                172.18.244.0/24     \
-                "
-    echo -n "Connecting to $vpn "
-    networksetup -connectpppoeservice "$vpn"
-    cnt=0
-    # shellcheck disable=SC2034
-    for i in 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 ; do
-        vpnint=$(scutil --nc status "$vpn" | awk '/InterfaceName/ {print $3}')
-        if echo "$vpnint" | grep -q "ppp"; then
-            echo
-            for net in $(eval echo "$officenets"); do
-                sudo route add -net "$net" -interface "$vpnint"
-            done
-            return
-        fi
-        echo -n "."
-        sleep 1
-	cnt=$(( cnt + 1 ))
-    done
-    echo -e "\nCould not establish VPN in ${cnt}s.: $vpn"
-}
+#! /bin/zsh
+#
+# prereqs:
+#   brew install go-jira
+#   go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest
+#
 
 export GOPRIVATE=github.com/netskope,github.com/netSkopePlatformEng,github.com/netskope-qe
+alias ji=~/go/bin/jira
+
+#
+# These zshisms expand globally.
+#
+alias -g .obs="-p OBS"
+alias -g .open="-s all-open"
+alias -g .backlog="-s backlog"
+alias -g .epic="-t epic"
+alias -g .ng="-l new-obs-repo"
+alias -g .upd="-u '>='"
+alias -g .cs='-S "openSprints()"'
+alias -g .fs='-S "futureSprints()"'
+alias -g .mine="-A 'currentuser()'"
+alias -g .rmine="-R 'currentuser()'"
+
+# alias new-obs-repo-all='jira list -q "$(jf .obs .open .ng) DESC" -t obs-list'
+# alias new-obs-repo-epics='jira list -q "$(jf .obs .open .epic .ng) DESC" -t obs-list'
+

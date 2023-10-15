@@ -58,6 +58,7 @@ then
         kvaradhan3/dotFiles path:zshell/plugins/nskc
         kvaradhan3/dotFiles path:zshell/plugins/batteryCharge
         kvaradhan3/dotFiles path:zshell/plugins/1p
+        kvaradhan3/dotFiles path:zshell/plugins/netSkope
 PLUGINS_LIST
 fi
 
