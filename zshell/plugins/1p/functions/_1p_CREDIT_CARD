@@ -1,0 +1,35 @@
+#! /bin/zsh
+# shellcheck disable=SC2086,SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+if [[ -z "${__1P[UTILITIES]}" ]]
+then
+    autoload -Uz _1p__utilities
+    _1p__utilities
+
+    __1P[FUNCTIONS]+=' _1p_CREDIT_CARD'
+fi
+
+local JSON="$1"
+
+(
+    printf "ID:,%s\n"       "$(base64 -d <<<"$JSON" | jq -r .id)"
+    printf "Title:,%s\n"    "$(base64 -d <<<"$JSON" | jq -r .title)"
+
+    printf "Cardholder Name:,%s\n"  "$(_1p__extract "$JSON" id cardholder)"
+    printf "Card Number:,%s\n"      "$(_1p__extract "$JSON" id ccnum)"
+    printf "CVV:,%s\n"              "********"
+    printf "Expiry:,%s\n"           "$(_1p__extract "$JSON" id expiry)"
+# | column -s, -t
+) | tidy-viewer -eR
+
+_1p__secret_to_clipboard "$JSON" id cvv

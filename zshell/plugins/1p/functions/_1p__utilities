@@ -1,0 +1,41 @@
+#! /bin/zsh
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+_1p__extract() {
+    local JSON="$1"
+    local field="$2"
+    local key="$3"
+    local val="${4:-"value"}"
+
+    base64 -d <<<"$JSON" | jq -r '.fields[] | select(.'"$field"' == "'"$key"'").'"$val"
+}
+
+_1p__validate() {
+    #
+    # check if we are signed in to the right domain.
+    #
+    local account="${1:-"my"}"
+    local domain="$(op account get --format=json 2>&- | jq -rc .domain)"
+    if [ "$domain" != "$account" ] ; then
+        # shellcheck disable=SC2046   # 1password returns a shell script.
+        eval $(op signin --account "$account$FQDN")
+    fi
+}
+
+_1p__secret_to_clipboard() {
+    (
+      _1p__extract "$@" | $__1P[copy]
+      (
+        sleep "$CLIPBOARD_TIMEOUT"
+        echo "" | $__1P[copy]
+      )  </dev/null >/dev/null 2>&1 &
+      # shellcheck disable=SC3044  # In POSIX sh, 'disown' is undefined
+      disown || true
+    ) </dev/null >/dev/null 2>&1
+}
+
+__1P[UTILITIES]='_1p__extract
+	         _1p__validate
+		 _1p__secret_to_clipboard'
