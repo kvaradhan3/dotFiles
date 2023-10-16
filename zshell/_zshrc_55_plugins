@@ -1,4 +1,5 @@
 #! /bin/zsh
+#
 # shellcheck disable=SC2278,SC2298,SC2296,SC2299
 # SC2086 (info): Double quote to prevent globbing and word splitting.
 # SC2296 (error): Parameter expansions can't start with (. Double check syntax.
@@ -8,17 +9,10 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-
-# shellcheck disable=SC2034
-COMPLETION_WAITING_DOTS="true"
-
 autoload -Uz compaudit compinit zrecompile
 compinit
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
-
 if [ -d /usr/local/opt/antidote ] ; then
     source /usr/local/opt/antidote/share/antidote/antidote.zsh
 elif [ -d /usr/share/zsh-antidote ] ; then
@@ -26,6 +20,17 @@ elif [ -d /usr/share/zsh-antidote ] ; then
 else
     echo 'antidote not found' >&2
 fi
+
+# Initialize a few things that OMZ did for you nicely...
+ZSH_CACHE_DIR="$(dirname "$(antidote home)")"/zshell
+
+# ensure completions dir
+mkdir -p "$ZSH_CACHE_DIR"/completions
+
+(( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || \
+    fpath=("$ZSH_CACHE_DIR/completions" "${fpath[@]}")
+
+# source <(antibody init)
 
 if ! [[ -f ~/.zsh_plugins.zsh ]] ||
    ! antidote path ohmyzsh/ohmyzsh >/dev/null 2>&1
@@ -46,7 +51,6 @@ then
     	ohmyzsh/ohmyzsh path:plugins/chucknorris
     	ohmyzsh/ohmyzsh path:plugins/helm
     	ohmyzsh/ohmyzsh path:plugins/kubectl
-    	ohmyzsh/ohmyzsh path:plugins/1password
 
     	wting/autojump  path:bin/autojump.zsh
 
@@ -63,20 +67,18 @@ then
 PLUGINS_LIST
 fi
 
-# Initialize a few things that OMZ did for you nicely...
-ZSH_CACHE_DIR="$(dirname "$(antidote home)")"/zshell
-
-# ensure completions dir
-mkdir -p "$ZSH_CACHE_DIR"/completions
-
-(( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || \
-    fpath=("$ZSH_CACHE_DIR/completions" "${fpath[@]}")
-
-# source <(antibody init)
 
 #shellcheck source=/Users/kvaradhan/.zsh_plugins.zsh
 source ~/.zsh_plugins.zsh
 
 # shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
 source "${0:h}"/themes/gitsy.zsh-theme
+
+#
+# completions
+#
+eval "$(gh completion -s zsh)"
+
+# shellcheck disable=SC2034
+COMPLETION_WAITING_DOTS="true"	# used in lib/completion.zsh
 

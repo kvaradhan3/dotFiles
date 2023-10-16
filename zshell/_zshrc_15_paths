@@ -1,0 +1,70 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+typeset -xT INFOPATH infopath :
+typeset -U PATH     path
+typeset -U CDPATH   cdpath
+
+# shellcheck disable=SC2034	# implicit zshism here
+typeset -U MANPATH  manpath
+typeset -U INFOPATH infopath
+
+path+=( . .. ./bin ./sbin ../bin ../sbin )
+infopath+=( ./info )
+
+for i in /usr/local     \
+         /opt           \
+         $HOME
+do
+    test -d "$i"       || continue
+    test -d "$i/bin"   && path+=(     "$i/bin"  )
+    test -d "$i/sbin"  && path+=(     "$i/sbin" )
+    test -d "$i/man"   && manpath+=(  "$i/man"  )
+    test -d "$/info"   && infopath+=( "$i/info" )
+done
+manpath+=( "" )
+
+#
+# golang 
+#
+path+=( "$(go env GOPATH)"/bin )
+export GOPRIVATE=github.com/netskope,github.com/netSkopePlatformEng,github.com/netskope-qe
+
+path+=( "$HOME/.krew" )
+
+# shellcheck disable=SC2034	# implicit zshism here
+cdpath=( . ..
+         "$HOME"
+         "$HOME/Desktop"
+         "$HOME/Documents"
+         "$HOME/Drives"
+         /
+         /Volumes
+         /mnt
+)
+
+export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,pickup_types='$"/?!=',boulder=0,name=Croesus,color
+
+if [[ "$(uname -s)" = Linux ]]
+then
+    if test -z "${XDG_RUNTIME_DIR}" ; then
+        export XDG_RUNTIME_DIR=/tmp/${UID}-runtime-dir
+        test -d ${XDG_RUNTIME_DIR} || mkdir ${XDG_RUNTIME_DIR}
+        chmod 0700 ${XDG_RUNTIME_DIR}
+    fi
+
+    export MOZ_ENABLE_WAYLAND=1
+    export QT_QPA_PLATFORM=wayland
+fi
+
