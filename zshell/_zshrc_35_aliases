@@ -9,27 +9,18 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-unalias -m '*'
-
-# some useful aliases
 alias c='clear'
-alias h='fc -l'
-alias jo='jobs -l'
-alias m='$PAGER'
+alias h='fc -l -d'
 
 export CLICOLOR=
-alias ls='ls -F'
-alias ll='ls -laFo'
-alias l='ls -l'
+alias ls='/bin/ls -F --color=auto'
+alias l='/bin/ls -lF --color=auto'
 
-alias g='egrep -i'
+alias g='grep -iE'
 alias qlp='/usr/bin/qlmanage -p'
 
 alias p=pushd
 alias pop=popd
-
-alias rc='readlink current'
-alias mkrc='$(ln -sf "$(pf -d .values)" current)'
 
 alias tl='tmux list-sessions'
 alias ta='tmux attach -t'
