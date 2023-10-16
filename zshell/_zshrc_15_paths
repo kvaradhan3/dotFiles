@@ -9,9 +9,6 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-
 typeset -xT INFOPATH infopath :
 typeset -U PATH     path
 typeset -U CDPATH   cdpath
@@ -23,15 +20,16 @@ typeset -U INFOPATH infopath
 path+=( . .. ./bin ./sbin ../bin ../sbin )
 infopath+=( ./info )
 
-for i in /usr/local     \
-         /opt           \
+local _i
+for _i in /usr/local     \
+         /opt            \
          $HOME
 do
-    test -d "$i"       || continue
-    test -d "$i/bin"   && path+=(     "$i/bin"  )
-    test -d "$i/sbin"  && path+=(     "$i/sbin" )
-    test -d "$i/man"   && manpath+=(  "$i/man"  )
-    test -d "$/info"   && infopath+=( "$i/info" )
+    test -d "$_i"       || continue
+    test -d "$_i/bin"   && path+=(     "$_i/bin"  )
+    test -d "$_i/sbin"  && path+=(     "$_i/sbin" )
+    test -d "$_i/man"   && manpath+=(  "$_i/man"  )
+    test -d "$_i/info"  && infopath+=( "$_i/info" )
 done
 manpath+=( "" )
 
@@ -39,7 +37,6 @@ manpath+=( "" )
 # golang 
 #
 path+=( "$(go env GOPATH)"/bin )
-export GOPRIVATE=github.com/netskope,github.com/netSkopePlatformEng,github.com/netskope-qe
 
 path+=( "$HOME/.krew" )
 
