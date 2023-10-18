@@ -1,7 +1,5 @@
 #! /bin/zsh
 
-emulate -L zsh
-
 SIZE="$(echo "$1" | tr '[:lower:]' '[:upper:]')"
 PRID=$2
 

@@ -8,8 +8,6 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-emulate -L zsh
-
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 

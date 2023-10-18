@@ -1,7 +1,5 @@
 #! /bin/zsh
 
-emulate -L zsh
-
 case "$1" in
     vagrant)
         alias v=vagrant

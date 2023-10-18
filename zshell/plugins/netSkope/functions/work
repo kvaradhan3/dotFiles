@@ -12,8 +12,6 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-emulate -L zsh
-
 typeset -A __w
 __w[master]=develop  # the master branch
 __w[branch]="$(git symbolic-ref --short HEAD)"

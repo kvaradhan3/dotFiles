@@ -11,23 +11,35 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-if [[ ${zsh_loaded_plugins[-1]} != */netSkope ]] && \
+if [[ ${zsh_loaded_plugins[-1]} != */kcf ]] && \
        [[ -z ${fpath[(r)${0:h}/functions]} ]]
 then
     fpath+=( "${0:h}/functions" )
 fi
 
-netSkope_plugin_unload() {
-    for i in jf spr
-    do
-        whence -w $i &>/dev/null && unfunction $i
-    done
-    whence -w work_plugin_unload &>/dev/null && work_plugin_unload
+# plugin unload https://github.com/agkozak/zsh-z/blob/16fba5e9d5c4b650358d65e07609dda4947f97e8/zsh-z.plugin.zsh#L680-L698
 
-    fpath=("${(@)fpath:#${0:A:h}}")
-    unfunction $0
-}
+local deviceHasBattery=false
+case "$(uname -s)" in
+    Darwin)
+        if ioreg -i | grep "AppleSmartBattery " >/dev/null
+	then
+	    deviceHasBattery=true
+	fi
+        ;;
+    Linux)
+        if [[ -d /sys/class/power_supply/BAT0 ]]
+	then
+	    deviceHasBattery=true
+	fi
+        ;;
+esac
 
-autoload -Uz jf		# jira format definer
-autoload -Uz spr	# helper to generate github PR reference
-autoload -Uz work
+if $deviceHasBattery
+then
+    # if we were run multiple times, remove earlier instances
+    # and set the bcharge again.
+    #
+    autoload -Uz _bcharge
+    export RPROMPT='$(_bcharge) '"${RPROMPT/'$(_bcharge) '/}"
+fi

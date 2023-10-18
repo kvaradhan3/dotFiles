@@ -1,7 +1,5 @@
 #! /bin/zsh
 
-emulate -L zsh
-
 JQF=
 ORD=" order by created"
 while getopts :a:e:l:p:r:s:t:u:xA:R:S: arg ; do

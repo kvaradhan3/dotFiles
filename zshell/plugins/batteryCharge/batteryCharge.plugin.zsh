@@ -45,8 +45,6 @@ then
     export RPROMPT='$(_bat_charge) '"${RPROMPT/'$(_bat_charge) '/}"
 
     batteryCharge_plugin_unload() {
-        emulate -L zsh
-
 	unfunction _bat_charge
 	unfunction $0
     }

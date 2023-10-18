@@ -1,7 +1,5 @@
 #! /bin/zsh
 
-emulate -L zsh
-
 _vboxlist() {
     case $# in
     0)  VBoxManage list vms | sed -e 's/"\(.*\)" {\(.*\)}/\2	\1/' ;;
