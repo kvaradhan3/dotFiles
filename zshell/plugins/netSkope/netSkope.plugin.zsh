@@ -24,6 +24,7 @@ netSkope_plugin_unload() {
     do
         whence -w $i &>/dev/null && unfunction $i
     done
+    whence -w work_plugin_unload &>/dev/null && work_plugin_unload
 
     fpath=("${(@)fpath:#${0:A:h}}")
     unfunction $0
@@ -31,3 +32,4 @@ netSkope_plugin_unload() {
 
 autoload -Uz jf		# jira format definer
 autoload -Uz spr	# helper to generate github PR reference
+autoload -Uz work
