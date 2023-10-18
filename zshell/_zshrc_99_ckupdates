@@ -53,5 +53,6 @@ case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
                "$(basename "$0")" "$(uname -s)" "$(uname -r)"
 	;;
 esac
+$do_checkupdates antidote update
 $do_checkupdates touch -m "$0"
 unfunction skip run
