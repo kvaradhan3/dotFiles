@@ -1,0 +1,143 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC1110,SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+emulate -L zsh
+
+typeset -A __w
+__w[master]=develop  # the master branch
+__w[branch]="$(git symbolic-ref --short HEAD)"
+__w[FUNCTIONS]='_w__usage
+                _w__debug
+                _w__error
+                _w__isValid_ticket
+                _w_start
+                _w_finish'
+
+_w__usage() {
+    printf "usage: %s %s\n" "$(basename "$0")" '[start {{JIRA}}|end [{{JIRA}}]]'
+    exit
+}
+
+_w__debug() {
+    printf -P "%s: %s" "$(basename "$0")" "$*" >&2
+}
+
+_w__error() {
+    _w__debug "$@" "\n"
+    exit 1
+}
+
+_w__isValid_ticket() {
+    emulate -L  zsh
+
+    setopt EXTENDED_GLOB
+    ! [[ -z "$1" ]] && [[ -z ${1##[[:upper:]]#-[[:digit:]]#} ]]
+}
+
+_w_start() {
+    local JIRA="$1"
+    if ! _w__isValid_ticket $JIRA
+    then
+	_w__error '<' "$JIRA" '>' is not a valid jira ticket.
+    fi
+    shift
+
+    # check that we are in the master branch
+    #
+    if [[ "$__w[branch]" != "$__w[master]" ]]
+    then
+	_w__debug workspace is not in the $__w[master] branch "\n"
+	if [[ "$(git status --porcelain --untracked-files=no | tail -n 1)" ]]
+	then
+	    _w__error stash your changes and switch \
+		      to "$__w[master]" to start this work
+	fi
+
+	_w__debug switching to "$__w[master]\n"
+	git co "$__w[master]"
+    fi
+
+    if [[ $# -eq 0 ]] ; then
+	set -- $(jira view --gjq='fields.summary' "$JIRA")
+    fi
+    local brname="$(echo "$*"                 | \
+                    cut -c 1-30               | \
+                    tr ' .' '--'              | \
+                    tr -cd '[:alnum:]._-')"
+
+    _w__debug "$JIRA" ' -> ' To Do
+    jira todo "$JIRA"
+
+    _w__debug "Create $JIRA-$brname\n"
+    git br "$JIRA"-"$brname" || true
+    git co "$JIRA"-"$brname"
+
+    _w__debug "$JIRA" ' -> ' Start
+    jira start "$JIRA"
+}
+
+_w_finish() {
+    local JIRA="${$( cut -d- -f 1-2 <<<"$__w[branch]" ):-"$1"}"
+    if ! _w__isValid_ticket $JIRA
+    then
+   	_w__error '<' "$JIRA" '>' is not a valid jira ticket.
+    fi
+
+    local status=$(jira view --gjq='fields.status.name' "$JIRA")
+    if [[ "$status" != "In Progress" ]]
+    then
+        _w__error "$JIRA" is not '`'In Progress"'".  Fix
+    fi
+
+    if [[ "$(git status --porcelain --untracked-files=no | tail -n 1)" ]]
+    then
+        _w__error "Commit all your changes to $JIRA first"
+    fi
+
+    jira transition 'Problem fixed & merged' "$JIRA" --noedit
+    jira transition 'Fix accepted by reporter' "$JIRA" --noedit
+
+    # Cleanup
+    #
+    git co "$__w[master]"
+    git pull
+    git br -d "$__w[branch]"
+}
+
+work_plugin_unload() {
+  emulate -L zsh
+
+  local x
+  for x in ${=__w[FUNCTIONS]}; do
+    whence -w $x &> /dev/null && unfunction $x
+  done
+
+  unset __w
+  unfunction $0
+}
+
+case  "$1"  in
+    start)
+	shift
+	_w_start "$@"
+	;;
+    finish)
+	shift
+	_w_finish "$@"
+	;;
+    *)
+	_w__usage
+	exit 1
+	;;
+esac
