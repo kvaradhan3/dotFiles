@@ -9,8 +9,18 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-autoload -Uz compaudit compinit zrecompile
-compinit
+#zmodload zsh/zprof
+autoload -Uz compinit
+# From https://gist.github.com/ctechols/ca1035271ad134841284#gistcomment-2308206
+# shellcheck disable=SC1072,SC1073
+() {
+  if [[ $# -gt 0 ]]; then
+    compinit
+  else
+      compinit -Cf
+
+  fi
+} ${ZDOTDIR:-$HOME}/.zcompdump(N.mh+24)
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 if [ -d /usr/local/opt/antidote ] ; then
@@ -81,4 +91,4 @@ eval "$(gh completion -s zsh)"
 
 # shellcheck disable=SC2034
 COMPLETION_WAITING_DOTS="true"	# used in lib/completion.zsh
-
+#zprof
