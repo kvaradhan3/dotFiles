@@ -1,58 +1,40 @@
 #! /bin/zsh
 
-if [ ! -t 0 ] ; then
-    return 0
-fi
-
-local TWODAYS=$(( 2 * 24 * 60 * 60 ))
-local do_checkupdates=skip
-
-if /usr/bin/stat --format %Y "$0" >/dev/null 2>&-
-then
-    # Linux
-    if [[ $(( $(/usr/bin/stat --format %Y  "$0") + TWODAYS ))	\
-       -lt "$(date +%s)" ]]
-    then
-        do_checkupdates=run
-    fi
-else
-    # Darwin
-    if [[ $(( $(/usr/bin/stat -Lf %m "$0") + TWODAYS ))	\
-       -lt "$(date +%s)" ]]
-    then
-        do_checkupdates=run
-    fi
-fi
-
-skip() { :    ; } 
-run()  { "$@" ; }
-
 case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
-    *darwin*)
-        $do_checkupdates /usr/sbin/softwareupdate -l
-        $do_checkupdates brew update >/dev/null 2>&-
-        $do_checkupdates brew outdated
-	;;
-    *ubuntu*|*debian*)
-        $do_checkupdates /usr/lib/update-notifier/apt-check -p
-	;;
-    *centos*|*rhel*|*fedora*)
-	$do_checkupdates yum list upgradable
-	;;
     *arch*)
         export AURDEST=/var/pacman/packages
         export AUR_PACMAN_AUTH="sudo --askpass"
         export AUR_PAGER=ranger
         export AUR_REPO=AUR
-
-        $do_checkupdates paclist AUR | aur vercmp
-        $do_checkupdates checkupdates
-        ;;
-    *)
-	printf "%s: unknown system %s (%s), updates check not done.\n"	\
-               "$(basename "$0")" "$(uname -s)" "$(uname -r)"
-	;;
 esac
-$do_checkupdates antidote update
-$do_checkupdates touch -m "$0"
-unfunction skip run
+
+# shellcheck disable=SC1072,SC1073
+() {
+    if [[ $# -gt 0 ]]
+    then
+        case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
+        *darwin*)
+            /usr/sbin/softwareupdate -l
+            brew update >/dev/null 2>&-
+            brew outdated
+            ;;
+        *ubuntu*|*darwin*)
+            /usr/lib/update-notifier/apt-check -p
+            ;;
+        *centos*|*rhel*|*fedora*)
+            yum list upgradable
+            ;;
+        *arch*)
+            paclist AUR | aur vercmp
+            checkupdates
+            ;;
+        *)
+            printf "%s: unknown system %s (%s), updates check not done.\n" \
+                   "$(basename "$0")" "$(uname -s)" "$(uname -r)"
+            ;;
+        esac
+        antidote update
+        touch -m "$@"
+    fi
+} $0(N.mh+192)
+
