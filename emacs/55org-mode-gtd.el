@@ -108,14 +108,14 @@
   )
 ;; (require 'org-capture)
 
-(use-package helm-org-rifle
-  :bind
-  ("M-g r r"    . helm-org-rifle)               ;; Show results from all open Org buffers
-  ("M-g r R"    . helm-org-rifle-occur)               
-  ("M-g r a"    . helm-org-rifle-agenda-files)  ;; Show results from Org agenda files
-  ("M-g r A"    . helm-org-rifle-occur-agenda-files) 
-  )
-(require 'helm-org-rifle)
+;; (use-package helm-org-rifle
+;;  :bind
+;;  ("M-g r r"    . helm-org-rifle)               ;; Show results from all open Org buffers
+;;  ("M-g r R"    . helm-org-rifle-occur)               
+;;  ("M-g r a"    . helm-org-rifle-agenda-files)  ;; Show results from Org agenda files
+;;  ("M-g r A"    . helm-org-rifle-occur-agenda-files) 
+;;  )
+;;(require 'helm-org-rifle)
 
 (defun my/org-capture-add-tags (canned-tags)
   "Add CANNED-TAGS to an entry in the capture buffer."
