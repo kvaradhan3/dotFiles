@@ -1,16 +1,12 @@
 ###
-# slack only runon X.
-xwayland disable
+# 1password and zoom need Xwayland....still
+xwayland enable
 
 ### Variables
-
-###
-# baseline preferences
-#
-#
 set {
-    # Use Alt
-    $mod    Mod1
+    # Mod1 == Alt, Mod4 == Win on malgudi.   
+    # I need my alt for emacs...duh!!!
+    $mod    Mod4
 
     $left   h
     $down   j
@@ -22,7 +18,7 @@ set {
 }
 
 
-# Defining colors
+### Colours
 set {
     $white          #ffffff
     $cyan           #00afd7
@@ -46,10 +42,19 @@ client.urgent              $elegant    $magenta    $silver       $magenta    $ma
 client.placeholder         $elegant    $magenta    $silver       $white      $magenta
 
 exec {
+
+    XDG_CURRENT_DESKTOP=sway
+    systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+    dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
+    1password
+
     firefox-developer-edition
 
     $term --app-id netSkope  
-    slack
+    # slack
+    whatsapp-for-linux
+    emacs
 
     $term --app-id monitors  -T "__htop__"            -e htop
     $term --app-id speedtest -T "watch speedtest-cli" -e watch -cd -n 600 sptest   
@@ -60,22 +65,39 @@ exec {
          timeout 600 'swaymsg "output * dpms off"'  \
               resume 'swaymsg "output * dpms on"'   \
         before-sleep 'swaylock -f -c 000000'
+
+    gammastep 
+
+    sh -c 'rm -f /tmp/sovpipe && mkfifo /tmp/sovpipe && tail -f /tmp/sovpipe | sov -n -t 500'
 }
 
 bindsym {
     $mod+Return         exec $term
+    $mod+n              exec $term
     $mod+q              kill
     $mod+d              exec $menu
     $mod+Shift+c        reload
     $mod+Shift+x        exec swaymsg exit
 }
 
+set {
+    $Monitors $ws1
+    $Browsers $ws2
+    $netSkope $ws3
+    $Editors  $ws4
+    $Social   $ws9
+    $Secrets  $ws10
+}
+
 for_window {
-    [app_id="speedtest"]    move container to workspace $wsMonitor, focus, split v
-    [app_id="monitors"]     move container to workspace $wsMonitor, focus, split h
-    [app_id=".*firefox.*"]  move container to workspace $wsBrowsers
-    [class="Slack"]         move container to workspace $wsnetSkope
-    [app_id="netSkope"]     move container to workspace $wsnetSkope
+    [app_id="speedtest"]    move container to workspace $Monitors, focus, split v
+    [app_id="monitors"]     move container to workspace $Monitors, focus, split h
+    [app_id=".*firefox.*"]  move container to workspace $Browsers
+    [class="Slack"]         move container to workspace $netSkope
+    [app_id="netSkope"]     move container to workspace $netSkope
+    [class="1Password"]     move container to workspace $Secrets
+    [app_id="emacs"]        move container to workspace $Editors
+    [app_id="whatsapp.*"]   move container to workspace $Social
 }
 
 ##
@@ -93,7 +115,7 @@ bindsym {
     $mod+bar            splith
     $mod+backslash      splith
     $mod+equal          splitv
-    #$mod+minus          splitv
+    #$mod+minus         splitv
 }
 
 ### Output configuration
@@ -106,7 +128,10 @@ bindsym {
 input <identifier> xkb_model "pc101" 
 input type:touchpad {
     tap enabled
-    natural_scroll enabled
+    tap_button_map lmr
+    click_method   button_areas
+    natural_scroll disabled
+    scroll_method  two_finger
 }
 
 ### Key bindings
@@ -124,56 +149,111 @@ bindsym $mod+Shift+Right    move right
 ##
 # workspaces
 set {
-    $wsMonitor   1:monitors
-    $wsBrowsers  2:Firefox
-    $wsnetSkope  3:netSkope
-    $ws4   4:4
+    $ws1   1:󰨇
+	# U-F0a07  Dashboards	Monitors
+    $ws2   2:
+	# U-e745   Firefox	Browsers
+    $ws3   3:netSkope
+    $ws4   4:
+	# U-e779   Emacs Gnus   Editors
     $ws5   5:5
     $ws6   6:6
     $ws7   7:7
     $ws8   8:8
-    $ws9   9:9
-    $ws0   10:10
-    $wsF1  11:
-    $wsF2  12:
-    $wsF3  13:13
-    $wsF4  14:14
-    $wsF5  15:15
-    $wsF6  16:16
-    $wsF7  17:17
-    $wsF8  18:
-    $wsF9  19:19
-    $wsF10 20:20
-    $wsF11 21:
-    $wsF12 22:
-    $ws1   23:
-    $ws2   24:
+    $ws9   9:
+	# U-f232   WhatsApp	Social
+    $ws10  10:
+	# U-ebb3   1Password	Secrets
+    $ws11  11:
+    $ws12  12:
+    $ws13  13:13
+    $ws14  14:14
+    $ws15  15:15
+    $ws16  16:16
+    $ws17  17:17
+    $ws18  18:
+    $ws19  19:19
+    $ws20  20:20
+    $ws21  21:
+    $ws22  22:
+    $ws23  23:
+    $ws24  24:
+}
+
+bindsym --no-repeat {
+    # Switch to workspace
+    $mod+1              workspace $ws1;  exec "echo 1 >/tmp/sovpipe"
+    $mod+2              workspace $ws2;  exec "echo 1 >/tmp/sovpipe"
+    $mod+3              workspace $ws3;  exec "echo 1 >/tmp/sovpipe"
+    $mod+4              workspace $ws4;  exec "echo 1 >/tmp/sovpipe"
+    $mod+5              workspace $ws5;  exec "echo 1 >/tmp/sovpipe"
+    $mod+6              workspace $ws6;  exec "echo 1 >/tmp/sovpipe"
+    $mod+7              workspace $ws7;  exec "echo 1 >/tmp/sovpipe"
+    $mod+8              workspace $ws8;  exec "echo 1 >/tmp/sovpipe"
+    $mod+9              workspace $ws9;  exec "echo 1 >/tmp/sovpipe"
+    $mod+0              workspace $ws10; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+1      workspace $ws11; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+2      workspace $ws12; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+3      workspace $ws13; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+4      workspace $ws14; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+5      workspace $ws15; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+6      workspace $ws16; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+7      workspace $ws17; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+8      workspace $ws18; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+9      workspace $ws19; exec "echo 1 >/tmp/sovpipe"
+    $mod+Control+0      workspace $ws20; exec "echo 1 >/tmp/sovpipe"
+    $mod+Left           workspace prev;  exec "echo 1 >/tmp/sovpipe"
+    $mod+Right          workspace next;  exec "echo 1 >/tmp/sovpipe"
+}
+
+bindsym --release {
+    # Switch to workspace
+    $mod+1              exec "echo 0 >/tmp/sovpipe"
+    $mod+2              exec "echo 0 >/tmp/sovpipe"
+    $mod+3              exec "echo 0 >/tmp/sovpipe"
+    $mod+4              exec "echo 0 >/tmp/sovpipe"
+    $mod+5              exec "echo 0 >/tmp/sovpipe"
+    $mod+6              exec "echo 0 >/tmp/sovpipe"
+    $mod+7              exec "echo 0 >/tmp/sovpipe"
+    $mod+8              exec "echo 0 >/tmp/sovpipe"
+    $mod+9              exec "echo 0 >/tmp/sovpipe"
+    $mod+0              exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+1      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+2      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+3      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+4      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+5      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+6      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+7      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+8      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+9      exec "echo 0 >/tmp/sovpipe"
+    $mod+Control+0      exec "echo 0 >/tmp/sovpipe"
+    $mod+Left           exec "echo 0 >/tmp/sovpipe"
+    $mod+Right          exec "echo 0 >/tmp/sovpipe"
 }
 
 bindsym {
-    # Switch to workspace
-    $mod+1              workspace $wsMonitor
-    $mod+2              workspace $wsBrowsers
-    $mod+3              workspace $wsnetSkope
-    $mod+4              workspace $ws4
-    $mod+5              workspace $ws5
-    $mod+6              workspace $ws6
-    $mod+7              workspace $ws7
-    $mod+8              workspace $ws8
-    $mod+9              workspace $ws9
-    $mod+0              workspace $ws10
-
     # Move focused container to workspace
-    $mod+Shift+1        move container to workspace $wsMonitor
-    $mod+Shift+2        move container to workspace $wsBrowsers
-    $mod+Shift+3        move container to workspace $wsnetSkope
-    $mod+Shift+4        move container to workspace $ws4
-    $mod+Shift+5        move container to workspace $ws5
-    $mod+Shift+6        move container to workspace $ws6
-    $mod+Shift+7        move container to workspace $ws7
-    $mod+Shift+8        move container to workspace $ws8
-    $mod+Shift+9        move container to workspace $ws9
-    $mod+Shift+0        move container to workspace $ws10
+    $mod+Shift+1              move container to workspace $ws1
+    $mod+Shift+2              move container to workspace $ws2
+    $mod+Shift+3              move container to workspace $ws3
+    $mod+Shift+4              move container to workspace $ws4
+    $mod+Shift+5              move container to workspace $ws5
+    $mod+Shift+6              move container to workspace $ws6
+    $mod+Shift+7              move container to workspace $ws7
+    $mod+Shift+8              move container to workspace $ws8
+    $mod+Shift+9              move container to workspace $ws9
+    $mod+Shift+0              move container to workspace $ws10
+    $mod+Control+Shift+1      move container to workspace $ws11
+    $mod+Control+Shift+2      move container to workspace $ws12
+    $mod+Control+Shift+3      move container to workspace $ws13
+    $mod+Control+Shift+4      move container to workspace $ws14
+    $mod+Control+Shift+5      move container to workspace $ws15
+    $mod+Control+Shift+6      move container to workspace $ws16
+    $mod+Control+Shift+7      move container to workspace $ws17
+    $mod+Control+Shift+8      move container to workspace $ws18
+    $mod+Control+Shift+9      move container to workspace $ws19
+    $mod+Control+Shift+0      move container to workspace $ws20
 }
 
 # Scratchpad:
@@ -206,12 +286,19 @@ bindsym --locked {
     XF86AudioLowerVolume   exec pactl set-sink-volume @DEFAULT_SINK@ -5%
     XF86AudioMute          exec pactl set-sink-mute @DEFAULT_SINK@ toggle
     XF86AudioMicMute       exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
-    XF86MonBrightnessDown  exec brightnessctl set 5%-
-    XF86MonBrightnessUp    exec brightnessctl set 5%+
     XF86AudioPlay          exec playerctl play-pause
     XF86AudioNext          exec playerctl next
     XF86AudioPrev          exec playerctl previous
     XF86Search             exec $menu
+}
+
+# Screen brightness
+#
+bindsym --locked {
+    XF86MonBrightnessDown  exec brightnessctl set 5%-
+    XF86MonBrightnessUp    exec brightnessctl set 5%+
+#    XF86MonBrightnessUp    exec light -A 10
+#    XF86MonBrightnessDown  exec light -U 10
 }
 
 # Status Bar:
