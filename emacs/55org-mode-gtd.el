@@ -56,7 +56,6 @@
                            (org-agenda nil "a")
                            (org-save-all-org-buffers))))
   )
-(require 'org-agenda)
 
 ;;; https://github.com/progfolio/doct
 (use-package doct)
