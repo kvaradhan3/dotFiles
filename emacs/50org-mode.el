@@ -35,9 +35,8 @@
 	  ("rfc"  . "http://tools.ietf.org/html/rfc")
 	  ))
 
-  (add-hook 'org-mode-hook
-	    (lambda () 
-	      (turn-on-auto-fill)))
+  :hook
+  ((org-mode    .    turn-on-auto-fill))
   )
 
 (use-package org-crypt
