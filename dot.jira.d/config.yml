@@ -195,8 +195,8 @@ custom-commands:
       board_id=$({{jira}} req                                                \
                  "/rest/agile/1.0/board?projectKeyOrId={{options.project}}"  \
                  --gjq values.0.id)
-      if [[ -n "{{options.id}}" ]] ; then
-        sprint_id={{options.id}}
+      if [[ "{{options.id}}" != '<no value>' ]] ; then
+        sprint_id='{{options.id}}'
       elif {{options.future}} ; then
         sprint_id=$({{jira}} req                                             \
                   "/rest/agile/1.0/board/$board_id/sprint?state=future"      \
