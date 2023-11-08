@@ -39,6 +39,6 @@ _1p__secret_to_clipboard() {
     ) </dev/null >/dev/null 2>&1
 }
 
-__1P[UTILITIES]='_1p__extract
-	         _1p__validate
-		 _1p__secret_to_clipboard'
+__1P[UTILITIES]+=' _1p__extract
+	           _1p__validate
+		   _1p__secret_to_clipboard'
