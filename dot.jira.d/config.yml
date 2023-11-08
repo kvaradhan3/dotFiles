@@ -300,7 +300,7 @@ custom-commands:
     script: |
       {{jira}} ls -n {{args.query}}     | \
         fzf --header-lines=1              \
-            --preview="echo {1} | xargs -I % sh -c 'jira view %'"
+            --preview="jira clean {1}" 
 
   - name: ls-by-key
     aliases:
@@ -328,38 +328,19 @@ custom-commands:
         short: m
         type: BOOL
         default: false
-      - name: raw
-        short: r
-        type: BOOL
-        default: false
     script: |
-      if {{options.raw}} ; then
-          if {{options.email}} ; then
-              {{range $idx, $email := args.key -}}
-                  {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
-                  jq -r '.[] | [ .accountId ] | @sh'                       | \
-                  xargs printf '[~accountid:%s]'
-             {{end -}}
-          else
-              {{range $idx, $acid := args.key -}}
-                  {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
-                  jq -r '[ .displayName, .emailAddress ]   | @sh'      | \
-                  xargs printf '"%s" <%s>\n'
-              {{end -}}
-          fi
+      if {{options.email}} ; then
+        {{range $idx, $email := args.key -}}
+          {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
+          jq -r '.[] | [ .accountId ] | @sh'                       | \
+          xargs printf '[~accountid:%s] '
+        {{end -}}
       else
-          printf "%s,%s,%s\n" "accountId" "emailAddress" "displayName"
-          if {{options.email}} ; then
-              {{range $idx, $email := args.key -}}
-                  {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
-                  jq -r '.[] | [ .accountId, .emailAddress, .displayName ] | @csv'
-             {{end -}}
-          else
-              {{range $idx, $acid := args.key -}}
-                  {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
-                  jq -r '[ .accountId, .emailAddress, .displayName ]   | @csv'
-              {{end -}}
-          fi
+        {{range $idx, $acid := args.key -}}
+          {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
+          jq -r '[ .displayName, .emailAddress ]   | @sh'      | \
+          xargs printf '"%s" <%s>\n'
+        {{end -}}
       fi
 
   - name: clean
