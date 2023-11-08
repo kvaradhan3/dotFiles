@@ -1,0 +1,17 @@
+#! /bin/zsh
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+_1p__b64encode() {
+    base64 --wrap=0
+}
+
+_1p__b64decode() {
+    base64 --decode
+}
+
+__1P[copy]=wl-copy
+__1P[paste]=wl-paste
+__1P[UTILITIES]+=' _1p__b64encode
+                   _1p__b64decode'

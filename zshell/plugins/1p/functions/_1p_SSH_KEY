@@ -11,24 +11,15 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-if [[ -z "${__1P[UTILITIES]}" ]]
-then
-    autoload -Uz _1p__utilities
-    _1p__utilities
-
-    __1P[FUNCTIONS]+=' _1p_SSH_KEY'
-fi
-
+__1P[FUNCTIONS]+=' _1p_SSH_KEY'
 local JSON="$1"
-
 (
-    printf "ID:,%s\n"       "$(base64 -d <<<"$JSON" | jq -r .id)"
-    printf "Title:,%s\n"    "$(base64 -d <<<"$JSON" | jq -r .title)"
+    printf "ID:,%s\n"       "$(_1p__b64decode <<<"$JSON" | jq -r .id)"
+    printf "Title:,%s\n"    "$(_1p__b64decode <<<"$JSON" | jq -r .title)"
 
     printf "Key Type:,%s\n"    "$(_1p__extract "$JSON" id key_type)"
     printf "Fingerprint:,%s\n" "$(_1p__extract "$JSON" id fingerprint)"
     printf "Password:,%s\n"    "********"
 # | column -s, -t
 ) | tidy-viewer -eR
-
 _1p__secret_to_clipboard "$JSON" label password
