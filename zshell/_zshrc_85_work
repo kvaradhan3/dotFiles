@@ -36,3 +36,5 @@ alias -g .rmine="-R 'currentuser()'"
 
 # alias new-obs-repo-all='jira list -q "$(jf .obs .open .ng) DESC" -t obs-list'
 # alias new-obs-repo-epics='jira list -q "$(jf .obs .open .epic .ng) DESC" -t obs-list'
+
+alias j-fzf='fzf --header-lines=1 --preview="jira clean {1}"'
