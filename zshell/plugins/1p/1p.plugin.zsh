@@ -29,11 +29,6 @@ typeset -A __1P
 __1P[FUNCTIONS]=''
 __1P[UTILITIES]=''
 
-case $(uname) in
-Linux)   __1P[copy]=wl-copy ;;
-Darwin)  __1P[copy]=pbcopy  ;;
-esac
-
 1p_plugin_unload() {
     local x
     for x in ${=__1P[FUNCTIONS]} ${=__1P[UTILITIES]}

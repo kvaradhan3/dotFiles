@@ -9,7 +9,9 @@ _1p__extract() {
     local key="$3"
     local val="${4:-"value"}"
 
-    base64 -d <<<"$JSON" | jq -r '.fields[] | select(.'"$field"' == "'"$key"'").'"$val"
+    _1p__b64decode <<<"$JSON" | \
+	jq -r '.fields[] |
+                select(.'"$field"' == "'"$key"'").'"$val"
 }
 
 _1p__validate() {
@@ -26,16 +28,17 @@ _1p__validate() {
 
 _1p__secret_to_clipboard() {
     (
-      _1p__extract "$@" | $__1P[copy]
-      (
-        sleep "$CLIPBOARD_TIMEOUT"
-        echo "" | $__1P[copy]
-      )  </dev/null >/dev/null 2>&1 &
-      # shellcheck disable=SC3044  # In POSIX sh, 'disown' is undefined
-      disown || true
+	local pre=$(eval "${__1P[paste]}")
+	_1p__extract "$@" | $__1P[copy]
+	(
+            sleep "$CLIPBOARD_TIMEOUT"
+            echo "$pre" | $__1P[copy]
+	)  </dev/null >/dev/null 2>&1 &
+	# shellcheck disable=SC3044  # In POSIX sh, 'disown' is undefined
+	disown || true
     ) </dev/null >/dev/null 2>&1
 }
 
-__1P[UTILITIES]='_1p__extract
-	         _1p__validate
-		 _1p__secret_to_clipboard'
+__1P[UTILITIES]+=' _1p__extract
+	           _1p__validate
+		   _1p__secret_to_clipboard'

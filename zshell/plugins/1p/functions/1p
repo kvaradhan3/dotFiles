@@ -15,6 +15,9 @@ if [[ -z "${__1P[UTILITIES]}" ]]
 then
     autoload -Uz _1p__utilities
     _1p__utilities
+
+    autoload -Uz _1p__utilities_"$(uname -s)"
+    _1p__utilities_"$(uname -s)"
 fi
 
 #
@@ -50,7 +53,7 @@ do
 done
 shift $((OPTIND-1))
 
-_1p__validate $__1P[account]
+_1p__validate "${__1P[account]}"
 
 local items="$(op item list --format=json                       |
                jq -rc '.[] | [ .category, .title, .id ] | @csv' |
@@ -59,7 +62,7 @@ local items="$(op item list --format=json                       |
 if [[ -z "$items" ]]
 then
     printf "%s: no items for %s found\n" "$(basename $0)" "$1" >&2
-elif [[ "$(echo "$items" | wc -l)" -gt 1 ]]
+elif (( "$(echo "$items" | wc -l)" > 1 ))
 then
     (
         print "__category__","__item name__","__item id__"
@@ -75,16 +78,16 @@ else
     category="$(eval echo "$category")"
     id="$(eval echo "$id")"
 
-    JSON="$(base64 -w0 <(op item get "$id" --format=json))"
-    case __1P[outputf] in
+    JSON="$(op item get "$id" --format=json | _1p__b64encode)"
+    case "${__1P[outputf]}" in
     raw)
         eval op item get "$id"
         ;;
     json)
-        base64 -d <<<"$JSON" | jq .
+	_1p__b64decode <<<"$JSON" | jq .
         ;;
     *)
-	if [[ __1P[FUNCTIONS] != *_1p_$category* ]]
+	if [[ "${__1P[FUNCTIONS]}" != *_1p_$category* ]]
 	then
             autoload -Uz "_1p_$category"
 	fi

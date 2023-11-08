@@ -195,8 +195,8 @@ custom-commands:
       board_id=$({{jira}} req                                                \
                  "/rest/agile/1.0/board?projectKeyOrId={{options.project}}"  \
                  --gjq values.0.id)
-      if [[ -n "{{options.id}}" ]] ; then
-        sprint_id={{options.id}}
+      if [[ "{{options.id}}" != '<no value>' ]] ; then
+        sprint_id='{{options.id}}'
       elif {{options.future}} ; then
         sprint_id=$({{jira}} req                                             \
                   "/rest/agile/1.0/board/$board_id/sprint?state=future"      \
@@ -316,3 +316,62 @@ custom-commands:
         {{- if $idx}},{{end -}}
         {{- $issue }} {{end -}}
         )"
+
+  - name: user
+    help: helper routine to map email to accountId or viceversa...
+    args:
+      - name: key
+        required: true
+        repeat: true
+    options:
+      - name: email
+        short: m
+        type: BOOL
+        default: false
+      - name: raw
+        short: r
+        type: BOOL
+        default: false
+    script: |
+      if {{options.raw}} ; then
+          if {{options.email}} ; then
+              {{range $idx, $email := args.key -}}
+                  {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
+                  jq -r '.[] | [ .accountId ] | @sh'                       | \
+                  xargs printf '[~accountid:%s]'
+             {{end -}}
+          else
+              {{range $idx, $acid := args.key -}}
+                  {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
+                  jq -r '[ .displayName, .emailAddress ]   | @sh'      | \
+                  xargs printf '"%s" <%s>\n'
+              {{end -}}
+          fi
+      else
+          printf "%s,%s,%s\n" "accountId" "emailAddress" "displayName"
+          if {{options.email}} ; then
+              {{range $idx, $email := args.key -}}
+                  {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
+                  jq -r '.[] | [ .accountId, .emailAddress, .displayName ] | @csv'
+             {{end -}}
+          else
+              {{range $idx, $acid := args.key -}}
+                  {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
+                  jq -r '[ .accountId, .emailAddress, .displayName ]   | @csv'
+              {{end -}}
+          fi
+      fi
+
+  - name: clean
+    help: Show cleaned up view of ticket, mainly map accountId to friendly name...
+    args:
+      - name: ISSUE
+        required: true
+    script: |
+      {{jira}} {{args.ISSUE}} | while IFS= read -r x ; do
+        for acid in $(grep -o -e '~accountid:[0-9a-f]*' <<<"$x") ; do
+            j="$(jira user -r $(cut -d: -f2 <<<"$acid"))"
+            x=$(echo "$x" | sed "s/^\(.*\)$acid/\1$j/")
+        done
+        printf "%s\n" "$x"
+      done
