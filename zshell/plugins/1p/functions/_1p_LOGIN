@@ -22,8 +22,8 @@ fi
 local JSON="$1"
 
 (
-    printf "ID:,%s\n"       "$(base64 -d <<<"$JSON" | jq -r .id)"
-    printf "Title:,%s\n"    "$(base64 -d <<<"$JSON" | jq -r .title)"
+    printf "ID:,%s\n"       "$(_1p__b64decode <<<"$JSON" | jq -r .id)"
+    printf "Title:,%s\n"    "$(_1p__b64decode <<<"$JSON" | jq -r .title)"
 
     printf "Username:,%s\n"  "$(_1p__extract "$JSON" id username)"
     printf "Password:,%s\n"    "********"
@@ -35,19 +35,20 @@ local JSON="$1"
 # | column -s, -t
 ) | tidy-viewer -eRD
 
-section_id="$(base64 -d <<< "$JSON" |
+section_id="$(_1p__b64decode <<< "$JSON" |
               jq -rc '.sections[]
                      | select(.label == "ADDITIONAL QUESTIONS")
-                     | .id // empty')"
+                     | .id // empty' 2>&- )"
 
 if [ -n "$section_id" ] ; then
     # shellcheck disable=SC2154
-    printf "\n        \e[%sm%s\e[%sm"   \
+    printf "\n        \e[%sm%s\e[%sm"		  \
        "${color[reverse]}" "ADDITIONAL QUESTIONS" \
        "${color[none]}"
     {
       echo '__Challenge__,__Response__'
-      base64 -d <<< "$JSON" | jq -rc '.fields[] 
+      _1p__b64decode <<< "$JSON"		| \
+      jq -rc '.fields[]
              | select(.section.id == "'"$section_id"'")
              | [ .label, .value ]
              | @csv'

@@ -15,6 +15,9 @@ if [[ -z "${__1P[UTILITIES]}" ]]
 then
     autoload -Uz _1p__utilities
     _1p__utilities
+
+    autoload -Uz _1p__utilities_"$(uname -s)"
+    _1p__utilities_"$(uname -s)"
 fi
 
 #
@@ -75,13 +78,13 @@ else
     category="$(eval echo "$category")"
     id="$(eval echo "$id")"
 
-    JSON="$(base64 -w0 <(op item get "$id" --format=json))"
+    JSON="$(op item get "$id" --format=json | _1p__b64encode)"
     case __1P[outputf] in
     raw)
         eval op item get "$id"
         ;;
     json)
-        base64 -d <<<"$JSON" | jq .
+	_1p__b64decode <<<"$JSON" | jq .
         ;;
     *)
 	if [[ __1P[FUNCTIONS] != *_1p_$category* ]]
