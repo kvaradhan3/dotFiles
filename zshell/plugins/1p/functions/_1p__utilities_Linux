@@ -12,5 +12,6 @@ _1p__b64decode() {
 }
 
 __1P[copy]=wl-copy
+__1P[paste]=wl-paste
 __1P[UTILITIES]+=' _1p__b64encode
                    _1p__b64decode'
