@@ -11,5 +11,6 @@ _1p__b64decode() {
     base64 --decode
 }
 
+__1P[copy]=pbcopy
 __1P[UTILITIES]+=' _1p__b64encode
                    _1p__b64decode'
