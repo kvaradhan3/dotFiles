@@ -327,13 +327,13 @@ custom-commands:
       - name: email
         short: m
         type: BOOL
-        default: falsw
+        default: false
     script: |
       if {{options.email}} ; then
         {{range $idx, $email := args.key -}}
           {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
           jq -r '.[] | [ .accountId ] | @sh'                       | \
-          xargs printf '[~accountid:%s]'
+          xargs printf '[~accountid:%s] '
         {{end -}}
       else
         {{range $idx, $acid := args.key -}}
