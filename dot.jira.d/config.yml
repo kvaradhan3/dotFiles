@@ -68,6 +68,11 @@ queries:
     {{if .project}}AND project = '{{.project}}'{{end}}
     AND updated > -10d
     order by created ASC
+  comment2me: >-
+    resolution = unresolved
+    {{if .project}}AND project = '{{.project}}'{{end}}
+    AND comment ~ currentUser()
+    ORDER BY priority DESC, updated DESC
 
 custom-commands:
   - name: info
@@ -331,15 +336,39 @@ custom-commands:
     script: |
       if {{options.email}} ; then
         {{range $idx, $email := args.key -}}
-          {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
-          jq -r '.[] | [ .accountId ] | @sh'                       | \
-          xargs printf '[~accountid:%s] '
+          if (( $(redis-cli SISMEMBER emailIds "{{$email}}") > 0 )) 
+          then
+            redis-cli GET "emailId:{{$email}}"
+          else
+            eval "$(
+              {{jira}} req "/rest/api/3/user/search?query={{$email}}"  | \
+              jq -r '.[] | 
+                     # @sh "displayName=\(.displayName)",
+                     @sh "accountId=[~accountid:\(.accountId)]"'
+            )"
+
+            printf '%s ' $accountId
+            redis-cli SET "emailId:{{$email}}" "$accountId" >/dev/null
+            redis-cli SADD emailIds "{{$email}}"            >/dev/null
+          fi
         {{end -}}
       else
         {{range $idx, $acid := args.key -}}
-          {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
-          jq -r '[ .displayName, .emailAddress ]   | @sh'      | \
-          xargs printf '"%s" <%s>\n'
+          if (( $(redis-cli SISMEMBER accountIds "{{$acid}}") > 0 )) 
+          then
+            redis-cli GET "accountId:{{$acid}}"
+          else
+            eval $(
+              {{jira}} req "/rest/api/2/user/?accountId={{$acid}}" | \
+              jq -r '@sh "displayName=\(.displayName)",
+                     @sh "emailAddress=\(.emailAddress)"'
+            )
+
+            email="$(printf '"%s" <%s>' "$displayName" $emailAddress)"
+            printf '%s ' $email
+            redis-cli SET "accountId:{{$acid}}" "$email"    >/dev/null
+            redis-cli SADD accountIds "{{$acid}}"           >/dev/null
+          fi
         {{end -}}
       fi
 
@@ -350,9 +379,37 @@ custom-commands:
         required: true
     script: |
       {{jira}} {{args.ISSUE}} | while IFS= read -r x ; do
-        for acid in $(grep -o -e '~accountid:[0-9a-f]*' <<<"$x") ; do
-            j="$(jira user -r $(cut -d: -f2 <<<"$acid"))"
+        for acid in $(grep -io -e '~accountid:[:0-9a-f-]*' <<<"$x") ; do
+            j="$(jira user $(cut -d: -f2- <<<"$acid"))"
             x=$(echo "$x" | sed "s/^\(.*\)$acid/\1$j/")
         done
         printf "%s\n" "$x"
       done
+
+  - name: epic-walk
+    help: fzf walk of tickets in an epic
+    args:
+      - name: ISSUE
+        required: true
+    script: |
+      {{jira}} list -q "resolution = unresolved 
+                        AND ( key = {{args.ISSUE}} or parent in ( {{args.ISSUE}} ))
+                        order by created ASC" | \
+      fzf --header-lines=1 --preview="{{jira}} clean {1}"
+
+  - name: he
+    help: Extended help
+    args:
+      - name: COMMAND
+        required: false
+        default: ""
+    script: |
+      if [[ '{{ args.COMMAND }}' = '<no value>' ]] ; then
+          {{jira}} help
+      else
+          {{jira}} help {{args.COMMAND}}
+          if [[ -f ~/.jira.d/templates/{{args.COMMAND}} ]] ; then
+             grep -E '^...\*' ~/.jira.d/templates/{{args.COMMAND}}
+          fi
+      fi
+

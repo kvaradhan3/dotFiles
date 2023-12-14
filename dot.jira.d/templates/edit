@@ -1,4 +1,16 @@
-{{/* edit template */ -}}
+{{/* edit template
+   *
+   * option:      sets                values/defaults
+   * epic         fields.parent.key   none
+   * comment      update.comment.add.body
+   * labels       fields.labels
+   * components   fields.components.name  (comma separated list)
+   * assignee     fields.assignee.emailAddress
+   * reporter     fields.reporter.emailAddress
+   * watcher      fields.customfield_10110.watcher
+   * priority     fields.priority.name
+   * description  fields.priority.name
+   */ -}}
 # issue: {{ .key }} - created: {{ .fields.created | age}} ago
 update:
   comment:

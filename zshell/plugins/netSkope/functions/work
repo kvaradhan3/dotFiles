@@ -19,12 +19,12 @@ __w[FUNCTIONS]='_w__usage
                 _w__debug
                 _w__error
                 _w__isValid_ticket
-                _w_start
+                _tools/w_start
                 _w_finish'
 
 _w__usage() {
     printf "usage: %s %s\n" "$(basename "$0")" '[start {{JIRA}}|end [{{JIRA}}]]'
-    exit
+    return
 }
 
 _w__debug() {
@@ -33,7 +33,7 @@ _w__debug() {
 
 _w__error() {
     _w__debug "$@" "\n"
-    exit 1
+    return 1
 }
 
 _w__isValid_ticket() {
@@ -127,15 +127,15 @@ work_plugin_unload() {
 
 case  "$1"  in
     start)
-	shift
-	_w_start "$@"
+        shift
+        _w_start "$@"
 	;;
     finish)
-	shift
-	_w_finish "$@"
+        shift
+        _w_finish "$@"
 	;;
     *)
-	_w__usage
-	exit 1
+        _w__usage
+        return 1
 	;;
 esac

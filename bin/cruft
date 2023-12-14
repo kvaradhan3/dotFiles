@@ -1,6 +1,6 @@
 #! /bin/sh
 
-CRUFTERS='tenber|gerd|-achin|achin-|kvarad|kannan|pran|hegde|santo|sangu|^b-|^f-|\*-[0-9][0-9]+-\*'
+CRUFTERS='tenber|gerd|-achin|achin-|kvarad|kannan|pran|hegde|santo|sangu|^b-|^f-|\*-[0-9][0-9]+-\*|cicd'
 
 usage() { echo "Usage: $0 [-q] [-x <op>]" 1>&2; exit 1; }
 
