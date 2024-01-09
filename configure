@@ -92,11 +92,6 @@ install   "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
 uninstall "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
 
 #
-# Protect the repo first
-#
-pre-commit install --install-hooks
-
-#
 # dotFiles
 #
 # setup defaults initilization
@@ -172,5 +167,10 @@ case "$(uname)" in
     Linux)  ./baseline-arch     ;;
     Darwin) brew bundle install ;;
 esac
+
+#
+# Finally Protect the repo
+#
+pre-commit install --install-hooks
 
 exit
