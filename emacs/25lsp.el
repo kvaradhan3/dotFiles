@@ -15,22 +15,8 @@
         lsp-completion-provider          :capf)
   (setq lsp-log-io                       t)
 
-  ;; 	GO111MODULE=on go get golang.org/x/tools/gopls
-  (add-hook 'go-mode-hook
-	    (lambda ()
-	      "Setup before-save hooks to formate buffer and add/delete imports."
-	      (lsp-deferred)
-	      (add-hook 'before-save-hook #'lsp-format-buffer    nil t)
-	      (add-hook 'before-save-hook #'lsp-organize-imports nil t))
-	    nil t)
   ;;; lsp-find-references
   ;;; https://emacs-lsp.github.io/lsp-mode/page/main-features/
-  )
-
-(use-package company
-  :config
-  (setq company-minimum-prefix-length 1
-        company-idle-delay            0.0) ;; default is 0.2
   )
 
 ;; optional - provides fancier overlays
@@ -45,24 +31,11 @@
         lsp-ui-sideline-ignore-duplicate t))
 
 (use-package yasnippet
-  :hook ((go-mode . yas-minor-mode))
   :config
   ;;; (yas-global-mode 1)
   (add-to-list	'yas-snippet-dirs
 		"https://github.com/dominikh/yasnippet-go")
   )
-
-;;; (use-package helm-lsp
-;;;   :commands helm-lsp-workspace-symbol)
-
-;;; (use-package lsp-treemacs
-;;;    :commands lsp-treemacs-errors-list)
-
-;; (use-package dap-mode)
-;; (use-package dap-go)
-;; (use-package which-key
-  ;; :config
-  ;; (which-key-mode))
 
 ;; (use-package company-lsp
 ;;   :ensure t

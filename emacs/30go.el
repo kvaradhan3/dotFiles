@@ -3,7 +3,9 @@
 ;;; Commentary:
 ;; 
 ;; https://dr-knz.net/a-tour-of-emacs-as-go-editor.html
-;; https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
+;; https://geeksocket.in/posts/emacs-lsp-go/
+;; https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
+;; https://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
 ;;
 
 ;;; Code:
@@ -13,53 +15,59 @@
   ;; GO111MODULE=off go get golang.org/x/tools/cmd/...
   ;; GO111MODULE=off go get github.com/rogpeppe/godef
   ;;
-  :bind (("M-."	. 'godef-jump)
-	 ("M-," . 'pop-tag-mark)
+  :bind (("M-."		. 'godef-jump)
+	 ("M-,"		. 'pop-tag-mark)
 	 ("C-c C-a"	. 'go-import-add)
 	 ("C-c C-r"	. 'go-remove-unused-imports)
 	 ("C-c C-g"	. 'go-goto-imports)
 	 ("C-c ?"	. 'godoc)
 	 ("C-c C-d"	. 'godef-describe))
-	 ;; ("M-g i a"	. 'go-import-add)
-	 ;; ("M-g i r"	. 'go-remove-unused-imports)
-	 ;; ("M-g i g"	. 'go-goto-imports))
-        ;; C-M-a beginning of defun
-        ;; C-M-e end of defun
-        ;; C-M-h mark defun
-        ;; C-x n w narrow to defun
-        ;; C-c C-d godef-describe
-        ;; C-c C-j godef jump
+         ;; C-M-a beginning of defun
+         ;; C-M-e end of defun
+         ;; C-M-h mark defun
+         ;; C-x n w narrow to defun
+         ;; C-c C-d godef-describe
+         ;; C-c C-j godef jump
 
-	;; playground:
-        ;; go-play-buffer	send to playground, store url in kill ring
-	;; go-play-region
-        ;; go-download-play
+         ;; playground:
+         ;; go-play-buffer ; send to playground, store url in kill ring
+	 ;; go-play-region
+         ;; go-download-play
 
-  :config
+  :init
   (setq tab-width        4
 	indent-tabs-mode nil
 	truncate-lines   t)
   ;;
-  ;; GO111MODULE=off go get golang.org/x/tools/cmd/goimports
+  ;; go install golang.org/x/tools/cmd/goimports@latest
+  ;; go install golang.org/x/tools/gopls@latest
   ;;
-  (setq gofmt-command "goimports")
+  (setq gofmt-command "goimports"
+	gofmt-args    "-s")
 
-  (add-hook 'before-save-hook	#'gofmt-before-save	nil t)
+  (defun go/set-before-save-hooks nil
+    "sets before-save hooks as buffer local to go-mode buffers"
+    (add-hook 'before-save-hook	#'lsp-format-buffer		nil t)
+    (add-hook 'before-save-hook #'lsp-organize-imports		nil t)
+    )
 
-  ;; 	GO111MODULE=on go get golang.org/x/tools/gopls
-  )
+  :hook
+  ((go-mode    .    lsp-deferred)
+   (go-mode    .    go/set-before-save-hooks))
+)
 
 (use-package go-autocomplete
   ;;
   ;; GO111MODULE=off go get -u github.com/nsf/gocode
   ;;
-  :config
-  (add-hook 'go-mode-hook #'(lambda () (auto-complete-mode 1)))
+  :init
+  (defun go/enable-auto-complete nil (auto-complete-mode t))
+  :hook
+  ((go-mode    .    go/enable-auto-complete))
   )
 
 (use-package go-eldoc
-  :after go-mode
-  :hook ((go-mode	. go-eldoc-setup))
+  :hook ((go-mode    . go-eldoc-setup))
   :config
   (set-face-attribute 'eldoc-highlight-function-argument nil
                       :underline t :foreground "green"
@@ -86,10 +94,15 @@
 ;;   ;;
 ;;   )
 
-;; (use-package lsp-mode
-;;   :after    go-mode
-;;   :config
-;;   (add-hook 'go-mode-hook #'lsp))
+(use-package company
+  :config
+  (setq company-minimum-prefix-length 1
+        company-idle-delay            0.0) ;; default is 0.2
+  )
+
+;;
+;; go debugging
+;;
 
 ;
 ;;; Local Variables:
