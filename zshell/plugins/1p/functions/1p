@@ -35,14 +35,12 @@ _1p__usage() {
 #
 # 1p main
 #
-__1P[account]=team-netskope
 __1P[account]=my
 __1P[outputf]=default
 
 while getopts 'wpo:hs' c
 do
     case $c in
-        w) __1P[account]='team-netskope';;    # work
         p) __1P[account]='my';;               # personal
         o) __1P[outputf]=$OPTARG;;            # output format
         s)    op account get;

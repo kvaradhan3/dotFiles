@@ -48,7 +48,7 @@ client.placeholder         $elegant    $magenta    $silver       $white      $ma
 exec {
     firefox-developer-edition
 
-    $term --app-id netSkope  
+    $term --app-id work  
     slack
 
     $term --app-id monitors  -T "__htop__"            -e htop
@@ -74,8 +74,8 @@ for_window {
     [app_id="speedtest"]    move container to workspace $wsMonitor, focus, split v
     [app_id="monitors"]     move container to workspace $wsMonitor, focus, split h
     [app_id=".*firefox.*"]  move container to workspace $wsBrowsers
-    [class="Slack"]         move container to workspace $wsnetSkope
-    [app_id="netSkope"]     move container to workspace $wsnetSkope
+    [class="Slack"]         move container to workspace $wsWork
+    [app_id="work"]         move container to workspace $wsWork
 }
 
 ##
@@ -126,7 +126,7 @@ bindsym $mod+Shift+Right    move right
 set {
     $wsMonitor   1:monitors
     $wsBrowsers  2:Firefox
-    $wsnetSkope  3:netSkope
+    $wsWork      3:work
     $ws4   4:4
     $ws5   5:5
     $ws6   6:6
@@ -154,7 +154,7 @@ bindsym {
     # Switch to workspace
     $mod+1              workspace $wsMonitor
     $mod+2              workspace $wsBrowsers
-    $mod+3              workspace $wsnetSkope
+    $mod+3              workspace $wsWork
     $mod+4              workspace $ws4
     $mod+5              workspace $ws5
     $mod+6              workspace $ws6
@@ -166,7 +166,7 @@ bindsym {
     # Move focused container to workspace
     $mod+Shift+1        move container to workspace $wsMonitor
     $mod+Shift+2        move container to workspace $wsBrowsers
-    $mod+Shift+3        move container to workspace $wsnetSkope
+    $mod+Shift+3        move container to workspace $wsWork
     $mod+Shift+4        move container to workspace $ws4
     $mod+Shift+5        move container to workspace $ws5
     $mod+Shift+6        move container to workspace $ws6

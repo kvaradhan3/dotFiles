@@ -1,6 +1,0 @@
-[core]
-disable_usage_reporting = False
-account = kvaradhan@netskope.com
-
-[compute]
-region = us-west1
