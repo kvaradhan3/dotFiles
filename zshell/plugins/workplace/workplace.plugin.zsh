@@ -11,13 +11,13 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-if [[ ${zsh_loaded_plugins[-1]} != */netSkope ]] && \
+if [[ ${zsh_loaded_plugins[-1]} != */workplace ]] && \
        [[ -z ${fpath[(r)${0:h}/functions]} ]]
 then
     fpath+=( "${0:h}/functions" )
 fi
 
-netSkope_plugin_unload() {
+workplace_plugin_unload() {
     for i in jf spr
     do
         whence -w $i &>/dev/null && unfunction $i

@@ -1,5 +1,6 @@
 [user]
-    name = Kannan Varadhan
+	name = Kannan Varadhan
+	email = kannan@ieee.org
 
 [push]
     default = simple
@@ -18,10 +19,10 @@
 #
 # Set per directory customizations as below:
 #
-# netSkope {
-#   github.user: ns-kvaradhan,
-#   user.email: kvaradhan@netskope.com,
-#   core.sshCommand: "ssh -i ~/.ssh/id_ed25519_netSkope",
+# work {
+#   github.user: work-uid
+#   user.email: work-email
+#   core.sshCommand: "ssh -i ~/.ssh/id_ed25519_work",
 # }
 #
 # personal {
@@ -32,3 +33,6 @@
 #
 # git config --local <key> <value>
 #
+[safe]
+	directory = /Users/zpa/src/et-libmaxminddb
+	directory = /Users/zpa/src/aws-sdk-cpp

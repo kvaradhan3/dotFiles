@@ -23,11 +23,18 @@ autoload -Uz compinit
 } ${ZDOTDIR:-$HOME}/.zcompdump(N.mh+24)
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
-if [ -d /usr/local/opt/antidote ] ; then
-    source /usr/local/opt/antidote/share/antidote/antidote.zsh
-elif [ -d /usr/share/zsh-antidote ] ; then
-    source /usr/share/zsh-antidote/antidote.zsh
-else
+for _25i in /usr/local/opt/antidote                    \
+         /usr/share/zsh-antidote                    \
+         /opt/homebrew/opt/antidote/share/antidote  \
+         FAIL
+do
+    if [[ -d "$_25i" ]] ; then
+        source "$_25i/antidote.zsh"
+        break
+    fi
+done
+if [[ $_25i = FAIL ]] ; then
+    # unwarranted chumminess alert here...
     echo 'antidote not found' >&2
 fi
 
@@ -72,7 +79,7 @@ then
         kvaradhan3/dotFiles path:zshell/plugins/nskc
         kvaradhan3/dotFiles path:zshell/plugins/batteryCharge
         kvaradhan3/dotFiles path:zshell/plugins/1p
-        kvaradhan3/dotFiles path:zshell/plugins/netSkope
+        kvaradhan3/dotFiles path:zshell/plugins/workplace
         kvaradhan3/dotFiles path:zshell/plugins/emulators
 PLUGINS_LIST
 fi

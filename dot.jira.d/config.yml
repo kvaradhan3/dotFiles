@@ -1,6 +1,6 @@
-endpoint: https://netskope.atlassian.net
+endpoint: https://jira-staging.corp.zscaler.com
 user: kvaradhan
-login: kvaradhan@netskope.com
+login: kvaradhan@zscaler.com
 password-source: keyring
 editor: /usr/local/bin/emacsclient -c -n -t -a ''
 source: https://github.com/go-jira/jira
