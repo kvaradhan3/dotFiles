@@ -10,7 +10,7 @@
 
 (use-package docker
   :ensure t
-  :bind ("C-c d" . docker))
+  :bind ("C-c r" . docker))
 
 (provide '60cloud)
 

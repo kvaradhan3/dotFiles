@@ -2,13 +2,13 @@
 ;;; Org Mode
 ;;;
 
-(setq work-organizer (expand-file-name "~/org/inbox.org")
-      home-organizer (expand-file-name "~/Drives/Sync/Agenda/inbox.org")
-      dflt-organizer (expand-file-name "~/Drives/Sync/Agenda/gtd-inbox.org")
-      )
+;; (setq work-organizer (expand-file-name "~/org/inbox.org")
+;;       home-organizer (expand-file-name "~/Drives/Sync/Agenda/inbox.org")
+;;       dflt-organizer (expand-file-name "~/Drives/Sync/Agenda/gtd-inbox.org")
+;;       )
 
-(set-register ?o (cons 'file work-organizer))
-(set-register ?h (cons 'file home-organizer))
+;; (set-register ?o (cons 'file work-organizer))
+;; (set-register ?h (cons 'file home-organizer))
 
 (use-package org
   :mode ("\\.org\\'"            . org-mode)
@@ -17,10 +17,11 @@
   :bind (("C-c l"       . org-store-link)
          ("C-c b"       . org-switchb))
   :config
-  (setq org-agenda-files        '()
-        org-capture-templates   '()
-        org-refile-targets      '((nil :maxlevel . 9))
-        org-completion-use-ido  nil)
+
+  ;; (setq org-agenda-files        '()
+  ;;       org-capture-templates   '()
+  ;;       org-refile-targets      '((nil :maxlevel . 9))
+  ;;       org-completion-use-ido  nil)
 
   ;;; https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
   (setq org-refile-use-outline-path             'file
