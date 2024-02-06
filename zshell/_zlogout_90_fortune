@@ -3,7 +3,7 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-OMZ_BASE="$(antibody list | awk '/ohmyzsh/ { print $NF }')"
+OMZ_BASE="$(antidote path ohmyzsh/ohmyzsh)"
 CHUCKSTER=${OMZ_BASE}/plugins/chucknorris
 
 #
