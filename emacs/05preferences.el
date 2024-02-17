@@ -137,6 +137,9 @@
 (setq split-height-threshold 100
       split-width-threshold  100)
 
+(use-package info
+  :mode (("\\.info\\'"            . Info-mode)))
+
 
 ;;;
 ;;; Keybindings that we care about, as defaults

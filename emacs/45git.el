@@ -6,6 +6,9 @@
   :after magit
   )
 
+(use-package magit-delta
+  :hook (magit-mode . magit-delta-mode))
+
 ;; (use-package code-review
 ;;   :config
 ;;   (add-hook 'code-review-mode-hook #'emojify-mode)
