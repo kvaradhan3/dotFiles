@@ -29,6 +29,14 @@
 
 (use-package sqlite3)
 
+(use-package benchmark-init
+  :init
+  (defun load-benchmark-init-modes nil (require 'benchmark-init-modes))
+  
+  :hook
+  ((after-init    .    benchmark-init/deactivate)
+   (after-init    .    load-benchmark-init-modes)))
+
 ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lib/"))
 
 ;;; Local Variables:
