@@ -2,13 +2,18 @@
 # MacOSX directives
 #
 Host github.com
-  HostName              github.com
-  User                  git
+  HostName                 github.com
+  User                     git
   PreferredAuthentications publickey
-  ForwardX11            no
-  IdentityFile          ~/.ssh/id_ed25519_github
+  ForwardAgent             no
+  ForwardX11               no
+  IdentityFile             ~/.ssh/id_ed25519_github
 
 Host *
-  User          kannan
-  ForwardAgent  yes
-  ForwardX11    yes
+  User                     kannan
+  AddKeysToAgent           yes
+  UseKeychain              yes
+  ForwardAgent             yes
+  ForwardX11               no
+
+Include                    config.*
