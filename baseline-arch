@@ -1,4 +1,4 @@
-#! /bin/sh -x
+#! /bin/zsh -x
 
 set -eu
 
@@ -87,14 +87,6 @@ set -eu
 #
 WIFI_SSID='idli vadai sambhar'
 
-aur_install() {
-    aur sync --no-view --no-confirm "$@"
-}
-
-pac_install() {
-    sudo pacman -S --noconfirm --needed "$@"
-}
-
 block_exists_in_file() {
     grep -E "$1" "$2" >/dev/null 2>&-
 }
@@ -153,157 +145,159 @@ if ! block_exists_in_file '^\[AUR]$' /etc/pacman.conf ; then
     makepkg --install --syncdeps --asdeps --needed --noconfirm 
     rm -rf /tmp/aurutils
 
-    sudo pacman -Syu --noconfirm --needed
+    sudo pacman -Syu --noconfirm --needed pacman_contrib
 fi
 
 export AURDEST=/var/pacman/packages
 export AUR_PACMAN_AUTH="sudo --askpass"
 export AUR_REPO=AUR
 
-aur_install aurutils
-pac_install --overwrite '*' aurutils
+aur sync --no-view --no-confirm aurutils
+sudo pacman -S --noconfirm --needed --overwrite '*' aurutils
 
-##
-# Essentials
-#
-pac_install gnupg
-
-# 1password
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
-aur_install 1password 1password-cli 1passord-beta
-pac_install 1password-cli
-# pac_install 1password
-pac_install 1password-beta
 
-# aur_install emacs-gcc-wayland-devel-bin
-# pac_install emacs-gcc-wayland-devel-bin
-pac_install emacs-wayland
-pac_install cups-pdf
-
-pac_install man-db
-
-aur_install autojump
-pac_install autojump
-
-aur_install python-fangfrisch
-pac_install python-fangfrisch
-pac_install bc
-pac_install fzf
-pac_install ranger
-pac_install bluez
-pac_install bluez-utils
-pac_install rsync
-pac_install shellcheck
-pac_install python-docutils
-pac_install util-linux
-pac_install openssh
-pac_install doas
-
-##
-# Tools
 #
-pac_install ethtool
-pac_install iw
-pac_install htop
-pac_install neofetch
-pac_install laptop-detect
-pac_install nethogs
-pac_install tmux
-pac_install github-cli
-pac_install python-pre-commit
-pac_install usbutils
-pac_install jq
-
-pac_install fprintd         # fingerprint read
-sudo usermod --append --group input $USER
-
-aur_install laptop-mode-tools
-pac_install laptop-mode-tools
-
-##
-# Personalizations
+# fetch/upgrade aurutils.   This list is generated using:
+# 
+#    % paclist AUR
 #
-aur_install zsh-antidote
-pac_install zsh-antidote
 
-##
-# window management
-#
-# aur_install vlc-git vlc-pause-click-plugin
-# pac_install vlc-git vlc-pause-click-plugin
+while read pkg ver ; do
+    aur sync --no-view --no-confirm $pkg
+done <<- "AURLIST"
+    1password-beta 8.10.26_11.BETA-11
+    1password-cli 2.24.0-2
+    aurutils 18.5-1
+    autojump 22.5.3-9
+    google-cloud-cli 462.0.1-1
+    hw-probe 1.6.5-1
+    laptop-mode-tools 1.74-1
+    ltunify 0.3-1
+    python-fangfrisch 1.7.0-1
+    ttf-meslo 1.2.1-3
+    ttf-monaco 6.1-7
+    vlc-git 4.0.0.r27536.g051c1c067e-1
+    zsh-antidote 1.9.4-1
+AURLIST
+    # vlc-pause-click-plugin 2.2.0-1
 
-pac_install sway
-pac_install swaylock swayidle swaybg
-pac_install waybar
-pac_install foot
-pac_install qt6-wayland glfw-wayland
-pac_install wofi
-pac_install xorg-xeyes
-pac_install electron25
-
-aur_install wev
-pac_install wev
-pac_install xorg-xlsclients
-
-pac_install ttf-inconsolata-nerd
-pac_install ttf-nerd-fonts-symbols-mono
-pac_install ttf-anonymous-pro
-
-aur_install ttf-meslo
-aur_install ttf-monaco
-pac_install ttf-meslo
-pac_install ttf-monaco
-
-pac_install adobe-source-code-pro-fonts
-
-pac_install adobe-source-sans-fonts
-
-# cask "font-alegreya"
-# cask "font-alegreya-sans"
-# cask "font-fontawesome"
-# cask "font-humor-sans"
-# cask "font-lato"
-# cask "font-sf-compact"
-# cask "font-sf-mono"
-# cask "font-sf-pro"
-# cask "font-source-serif-pro"
-
-pac_install firefox
-pac_install firefox-developer-edition
-
-##
-# sound
-#
-pac_install sof-firmware
-pac_install alsa-plugins
-pac_install alsa-utils
-pac_install pipewire
-pac_install wireplumber
-pac_install pipewire-alsa
-pac_install pipewire-alsa
-pac_install pipewire-pulse
-
-##
-# Games
-#
-pac_install cowsay
-pac_install fortune-mod
-pac_install nethack
-
-
-##
-# Extras
-#
-pac_install go
-
-pac_install pacman-contrib
-
-
-##
-# Cloud and Virtualization...
-#
-pac_install docker
-pac_install docker-compose
+while read pkg ver ; do
+    sudo pacman -S --noconfirm --needed $pkg
+done <<- "PACLIST"
+    1password-beta 8.10.26_11.BETA-11
+    1password-cli 2.24.0-2
+    adobe-source-sans-fonts 3.052-1
+    alsa-plugins 1:1.2.7.1-2
+    alsa-utils 1.2.10-1
+    archlinux-contrib 20221211-2
+    aurutils 18.5-1
+    autojump 22.5.3-9
+    bandwhich 0.22.2-1
+    base 3-2
+    base-devel 1-1
+    bc 1.07.1-4
+    bind 9.18.21-1
+    bluez 5.72-2
+    bluez-utils 5.72-2
+    clamav 1.2.1-1
+    cowsay 3.04-4
+    cups 1:2.4.7-2
+    cups-pdf 3.0.1-7
+    dbus-python 1.3.2-2
+    docker 1:24.0.7-1
+    docker-compose 2.24.5-1
+    electron25 25.9.8-1
+    emacs-wayland 29.2-1
+    ethtool 1:6.5-1
+    firefox 122.0-1
+    firefox-developer-edition 123.0b6-1
+    foot 1.16.2-2
+    fortune-mod 3.20.0-1
+    fprintd 1.94.2-2
+    fzf 0.46.1-1
+    gd 2.3.3-7
+    git 2.43.0-1
+    github-cli 2.43.1-1
+    glfw-wayland 3.3.9-1
+    google-cloud-cli 462.0.1-1
+    gpick 0.3-1
+    hdparm 9.65-1
+    htop 3.3.0-1
+    hw-probe 1.6.5-1
+    iw 6.7-1
+    iwd 2.13-4
+    jq 1.7.1-1
+    kubectl 1.29.1-1
+    laptop-detect 0.16-1
+    laptop-mode-tools 1.74-1
+    linux 6.7.3.arch1-1
+    linux-firmware 20240115.9b6d0b08-2
+    ltunify 0.3-1
+    lvm2 2.03.23-1
+    lynx 2.8.9-7
+    man-db 2.12.0-1
+    mate-control-center 1.26.1-1
+    mupdf 1.23.9-4
+    neofetch 7.1.0-2
+    nethack 3.6.7-5
+    nethogs 0.8.7-1
+    netsniff-ng 0.6.8-6
+    nss-mdns 0.15.1-1
+    oniguruma 6.9.9-1
+    opendoas 6.8.2-1
+    openresolv 3.13.2-2
+    openssh 9.6p1-1
+    otf-font-awesome 6.5.1-1
+    pacman-contrib 1.10.4-1
+    pacutils 0.11.1-1
+    pipewire-alsa 1:1.0.3-1
+    pipewire-pulse 1:1.0.3-1
+    pkgfile 21-2
+    pre-commit 3.6.0-1
+    python-docutils 1:0.20.1-1
+    python-fangfrisch 1.7.0-1
+    qpwgraph 0.6.2-1
+    qt5-wayland 5.15.12+kde+r61-1
+    qt6-wayland 6.6.1-1
+    ranger 1.9.3-9
+    rsync 3.2.7-6
+    shellcheck 0.9.0-78
+    smartmontools 7.4-1
+    sof-firmware 2023.12-1
+    speedtest-cli 2.1.3-7
+    sudo 1.9.15.p5-1
+    sway 1:1.8.1-5
+    swaybg 1.2.0-1
+    swayidle 1.8.0-1
+    swaylock 1.7.2-1
+    tmux 3.3_a-7
+    ttf-anonymous-pro 1.003-7
+    ttf-inconsolata-nerd 3.1.1-1
+    ttf-meslo 1.2.1-3
+    ttf-monaco 6.1-7
+    ttf-nerd-fonts-symbols-common 3.1.1-1
+    ttf-nerd-fonts-symbols-mono 3.1.1-1
+    udisks2 2.10.1-2
+    usbutils 017-1
+    vim 9.1.0000-1
+    vlc-git 4.0.0.r23113.gf7bb59d9f5-1
+    waybar 0.9.24-3
+    wayland-protocols 1.33-1
+    weston 13.0.0-1
+    wev 1.0.0-13
+    wl-clipboard 1:2.2.1-1
+    wofi 1.3-2
+    xl2tpd 1.3.18-1
+    xorg-xeyes 1.3.0-1
+    xorg-xlsclients 1.1.5-1
+    xorg-xwayland 23.2.4-2
+    xpdf 4.04-2
+    yt-dlp 2023.12.30-1
+    zsh 5.9-4
+    zsh-antidote 1.9.4-1
+PACLIST
+    # vlc-pause-click-plugin 2.2.1kva-1
 
 sudo systemctl start  docker.service
 sudo systemctl enable docker.service
@@ -311,7 +305,6 @@ sudo usermod --append		        \
              --groups docker		\
 	     $USER
 
-pac_install kubectl
 # pac_install kubeadm
 ##
 ## https://wiki.archlinux.org/title/Kubernetes
@@ -337,24 +330,6 @@ pac_install kubectl
 # }
 #
 # pac_install helm
-aur_install google-cloud-cli
-pac_install google-cloud-cli
-
-##
-# Teleconferencing tools
-aur_install zoom
-aur_install whatsapp-for-linux
-aur_install zulip-desktop-electron
-aur_install slack-desktop-wayland
-
-pac_install zoom
-pac_install whatsapp-for-linux
-pac_install zulip-desktop-electron
-pac_install slack-desktop-wayland
-
-##
-# Cloud SYnc
-pac_install rclone
 
 if false; then
   pac_install gpick 

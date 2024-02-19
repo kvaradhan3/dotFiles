@@ -1,5 +1,4 @@
-#! /bin/zsh
-#
+#! /bin/zsh #
 # shellcheck disable=SC2278,SC2298,SC2296,SC2299
 # SC2086 (info): Double quote to prevent globbing and word splitting.
 # SC2296 (error): Parameter expansions can't start with (. Double check syntax.
@@ -64,6 +63,7 @@ then
 
     export MOZ_ENABLE_WAYLAND=1
     export QT_QPA_PLATFORM=wayland
+    export SUDO_ASKPASS=$HOME/bin/sudo_askpass
 fi
 
 if [[ "$(uname -s)" = Darwin ]]

@@ -12,58 +12,147 @@ usage() {
     exit 1
 }
 
-log() {
-    local pre=
-    local post=
-    case $1 in
-        '--error') 
-            pre="${(%):-%B%F{red}"
-            post="${(%):-%f%b}"
-            shift
-            ;;
-        '--warn')
-            pre="${(%):-%B%F{yellow}"
-            post="${(%):-%f%b}"
-            shift
-            ;;
-        '--info')
-            pre="${(%):-%F{green}"
-            post="${(%):-%f}"
-            shift
-            ;;
-        *)
-            ;;
-    esac
-    printf "%s%s: %s%s\n" "$pre" "$PROGNAME" "$*" "$post"
-}
-
 INSTALLOP=install
 DESTDIR=$HOME
 DEBUG=false
-REFRESH=false
 while getopts "Drud:" o; do
     case "${o}" in
         u)  INSTALLOP=uninstall   ;;
         d)  DESTDIR=$OPTARG       ;;
-        r)  REFRESH=true          ;;
         D)  DEBUG=true            ;;
         *)  usage                 ;;
     esac
 done
 shift $((OPTIND-1))
-$DEBUG && INSTALLOP='echo'
+$DEBUG && INSTALLOP='log'
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
+main() {
+    prep
+    dotFiles
+    post
+
+    software-install
+}
+
+####
+##
+## utilities
+##
+prep() {
+    FLIST=()
+    find $DESTDIR -lname $HERE\* | while read _x ; do FLIST+=( "$_x" ) ; done
+
+    #
+    # setup defaults initilization
+    printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
+    {
+        printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
+        # shellcheck disable=SC2016
+        printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+               "${HERE}/zshell"
+        printf 'setopt NO_NOMATCH;'
+    } > dot.zinit
+}
+
+post() {
+    for i in $FLIST ; do
+        rm $i
+    done
+
+    #
+    # Protect the repo
+    #
+    pre-commit install --install-hooks
+}
+
+dotFiles() {
+    pushd $HERE
+    mkdir -p "$DESTDIR"
+    for i in ./dot.* ; do
+        ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/.\/dot/}"
+    done
+
+    mkdir -p "$DESTDIR/.config"
+    for i in ./dotConfig/* ; do
+        ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
+    done
+
+    # mkdir -p "$DESTDIR/.local/share"
+    # for i in ./dotLocal/* ; do
+    #     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotLocal/.local\/share}"
+    # done
+
+    #
+    # This is a one-off
+    #
+    mkdir -p "$DESTDIR"/.emacs.d/lib
+    ${INSTALLOP} "$HERE"/dotEmacs.d/lib/fonts "$DESTDIR"/.emacs.d/lib/fonts
+
+    #
+    # Some dot directories contain configs and secrets.  Only link the
+    # configs individuall in those directories.
+    #
+    find ./safeLink/dot.* -type f | while read -r _src ; do
+        _dst="${_src/.\/safeLink\/dot/}"
+        mkdir -p "$(dirname "$DESTDIR/$_dst")"
+        ${INSTALLOP} "$HERE/${_src/.\//}" "$DESTDIR/$_dst"
+    done
+
+    #
+    # binaries
+    #
+    mkdir -p "$DESTDIR"/bin
+    for i in "$HERE"/bin/*
+    do
+        ${INSTALLOP} "$i" "$DESTDIR"/bin/"$(basename "$i")"
+    done
+    popd
+}
+
+software-install() {
+    #
+    # Fonts
+    #
+    # brew install
+    #   font-alegreya
+    #   font-alegreya-sans-sc
+    #   font-alegreya-sans
+    #   font-alegreya-sc
+    #   font-anonymous-pro
+    #   font-atkinson-hyperlegible
+    #   font-awesome-terminal-fonts
+    #   font-fontawesome
+    #   font-hack-nerd-font
+    #   font-lato
+    #   font-source-sans-3
+    #   font-source-serif-4
+    #   font-source-code-pro
+    #
+
+    case "$(uname)" in
+        Linux)  $HERE/baseline-arch     ;;
+        Darwin) brew bundle install     ;;
+    esac
+}
 
 #
 # Utilities to (un)install
 #
 install() {
-    if [ -e "$2" ] ; then
-        $REFRESH && {
-            log --warn skip "$2"
+    # shellcheck disable=SC1073,SC1009,SC1072
+    if (( $FLIST[(Ie)$2] )) ; then
+        : remove from FLIST.
+        local _ENTRY="${FLIST[(Ie)$2]}"
+        FLIST[$_ENTRY]=()
+        if [[ "$(readlink $2)" = "$1" ]]; then
+            log --info skip $2
             return
-        }
+        else
+            rm $2
+            log --info remove older entry $_ENTRY
+        fi
+    elif [[ -e "$2" ]] ; then
         mv "$2" "$2".ORIG # backup existing
         log --warn save "$2"
     fi
@@ -85,92 +174,29 @@ uninstall() {
     fi
 }
 
-#
-# make shellcheck happy
-#
-install   "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
-uninstall "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
+log() {
+    local pre=
+    local post=
+    case $1 in
+        '--error')
+            pre="${(%):-%B%F{red}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--warn')
+            pre="${(%):-%B%F{yellow}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--info')
+            pre="${(%):-%F{green}"
+            post="${(%):-%f}"
+            shift
+            ;;
+        *)
+            ;;
+    esac
+    printf "%s%s: %s%s\n" "$pre" "$PROGNAME" "$*" "$post"
+}
 
-#
-# dotFiles
-#
-# setup defaults initilization
-printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
-{
-    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
-    # shellcheck disable=SC2016
-    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-           "${HERE}/zshell"
-    printf 'setopt NO_NOMATCH;'
-} > dot.zinit
-
-mkdir -p "$DESTDIR"
-for i in ./dot.* ; do
-    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/.\/dot/}"
-done
-
-mkdir -p "$DESTDIR/.config"
-for i in ./dotConfig/* ; do
-    ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
-done
-
-# mkdir -p "$DESTDIR/.local/share"
-# for i in ./dotLocal/* ; do
-#     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotLocal/.local\/share}"
-# done
-
-#
-# This is a one-off
-#
-mkdir -p "$DESTDIR"/.emacs.d/lib
-${INSTALLOP} "$HERE"/dotEmacs.d/lib/fonts "$DESTDIR"/.emacs.d/lib/fonts
-
-#
-# These dot files contain configs and secrets.  Only link the 
-# configs individually.
-#
-find ./safeLink/dot.* -type f | while read -r fil ; do
-    rfil="${fil/.\/safeLink\/dot/}"
-    mkdir -p "$(dirname "$DESTDIR/$rfil")"
-    ${INSTALLOP} "$HERE/${fil/.\//}" "$DESTDIR/$rfil"
-done
-
-#
-# binaries
-#
-mkdir -p "$DESTDIR"/bin
-for i in "$HERE"/bin/*
-do
-    ${INSTALLOP} "$i" "$DESTDIR"/bin/"$(basename "$i")"
-done
-
-#
-# Fonts
-#
-# brew install
-#   font-alegreya
-#   font-alegreya-sans-sc
-#   font-alegreya-sans
-#   font-alegreya-sc
-#   font-anonymous-pro
-#   font-atkinson-hyperlegible
-#   font-awesome-terminal-fonts
-#   font-fontawesome
-#   font-hack-nerd-font
-#   font-lato
-#   font-source-sans-3
-#   font-source-serif-4
-#   font-source-code-pro
-#
-
-case "$(uname)" in
-    Linux)  ./baseline-arch     ;;
-    Darwin) brew bundle install ;;
-esac
-
-#
-# Finally Protect the repo
-#
-pre-commit install --install-hooks
-
-exit
+main
