@@ -1,7 +1,8 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/straight/build/benchmark-init"))
-(require 'benchmark-init)
-(add-hook 'after-init-hook #'benchmark-init/deactivate)
-(add-hook 'after-init-hook #'(lambda () (require 'benchmark-init-modes)))
+(if (not (ignore-errors (require 'benchmark-init)))
+    (progn 
+      (add-hook 'after-init-hook #'benchmark-init/deactivate)
+      (add-hook 'after-init-hook #'(lambda () (require 'benchmark-init-modes)))))
 
 (setq package-enable-at-startup        nil)
 
