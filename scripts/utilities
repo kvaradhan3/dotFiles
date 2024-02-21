@@ -1,5 +1,7 @@
 #! /bin/zsh
-
+#
+#  shellcheck disable=SC2296
+#
 ##
 # Handle exisitng, changed and new files
 #
@@ -10,7 +12,7 @@ flist_init() {
     local _DESTDIR=${1:=$DESTDIR}
     local _HERE=${2:-$HERE}
 
-    find $_DESTDIR -lname $_HERE\* | while read _x ; do
+    find "$_DESTDIR" -lname "$_HERE"\* | while read -r _x ; do
 	_FLIST+=( "$_x" )
     done
 }
@@ -19,6 +21,7 @@ flist_processed() {
     # shellcheck disable=SC1073,SC1009,SC1072
     if (( ${_FLIST[(Ie)$1]} )) ; then
 	local _idx=${_FLIST[(Ie)$1]}
+	# shellcheck disable=SC2004
 	_FLIST[$_idx]=()
 	return 0
     fi
@@ -26,8 +29,9 @@ flist_processed() {
 }
 
 flist_done() {
-    for _i in $_FLIST ; do
-	rm $_i
+    for _i in "${_FLIST[@]}"
+    do
+	rm "${_i}"
     done
 }
 
@@ -36,12 +40,12 @@ flist_done() {
 #
 install() {
     if flist_processed "$2" ; then
-        if [[ "$(readlink $2)" = "$1" ]]; then
-            log --info skip $2
+        if [[ "$(readlink "$2")" = "$1" ]]; then
+            log --info skip "$2"
             return
         else
-            rm $2
-            log --info remove older entry $_ENTRY
+            rm "$2"
+            log --info remove older entry "$2" "\(points to $(readlink "$2")\)"
         fi
     elif [[ -e "$2" ]] ; then
         mv "$2" "$2".ORIG # backup existing

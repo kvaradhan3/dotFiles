@@ -1,6 +1,6 @@
 #! /bin/zsh
 #
-# shellcheck disable=SC2296,SC1090
+# shellcheck disable=SC2296,SC1090,SC1091
 #
 
 PROGNAME="$(basename "$0")"
@@ -25,6 +25,7 @@ while getopts "Drud:" o; do
 done
 shift $((OPTIND-1))
 $DEBUG && INSTALLOP='log'
+export INSTALLOP
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
