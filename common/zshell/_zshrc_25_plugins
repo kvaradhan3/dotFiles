@@ -81,6 +81,9 @@ then
         kvaradhan3/dotFiles path:zshell/plugins/1p
         kvaradhan3/dotFiles path:zshell/plugins/workplace
         kvaradhan3/dotFiles path:zshell/plugins/emulators
+
+        bigH/git-fuzzy      path:bin kind:path
+        wfxr/forgit
 PLUGINS_LIST
 fi
 
