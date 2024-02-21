@@ -20,7 +20,6 @@ defaults write org.cups.PrintingPrefs UseLastPrinter             -bool False
 
 # /Applications/RDM.app/Contents/MacOS/SetResX -w 2880 -h 1800 -s 2.0
 
-killall Finder
-killall Dock
+killall Finder Dock
 
 nvram boot-args='-v'
