@@ -1,4 +1,4 @@
-#! /bin/zsh -x
+#! /bin/zsh
 
 set -eu
 
@@ -8,10 +8,7 @@ set -eu
 #    % paclist AUR
 #
 
-while read -r pkg ver ; do
-    aur sync --no-view --no-confirm "$pkg"
-    log --info aur sync "$pkg@$ver">/dev/null 2>&1
-done <<- "AURLIST"
+awk '{print $1}' << AURLIST | xargs aur sync --no-view --no-confirm --reset
     1password-beta 8.10.26_11.BETA-11
     1password-cli 2.24.0-2
     aurutils 18.5-1
@@ -26,12 +23,10 @@ done <<- "AURLIST"
     vlc-git 4.0.0.r27536.g051c1c067e-1
     zsh-antidote 1.9.4-1
 AURLIST
+
     # vlc-pause-click-plugin 2.2.0-1
 
-while read -r pkg ver ; do
-    sudo pacman -S --noconfirm --needed "$pkg"
-    log --info aur sync "$pkg@$ver">/dev/null 2>&1
-done <<- "PACLIST"
+awk '{print $1}' << PACLIST | sudo pacman -S --noconfirm --needed -
     1password-beta 8.10.26_11.BETA-11
     1password-cli 2.24.0-2
     adobe-source-sans-fonts 3.052-1
@@ -144,6 +139,7 @@ done <<- "PACLIST"
     zsh 5.9-4
     zsh-antidote 1.9.4-1
 PACLIST
+
     # vlc-pause-click-plugin 2.2.1kva-1
 
 sudo systemctl start  docker.service
