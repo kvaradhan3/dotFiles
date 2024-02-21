@@ -76,11 +76,14 @@ then
         zsh-users/zsh-syntax-highlighting
         zsh-users/zsh-history-substring-search
 
-        kvaradhan3/dotFiles path:zshell/plugins/nskc
-        kvaradhan3/dotFiles path:zshell/plugins/batteryCharge
-        kvaradhan3/dotFiles path:zshell/plugins/1p
-        kvaradhan3/dotFiles path:zshell/plugins/workplace
-        kvaradhan3/dotFiles path:zshell/plugins/emulators
+        kvaradhan3/dotFiles path:common/zshell/plugins/nskc
+        kvaradhan3/dotFiles path:common/zshell/plugins/batteryCharge
+        kvaradhan3/dotFiles path:common/zshell/plugins/1p
+        kvaradhan3/dotFiles path:common/zshell/plugins/workplace
+        kvaradhan3/dotFiles path:common/zshell/plugins/emulators
+
+        bigH/git-fuzzy      path:bin kind:path
+        wfxr/forgit
 PLUGINS_LIST
 fi
 

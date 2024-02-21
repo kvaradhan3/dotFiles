@@ -44,8 +44,8 @@ install() {
             log --info skip "$2"
             return
         else
+            log --info remove older entry "$2" "(points to $(readlink "$2"))"
             rm "$2"
-            log --info remove older entry "$2" "\(points to $(readlink "$2")\)"
         fi
     elif [[ -e "$2" ]] ; then
         mv "$2" "$2".ORIG # backup existing
