@@ -1,0 +1,91 @@
+#! /bin/zsh
+
+##
+# Handle exisitng, changed and new files
+#
+
+local _FLIST=()
+
+flist_init() {
+    local _DESTDIR=${1:=$DESTDIR}
+    local _HERE=${2:-$HERE}
+
+    find $_DESTDIR -lname $_HERE\* | while read _x ; do
+	_FLIST+=( "$_x" )
+    done
+}
+
+flist_processed() {
+    # shellcheck disable=SC1073,SC1009,SC1072
+    if (( ${_FLIST[(Ie)$1]} )) ; then
+	local _idx=${_FLIST[(Ie)$1]}
+	_FLIST[$_idx]=()
+	return 0
+    fi
+    return 1
+}
+
+flist_done() {
+    for _i in $_FLIST ; do
+	rm $_i
+    done
+}
+
+#
+# Utilities to (un)install
+#
+install() {
+    if flist_processed "$2" ; then
+        if [[ "$(readlink $2)" = "$1" ]]; then
+            log --info skip $2
+            return
+        else
+            rm $2
+            log --info remove older entry $_ENTRY
+        fi
+    elif [[ -e "$2" ]] ; then
+        mv "$2" "$2".ORIG # backup existing
+        log --warn save "$2"
+    fi
+    ln -s -f "$1" "$2"
+    log --info link "$2" to "$1"
+}
+
+uninstall() {
+    if [[ "$(readlink "$2")" = "$1" ]]
+    then
+        rm -f "$2"
+        if [ -e "$2".ORIG ] ; then
+            mv "$2".ORIG "$2"
+            log --warn restore "$2"
+        fi
+        log --info unlink "$2" from "$1"
+    else
+        log --warn skip "$2"
+    fi
+}
+
+log() {
+    local pre=
+    local post=
+    case $1 in
+        '--error')
+            pre="${(%):-%B%F{red}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--warn')
+            pre="${(%):-%B%F{yellow}"
+            post="${(%):-%f%b}"
+            shift
+            ;;
+        '--info')
+            pre="${(%):-%F{green}"
+            post="${(%):-%f}"
+            shift
+            ;;
+        *)
+            ;;
+    esac
+    printf "%s%s: %s%s\n" "$pre" "$PROGNAME" "$*" "$post"
+}

@@ -1,0 +1,50 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2296
+#
+
+DESTDIR=${DESTDIR:-$HOME}
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+#
+# setup defaults initilization
+pushd "$HERE" || { log --error Direcotry "$HERE" not found; exit 1; }
+printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
+{
+    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
+    # shellcheck disable=SC2016
+    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+           "${HERE}/zshell"
+    printf 'setopt NO_NOMATCH;'
+} > dot.zinit
+
+mkdir -p "$DESTDIR"
+for i in ./dot.* ; do
+    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/.\/dot/}"
+done
+
+#
+# This is a one-off
+#
+mkdir -p "$DESTDIR"/.emacs.d/lib
+${INSTALLOP} "$HERE"/dotEmacs.d/lib/fonts "$DESTDIR"/.emacs.d/lib/fonts
+
+#
+# Some dot directories contain configs and secrets.  Only link the
+# configs individuall in those directories.
+#
+find ./safeLink/dot.* -type f | while read -r _src ; do
+    _dst="${_src/.\/safeLink\/dot/}"
+    mkdir -p "$(dirname "$DESTDIR/$_dst")"
+    ${INSTALLOP} "$HERE/${_src/.\//}" "$DESTDIR/$_dst"
+done
+
+#
+# binaries
+#
+mkdir -p "$DESTDIR"/bin
+for i in "$HERE"/bin/*
+do
+    ${INSTALLOP} "$i" "$DESTDIR"/bin/"$(basename "$i")"
+done
+popd || { log --error Direcotry "$HERE" not found; exit 1; }

@@ -1,6 +1,6 @@
 #! /bin/zsh
 #
-# shellcheck disable=SC2296
+# shellcheck disable=SC2296,SC1090
 #
 
 PROGNAME="$(basename "$0")"
@@ -12,165 +12,37 @@ usage() {
     exit 1
 }
 
-log() {
-    local pre=
-    local post=
-    case $1 in
-        '--error') 
-            pre="${(%):-%B%F{red}"
-            post="${(%):-%f%b}"
-            shift
-            ;;
-        '--warn')
-            pre="${(%):-%B%F{yellow}"
-            post="${(%):-%f%b}"
-            shift
-            ;;
-        '--info')
-            pre="${(%):-%F{green}"
-            post="${(%):-%f}"
-            shift
-            ;;
-        *)
-            ;;
-    esac
-    printf "%s%s: %s%s\n" "$pre" "$PROGNAME" "$*" "$post"
-}
-
 INSTALLOP=install
 DESTDIR=$HOME
 DEBUG=false
-REFRESH=false
 while getopts "Drud:" o; do
     case "${o}" in
         u)  INSTALLOP=uninstall   ;;
         d)  DESTDIR=$OPTARG       ;;
-        r)  REFRESH=true          ;;
         D)  DEBUG=true            ;;
         *)  usage                 ;;
     esac
 done
 shift $((OPTIND-1))
-$DEBUG && INSTALLOP='echo'
+$DEBUG && INSTALLOP='log'
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
-#
-# Utilities to (un)install
-#
-install() {
-    if [ -e "$2" ] ; then
-        $REFRESH && {
-            log --warn skip "$2"
-            return
-        }
-        mv "$2" "$2".ORIG # backup existing
-        log --warn save "$2"
-    fi
-    ln -s -f "$1" "$2"
-    log --info link "$2" to "$1"
-}
+export DESTDIR HERE
 
-uninstall() {
-    if [[ "$(readlink "$2")" = "$1" ]]
-    then
-        rm -f "$2"
-        if [ -e "$2".ORIG ] ; then
-            mv "$2".ORIG "$2"
-            log --warn restore "$2"
-        fi
-        log --info unlink "$2" from "$1"
-    else
-        log --warn skip "$2"
-    fi
-}
+. ./scripts/utilities
+
+flist_init
+
+. ./common/configure
+
+. ./"$(uname -s)"/configure
+
+. ./"$(uname -s)"/software-install
 
 #
-# make shellcheck happy
-#
-install   "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
-uninstall "$HERE"/no-op "$DESTDIR"/.no-op >/dev/null 2>&1
-
-#
-# dotFiles
-#
-# setup defaults initilization
-printf '(defconst emacs-rc-dir "%s/emacs")\n' "$HERE" > dot.emacs-rc-dir.el
-{
-    printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
-    # shellcheck disable=SC2016
-    printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-           "${HERE}/zshell"
-    printf 'setopt NO_NOMATCH;'
-} > dot.zinit
-
-mkdir -p "$DESTDIR"
-for i in ./dot.* ; do
-    ${INSTALLOP} "$HERE"/"$i" "$DESTDIR"/"${i/.\/dot/}"
-done
-
-mkdir -p "$DESTDIR/.config"
-for i in ./dotConfig/* ; do
-    ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
-done
-
-# mkdir -p "$DESTDIR/.local/share"
-# for i in ./dotLocal/* ; do
-#     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotLocal/.local\/share}"
-# done
-
-#
-# This is a one-off
-#
-mkdir -p "$DESTDIR"/.emacs.d/lib
-${INSTALLOP} "$HERE"/dotEmacs.d/lib/fonts "$DESTDIR"/.emacs.d/lib/fonts
-
-#
-# These dot files contain configs and secrets.  Only link the 
-# configs individually.
-#
-find ./safeLink/dot.* -type f | while read -r fil ; do
-    rfil="${fil/.\/safeLink\/dot/}"
-    mkdir -p "$(dirname "$DESTDIR/$rfil")"
-    ${INSTALLOP} "$HERE/${fil/.\//}" "$DESTDIR/$rfil"
-done
-
-#
-# binaries
-#
-mkdir -p "$DESTDIR"/bin
-for i in "$HERE"/bin/*
-do
-    ${INSTALLOP} "$i" "$DESTDIR"/bin/"$(basename "$i")"
-done
-
-#
-# Fonts
-#
-# brew install
-#   font-alegreya
-#   font-alegreya-sans-sc
-#   font-alegreya-sans
-#   font-alegreya-sc
-#   font-anonymous-pro
-#   font-atkinson-hyperlegible
-#   font-awesome-terminal-fonts
-#   font-fontawesome
-#   font-hack-nerd-font
-#   font-lato
-#   font-source-sans-3
-#   font-source-serif-4
-#   font-source-code-pro
-#
-
-case "$(uname)" in
-    Linux)  ./baseline-arch     ;;
-    Darwin) brew bundle install ;;
-esac
-
-#
-# Finally Protect the repo
+# Protect the repo
 #
 pre-commit install --install-hooks
 
-exit
+flist_done

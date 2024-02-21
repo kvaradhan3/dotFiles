@@ -1,0 +1,156 @@
+#! /bin/zsh -x
+
+set -eu
+
+#
+# Prep Steps:
+#
+# Partitions:
+# - EFI 1G
+# - /   128G
+# - /var 128G
+# - /home 512G
+# - /data rest (162.5G)
+# 
+# On boot, link:
+# iwctl
+# # station wlan0 scan
+# # station wlan0 get-networks
+# # station wlan0 connect "idli vadai sambhar"
+# 
+# timedatectl
+# 
+# format all partitions and mount them
+# 
+# # mkfs.fat -F 32 /dev/efi_system_partition
+# # mkfs.ext4 /dev/root_partition
+# 
+# # dd if=/dev/zero of=/swapfile bs=1M count=8k status=progress
+# # chmod 0600 /swapfile
+# # mkswap -U clear /swapfile
+# # swapon /swapfile
+# 
+# # mount --mkdir /dev/efi_system_partition /mnt/boot
+# 
+# 
+# BASE INSTALL
+# # pacstrap -K /mnt base linux linux-firmware git sudo refind iwd zsh
+# 
+# # genfstab -U /mnt >> /mnt/etc/fstab
+# # arch-chroot /mnt
+# # ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+# # hwclock --systohc
+# 
+# refind-install
+# echo {{hostname}} > /etc/hostname
+# passwd root
+# 
+# : For AUR :
+# groupadd pacman
+# useradd --base-dir /home \
+#         --home-dir /home/kannan \
+#         --create-home \
+#         --comment 'Kannan Varadhan' \
+#         --groups pacman,wheel \
+#         --shell /bin/zsh \
+#    kannan
+#
+# git clone https://github.com/kvaradhan3/dotFiles.git /home/kannan/sysinit
+#
+# --- /etc/security/faillock.bak	2023-08-29 20:51:41.409772012 -0700
+# +++ /etc/security/faillock.conf	2023-08-29 20:51:28.313105617 -0700
+# @@ -29,7 +29,7 @@
+#  # Deny access if the number of consecutive authentication failures
+#  # for this user during the recent interval exceeds n tries.
+#  # The default is 3.
+# -# deny = 3
+# +deny = 30
+#  #
+#  # The length of the interval during which the consecutive
+#  # authentication failures must happen for the user account
+# 
+# swapoff -a
+# cd /
+# umount -R /mnt
+# reboot
+#
+
+####
+#
+# Upgrade live system
+#
+WIFI_SSID='idli vadai sambhar'
+
+block_exists_in_file() {
+    grep -E "$1" "$2" >/dev/null 2>&-
+}
+
+add_block_to() {
+    FILE=$1
+    shift
+
+    for i in "$@" ; do
+        echo "$i" 
+    done | sudo tee -a "$FILE" >/dev/null 2>&1
+}
+
+
+##
+#
+# Base Network
+#
+
+echo 'Network'
+sudo mkdir -p /etc/iwd
+if ! block_exists_in_file '^# INIT:' /etc/iwd/main.conf ; then
+    add_block_to /etc/iwd/main.conf          \
+        "# INIT: $(date) #"                  \
+        "[General]"                          \
+        "EnableNetworkConfiguration=true"    \
+        ""                                   \
+        "[Network]"                          \
+        "NameResolvingService=systemd"       \
+        ""
+fi
+
+sudo iwctl station wlan0 connect "$WIFI_SSID"
+sudo systemctl start  iwd.service
+sudo systemctl enable iwd.service
+sudo systemctl start  systemd-resolved.service
+sudo systemctl enable systemd-resolved.service
+
+if ! block_exists_in_file '^\[AUR]$' /etc/pacman.conf ; then
+    echo 'bootstrap AUR'
+    add_block_to /etc/pacman.conf          \
+        ''                                 \
+        '[AUR]'                            \
+        'SigLevel = Optional TrustAll'     \
+        'Server = file:///var/pacman/AUR'
+
+    sudo mkdir -p /var/pacman/AUR
+    sudo chmod -R 02770  /var/pacman
+    sudo chgrp -R pacman /var/pacman
+
+    repo-add /var/pacman/AUR/AUR.db.tar.xz 
+    pac_install base-devel
+
+    git clone https://github.com/AladW/aurutils /tmp/aurutils
+    cd /tmp/aurutils
+    makepkg --install --syncdeps --asdeps --needed --noconfirm 
+    rm -rf /tmp/aurutils
+
+    sudo pacman -Syu --noconfirm --needed pacman_contrib
+fi
+
+export AURDEST=/var/pacman/packages
+export AUR_PACMAN_AUTH="sudo --askpass"
+export AUR_REPO=AUR
+
+aur sync --no-view --no-confirm aurutils
+sudo pacman -S --noconfirm --needed --overwrite '*' aurutils
+
+curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
+aur    sync --no-view --no-confirm 1password
+pacman -S   1password
+
+sudo pacman -Syu --noconfirm --needed

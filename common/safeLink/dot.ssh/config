@@ -12,7 +12,6 @@ Host github.com
 Host *
   User                     kannan
   AddKeysToAgent           yes
-  UseKeychain              yes
   ForwardAgent             yes
   ForwardX11               no
 

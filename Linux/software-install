@@ -1,0 +1,211 @@
+#! /bin/zsh -x
+
+set -eu
+
+#
+# fetch/upgrade aurutils.   This list is generated using:
+# 
+#    % paclist AUR
+#
+
+while read -r pkg ver ; do
+    aur sync --no-view --no-confirm "$pkg"
+    log --info aur sync "$pkg@$ver">/dev/null 2>&1
+done <<- "AURLIST"
+    1password-beta 8.10.26_11.BETA-11
+    1password-cli 2.24.0-2
+    aurutils 18.5-1
+    autojump 22.5.3-9
+    google-cloud-cli 462.0.1-1
+    hw-probe 1.6.5-1
+    laptop-mode-tools 1.74-1
+    ltunify 0.3-1
+    python-fangfrisch 1.7.0-1
+    ttf-meslo 1.2.1-3
+    ttf-monaco 6.1-7
+    vlc-git 4.0.0.r27536.g051c1c067e-1
+    zsh-antidote 1.9.4-1
+AURLIST
+    # vlc-pause-click-plugin 2.2.0-1
+
+while read -r pkg ver ; do
+    sudo pacman -S --noconfirm --needed "$pkg"
+    log --info aur sync "$pkg@$ver">/dev/null 2>&1
+done <<- "PACLIST"
+    1password-beta 8.10.26_11.BETA-11
+    1password-cli 2.24.0-2
+    adobe-source-sans-fonts 3.052-1
+    alsa-plugins 1:1.2.7.1-2
+    alsa-utils 1.2.10-1
+    archlinux-contrib 20221211-2
+    aurutils 18.5-1
+    autojump 22.5.3-9
+    bandwhich 0.22.2-1
+    base 3-2
+    base-devel 1-1
+    bc 1.07.1-4
+    bind 9.18.21-1
+    bluez 5.72-2
+    bluez-utils 5.72-2
+    clamav 1.2.1-1
+    cowsay 3.04-4
+    cups 1:2.4.7-2
+    cups-pdf 3.0.1-7
+    dbus-python 1.3.2-2
+    docker 1:24.0.7-1
+    docker-compose 2.24.5-1
+    electron25 25.9.8-1
+    emacs-wayland 29.2-1
+    ethtool 1:6.5-1
+    firefox 122.0-1
+    firefox-developer-edition 123.0b6-1
+    foot 1.16.2-2
+    fortune-mod 3.20.0-1
+    fprintd 1.94.2-2
+    fzf 0.46.1-1
+    gd 2.3.3-7
+    git 2.43.0-1
+    github-cli 2.43.1-1
+    glfw-wayland 3.3.9-1
+    google-cloud-cli 462.0.1-1
+    gpick 0.3-1
+    hdparm 9.65-1
+    htop 3.3.0-1
+    hw-probe 1.6.5-1
+    iw 6.7-1
+    iwd 2.13-4
+    jq 1.7.1-1
+    kubectl 1.29.1-1
+    laptop-detect 0.16-1
+    laptop-mode-tools 1.74-1
+    linux 6.7.3.arch1-1
+    linux-firmware 20240115.9b6d0b08-2
+    ltunify 0.3-1
+    lvm2 2.03.23-1
+    lynx 2.8.9-7
+    man-db 2.12.0-1
+    mate-control-center 1.26.1-1
+    mupdf 1.23.9-4
+    neofetch 7.1.0-2
+    nethack 3.6.7-5
+    nethogs 0.8.7-1
+    netsniff-ng 0.6.8-6
+    nss-mdns 0.15.1-1
+    oniguruma 6.9.9-1
+    opendoas 6.8.2-1
+    openresolv 3.13.2-2
+    openssh 9.6p1-1
+    otf-font-awesome 6.5.1-1
+    pacman-contrib 1.10.4-1
+    pacutils 0.11.1-1
+    pipewire-alsa 1:1.0.3-1
+    pipewire-pulse 1:1.0.3-1
+    pkgfile 21-2
+    pre-commit 3.6.0-1
+    python-docutils 1:0.20.1-1
+    python-fangfrisch 1.7.0-1
+    qpwgraph 0.6.2-1
+    qt5-wayland 5.15.12+kde+r61-1
+    qt6-wayland 6.6.1-1
+    ranger 1.9.3-9
+    rsync 3.2.7-6
+    shellcheck 0.9.0-78
+    smartmontools 7.4-1
+    sof-firmware 2023.12-1
+    speedtest-cli 2.1.3-7
+    sudo 1.9.15.p5-1
+    sway 1:1.8.1-5
+    swaybg 1.2.0-1
+    swayidle 1.8.0-1
+    swaylock 1.7.2-1
+    tmux 3.3_a-7
+    ttf-anonymous-pro 1.003-7
+    ttf-inconsolata-nerd 3.1.1-1
+    ttf-meslo 1.2.1-3
+    ttf-monaco 6.1-7
+    ttf-nerd-fonts-symbols-common 3.1.1-1
+    ttf-nerd-fonts-symbols-mono 3.1.1-1
+    udisks2 2.10.1-2
+    usbutils 017-1
+    vim 9.1.0000-1
+    vlc-git 4.0.0.r23113.gf7bb59d9f5-1
+    waybar 0.9.24-3
+    wayland-protocols 1.33-1
+    weston 13.0.0-1
+    wev 1.0.0-13
+    wl-clipboard 1:2.2.1-1
+    wofi 1.3-2
+    xl2tpd 1.3.18-1
+    xorg-xeyes 1.3.0-1
+    xorg-xlsclients 1.1.5-1
+    xorg-xwayland 23.2.4-2
+    xpdf 4.04-2
+    yt-dlp 2023.12.30-1
+    zsh 5.9-4
+    zsh-antidote 1.9.4-1
+PACLIST
+    # vlc-pause-click-plugin 2.2.1kva-1
+
+sudo systemctl start  docker.service
+sudo systemctl enable docker.service
+sudo usermod --append		        \
+             --groups docker		\
+	     "$USER"
+
+# pac_install kubeadm
+##
+## https://wiki.archlinux.org/title/Kubernetes
+##
+# aur_install etcd
+# pac_install etcd
+# pac_install kubernetes-control-plane # includes kubernetes-node
+#
+# pac_install containerd
+# {
+#     add_block_to /etc/modules-load.d/k8s.conf \
+#         "# INIT: $(date) #"                   \
+#         'overlay'                             \
+#         'br_netfilter'
+# 
+#     add_block_to /etc/sysctl.d/k8s.conf            \
+#         "# INIT: $(date) #"                        \
+#         'net.bridge.bridge-nf-call-iptables  = 1'  \
+#         'net.bridge.bridge-nf-call-ip6tables = 1'  \
+#         'net.ipv4.ip_forward                 = 1'
+# 
+#     sysctl --system
+# }
+#
+# pac_install helm
+
+if false; then
+  pac_install gpick 
+  pac_install mate-control-center 
+  pac_install mupdf 
+  pac_install netsniff-ng 
+  pac_install nwg-icon-picker 
+  pac_install openresolv 
+  pac_install openswan 
+  pac_install qpwgraph
+  pac_install speedtest-cli 
+  pac_install udisks2 
+  pac_install wl-clipboard 
+  pac_install xl2tpd 
+  pac_install xpdf 
+  pac_install youtube-dl 
+fi
+
+if false; then
+  # other
+  pac_install postgresql
+  aur_install paperless-ngx
+fi
+
+pwd
+if [[ -f ./$(uname -s)/software-install-$(uname -n) ]]
+then
+    # shellcheck disable=SC1090
+    source ./"$(uname -s)"/"software-install-$(uname -n)"
+fi
+
+sudo pacman -Syu --noconfirm --needed

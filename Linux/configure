@@ -1,0 +1,23 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2296
+#
+
+DESTDIR=${DESTDIR:-$HOME}
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+#
+# setup defaults initilization
+pushd "$HERE" || { log --error Direcotry "$HERE" not found; exit 1; }
+
+mkdir -p "$DESTDIR/.config"
+for i in ./dotConfig/* ; do
+    ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotConfig/.config}"
+done
+
+# mkdir -p "$DESTDIR/.local/share"
+# for i in ./dotLocal/* ; do
+#     ${INSTALLOP} "$HERE"/"${i/.\//}" "$DESTDIR"/"${i/.\/dotLocal/.local\/share}"
+# done
+
+popd || { log --error Direcotry "$HERE" not found; exit 1; }
