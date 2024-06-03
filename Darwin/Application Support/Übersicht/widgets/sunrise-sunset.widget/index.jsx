@@ -8,6 +8,12 @@
 import { css } from "uebersicht"
 import { run } from "uebersicht"
 
+/** weather codes list can eb fetched from https://weather.codes.
+    For the US, you can use the zip code as the default weather code.
+    For most countries, you can go to https://weather.codes/{{country}}
+    or check at the bottom of https://weather.codes for the list of countries.
+ **/
+
 const location  = 95129
 const keyFile   = '$HOME/.VisualCrossingKey'
 const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
@@ -24,7 +30,6 @@ export const command = (dispatch) => run(`cat "${keyFile}"`)
         const weather = new URL(API, baseURL);
         weather.searchParams.set("key", key);
         weather.searchParams.set("contentType", "json");
-
         return weather.href;
     })
     .then((href) => {
