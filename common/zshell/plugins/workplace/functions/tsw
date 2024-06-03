@@ -5,6 +5,8 @@ emulate -L zsh -o pipe_fail -o err_return
 export TELEPORT_LOGIN=${TELEPORT_LOGIN:-eng}
 export TELEPORT_ADD_KEYS_TO_AGENT=no
 
+declare _tsw_friendly
+
 function tsw {
     local -A _teleport_clusters=(
 	#env         proxy                    fqdn              friendly
@@ -25,7 +27,7 @@ function tsw {
 	'help'      'Print this help menu'
     )
 
-    local _tsw_friendly=""
+    _tsw_friendly=""
 
     if [[ $1 = "" ]] ; then
 	set -- status
@@ -35,10 +37,11 @@ function tsw {
 
     if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
         local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
-        export TELEPORT_PROXY=${_deets[1]};  shift _deets
-        export TSW_FQDN=${_deets[1]};        shift _deets
-        _tsw_friendly="$@"
+        export TELEPORT_PROXY=${_deets[1]}
+        export TSW_FQDN=${_deets[2]}
+        _tsw_friendly="${_deets:2}"
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
+
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
 	case "$1" in
 	    logout)
