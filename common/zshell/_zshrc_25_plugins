@@ -81,9 +81,11 @@ then
         kvaradhan3/dotFiles path:common/zshell/plugins/1p
         kvaradhan3/dotFiles path:common/zshell/plugins/workplace
         kvaradhan3/dotFiles path:common/zshell/plugins/emulators
+        kvaradhan3/dotFiles path:common/zshell/plugins/log
 
         bigH/git-fuzzy      path:bin kind:path
         wfxr/forgit
+        sindresorhus/pure
 PLUGINS_LIST
 fi
 
@@ -92,7 +94,8 @@ fi
 source ~/.zsh_plugins.zsh
 
 # shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
-source "${0:h}"/themes/gitsy.zsh-theme
+# source "${0:h}"/themes/gitsy.zsh-theme
+source "${0:h}"/themes/pure.zsh-theme
 
 #
 # completions

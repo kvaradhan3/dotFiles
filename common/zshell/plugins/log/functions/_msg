@@ -1,0 +1,49 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+emulate -L zsh -o pipe_fail -o err_return
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+#
+# Usage:
+#    msg -c '#ff0000'  -c bold "$@"
+#    msg -c yellow "$@"
+#    msg -c '#666' "$@"
+#
+emulate -L zsh -o pipe_fail -o err_return
+local caller="${funcstack[3]:-"${FUNCNAME[3]}"}"
+zparseopts -D -E c+:=clrs
+local ldr='' trl=''
+for c in ${clrs:l} ; do
+  case $c in
+  '-c')
+      ;;
+  bold)
+      ldr+='%B'
+      trl='%b'$trl
+      ;;
+  underline|uline)
+      ldr+='%U'
+      trl='%u'$trl
+      ;;
+  standout)
+      ldr+='%S'
+      trl='%s'$trl
+      ;;
+  *)
+      ldr+="%F{$c}"
+      trl='%f'$trl
+      ;;
+  esac
+done
+print -P "$ldr""%D{%FT%T%z} $caller:" "$@" "$trl"
