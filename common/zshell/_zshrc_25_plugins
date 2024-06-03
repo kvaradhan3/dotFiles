@@ -85,6 +85,7 @@ then
 
         bigH/git-fuzzy      path:bin kind:path
         wfxr/forgit
+        sindresorhus/pure
 PLUGINS_LIST
 fi
 
@@ -93,7 +94,8 @@ fi
 source ~/.zsh_plugins.zsh
 
 # shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
-source "${0:h}"/themes/gitsy.zsh-theme
+# source "${0:h}"/themes/gitsy.zsh-theme
+source "${0:h}"/themes/pure.zsh-theme
 
 #
 # completions
