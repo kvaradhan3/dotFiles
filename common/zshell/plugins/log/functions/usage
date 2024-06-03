@@ -1,0 +1,6 @@
+#! /bin/zsh
+
+emulate -L zsh -o err_return -o pipe_fail
+
+local caller="${funcstack[2]:-"${FUNCNAME[2]}"}"
+print -P "Usage: $caller" "$@"

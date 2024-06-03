@@ -81,6 +81,7 @@ then
         kvaradhan3/dotFiles path:common/zshell/plugins/1p
         kvaradhan3/dotFiles path:common/zshell/plugins/workplace
         kvaradhan3/dotFiles path:common/zshell/plugins/emulators
+        kvaradhan3/dotFiles path:common/zshell/plugins/log
 
         bigH/git-fuzzy      path:bin kind:path
         wfxr/forgit
