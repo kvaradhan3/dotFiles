@@ -1,0 +1,97 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+export TELEPORT_LOGIN=${TELEPORT_LOGIN:-eng}
+export TELEPORT_ADD_KEYS_TO_AGENT=no
+
+function tsw {
+    local -A _teleport_clusters=(
+	#env         proxy                    fqdn              friendly
+	'prod'      'prod.tpt.zpath.net     prod.zpath.net      Production'
+	'mod'       'tpt.zpagovc.us         zpagov.us           Fed (Moderate)'
+	'moderate'  'tpt.zpagovc.us         zpagov.us           Fed (Moderate)'
+	'gov'       'tpt.zpagov.net         zpagov.net          Gov'
+	'beta'      'beta.tpt.zpath.net     zpabeta.net         Beta'
+	'eng'       'eng.tpt.zpath.net      zpath.net           Engineering'
+    )
+
+    local -A _tsw_convenience=(
+	'clear'     'Clear teleport configurations'
+	'status'    'Print current teleport status'
+	'logout'    'Logout (and clear) current configuration'
+	'login'     'Login to specified cluster'
+	'clusters'  'List current known clusters'
+	'help'      'Print this help menu'
+    )
+
+    local _tsw_friendly=""
+
+    if [[ $1 = "" ]] ; then
+	set -- status
+    else
+	set -- "${(L)@}"
+    fi
+
+    if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
+        local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
+        export TELEPORT_PROXY=${_deets[1]};  shift _deets
+        export TSW_FQDN=${_deets[1]};        shift _deets
+        _tsw_friendly="$@"
+        log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
+    elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
+	case "$1" in
+	    logout)
+		tsh "$@"
+		info logout out of ${_tsw_friendly}
+		;&
+	    login|clear)
+		unset TELEPORT_PROXY TSW_FQDN
+		info clear cluster environments for ${_tsw_friendly}
+		_tsw_friendly=""
+		;|
+	    login)
+		if (( ${${(k)_teleport_clusters}[(I)$2]} )); then
+		    tsh --proxy $proxy "$@"
+		else
+		    tsh "$@"
+		fi
+		_tsw_friendly=$(tsh status --format=json | jq .active.profile)
+		;;
+	    clusters)
+		local cluster params
+		print "cluster,proxy FQDN,FQDN,Name"
+		for cluster params in ${(kv)_teleport_clusters}; do
+		    local -a _deets=( ${(z)params} )
+		    print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
+		done
+		;;
+            status)
+                tsh "$@"
+                ;&
+            help)
+		echo
+		usage "[${(k)_teleport_clusters// /|}]"
+		print "  Additional convenience functions:"
+		for key help in ${(kv)_tsw_convenience}; do
+		    print "    $key\t\t$help"
+		done
+                ;;
+        esac
+    else
+        tsh "$@"
+    fi
+}
+
+ #
+ # some aliases that we care about, once we are logged in...
+ #
+ alias tssh='tsh ssh'
+ alias tsh-list-mine='tsh ls --format=json aws/Owner=$USER@zscaler.com'
+ alias tsh-goto-mine='tsh ssh $(tsh ls \
+       			            --format=json aws/Owner=$USER@zscaler.com | \
+                                jq -r .[].spec.hostname)'
+
+
+tsw
+
