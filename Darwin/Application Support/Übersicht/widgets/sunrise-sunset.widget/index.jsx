@@ -34,7 +34,7 @@ export const initialState = {
    2. Use geolocation to not hardcode ${location}
  */}
 
-const weather = new URL(API, testURL)
+const weather = new URL(API, baseURL);
 weather.searchParams.set("key", key);
 weather.searchParams.set("contentType", "json");
 
@@ -75,13 +75,22 @@ export const render = (p) => {
                 <div className={sunRise}>{legend.sunrise}</div>
             </div>
             <div className={timeStamp}>
-                <div className={sunRise}>{p.sunrise}</div>
+                <div className={timeStamp_color}>[{p.datetime}] </div>
+            </div>
+            <div className={symbol}>
+		<div className={sunRise}> {legend.sunrise} </div>
             </div>
             <div className={symbol}>
                 <div className={sunRise}>{legend.sunset}</div>
             </div>
             <div className={timeStamp}>
-                <div className={sunSet}>{p.sunset}</div>
+                <div className={sunRise}>{p.sunrise} </div>
+            </div>
+            <div className={symbol}>
+		<div className={sunSet}> {legend.sunset} </div>
+            </div>
+            <div className={timeStamp}>
+                <div className={sunSet}>{p.sunset} </div>
             </div>
             <div className={debug}>LLL {String(p)}</div>
         </div>
@@ -94,35 +103,32 @@ export const className = `
   z-index: 1;
   color: grey;
 `
-
 const container = css`
     display:               grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto auto auto auto;
     border:                0 none;
     text-align:            center;
     vertical-align:        middle;
 `
-
 const symbol = css`
     padding:               8px;
     font-family:           Lucida-Sans Unicode;
     font-size:             25px;
 `
-
 const timeStamp = css`
     padding:               8px;
     font-family:           Helvetica Neue;
     font-size:             25px;
 `
-
+const timeStamp_color = css`
+    color:                  0077FF;
+`
 const sunRise = css`
     color:                  blue;
 `
-
 const sunSet = css`
     color:                  orange;
 `
-
 const debug = css`
     font-family: Helvetica;
     color: blue;
