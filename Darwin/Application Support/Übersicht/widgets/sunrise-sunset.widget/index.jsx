@@ -9,13 +9,13 @@ import { css } from "uebersicht"
 import { run } from "uebersicht"
 
 const location  = 95129
-const keyFile   = '.VisualCrossingKey'
+const keyFile   = '$HOME/.VisualCrossingKey'
 const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
 const API       = `/VisualCrossingWebServices/rest/services/timeline/${location}`
 
 export const refreshFrequency = 1000 * 60 * 60;
 
-export const command = (dispatch) => run(`cat $HOME/${keyFile}`)
+export const command = (dispatch) => run(`cat ${keyFile}`)
     .then((output) => {
 	let obj = JSON.parse(output)
 	return obj.key;
@@ -76,17 +76,11 @@ const legend = {
 export const render = (p) => {
     return (
         <div className={container}>
-            <div className={symbol}>
-                <div className={sunRise}>{legend.sunrise}</div>
-            </div>
             <div className={timeStamp}>
                 <div className={timeStamp_color}>[{p.datetime}] </div>
             </div>
             <div className={symbol}>
 		<div className={sunRise}> {legend.sunrise} </div>
-            </div>
-            <div className={symbol}>
-                <div className={sunRise}>{legend.sunset}</div>
             </div>
             <div className={timeStamp}>
                 <div className={sunRise}>{p.sunrise} </div>
@@ -97,7 +91,6 @@ export const render = (p) => {
             <div className={timeStamp}>
                 <div className={sunSet}>{p.sunset} </div>
             </div>
-            <div className={debug}>LLL {String(p)}</div>
         </div>
     )
 }
@@ -138,38 +131,3 @@ const debug = css`
     font-family: Helvetica;
     color: blue;
 `
-
-{/*
-   Notes:
-   - This form of command structure,
-     export const command = (dispatch) => {
-       fetch(`${weather.href}`)
-        .then((response) => {
-            return response.json();
-        })
-        .then((respdata) => {
-            return dispatch({ status: 'SUCCESS', data: respdata.curConditions });
-        })
-        .catch((error) => {
-            return dispatch({ status: 'FAILURE', error: String(error) });
-        })
-
-        }
-     runs repeatedly and throws error, "TypeError: Load failed".
-     Why?
-   - In this form:
-     export const command = (dispatch) => fetch(`${weather.href}`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((respdata) => {
-        return dispatch({ status: 'SUCCESS', data: respdata.curConditions });
-      })
-      .catch((error) => {
-        return dispatch({ status: 'FAILURE', error: String(error) });
-        })
-     The event.status is undefined, event itself is an object and I cannot tell its returned fields....
-
-
- */}
-
