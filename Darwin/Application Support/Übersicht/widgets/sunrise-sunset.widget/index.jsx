@@ -6,67 +6,72 @@
   */}
 
 import { css } from "uebersicht"
+import { run } from "uebersicht"
 
-const location = 95129
-const keyFile  = "$HOME/.VisualCrossingKey"
-const key      = "BAD"
-const baseURL  = new URL( "https://weather.VisualCrossing.Com/" )
-const testURL  = new URL( "http://127.0.0.1:5000/" )
-const API      = `/VisualCrossingWebServices/rest/services/timeline/${location}`
+const location  = 95129
+const keyFile   = '.VisualCrossingKey'
+const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
+const API       = `/VisualCrossingWebServices/rest/services/timeline/${location}`
+
+export const refreshFrequency = 1000 * 60 * 60;
+
+export const command = (dispatch) => run(`cat $HOME/${keyFile}`)
+    .then((output) => {
+	let obj = JSON.parse(output)
+	return obj.key;
+    })
+    .then((key) => {
+	const weather = new URL(API, baseURL);
+	weather.searchParams.set("key", key);
+	weather.searchParams.set("contentType", "json");
+
+	return weather.href;
+    })
+    .then((href) => {
+	fetch(href)
+	    .then((response) => {
+		response.json().then((resp) => {
+		    var queryDateTime =
+			resp.days[0].datetime + "T" +
+			resp.currentConditions.datetime;
+		    dispatch({ status: 'SUCCESS',
+			       datetime: queryDateTime,
+			       data: resp.currentConditions,
+			     });
+		});
+	    });
+    })
+    .catch((error) => {
+	dispatch({ status: 'FAILURE',
+		   error: String(error)
+		 });
+    });
+
+export const updateState = (event, previousState) => {
+    switch (event.status) {
+    case 'SUCCESS':
+	return {
+	    datetime: event.datetime,
+            sunrise: event.data.sunrise,
+            sunset:  event.data.sunset,
+	};
+    case 'FAILURE':
+	return {
+	    datetime: "",
+            sunrise: "ERROR",
+            sunset: "<" + event.error + ">",
+	};
+    default:
+	console.log("unknown status code: " + String(event.status) +
+		    " previous? " + String(previousState.status));
+        return previousState;
+    }
+}
 
 const legend = {
     sunrise: "\u263C",
     sunset:  "\u2600"
 };
-
-export const refreshFrequency = 1000;
-
-export const initialState = {
-    status: 'INIT',
-    data: {
-        sunrise: 'INIT',
-        sunset:  'INIT'
-    }
-};
-
-{/*
-   1. read key from 1password
-   2. Use geolocation to not hardcode ${location}
- */}
-
-const weather = new URL(API, baseURL);
-weather.searchParams.set("key", key);
-weather.searchParams.set("contentType", "json");
-
-export const command = (dispatch) => fetch(`${weather.href}`)
-    .then((response) => {
-        dispatch({ status: 'SUCCESS', data: response.json() })
-    })
-    .catch((error) => {
-        dispatch({ status: 'FAILURE', error: String(error) })
-    })
-
-const next = 'AB0012 '
-
-export const updateState = (event, previousState) => {
-    switch (event.status) {
-    case 'INIT': return event.data;
-    case 'SUCCESS': return {
-        sunrise: next + String(event.data.currentConditions.sunrise),
-        sunset:  event.data.currentConditions.sunset
-    };
-    case 'FAILURE': return {
-        sunrise: "ERRORRET",
-        sunset: "<" + event.error + ">"
-    };
-    default: {
-        return {
-            sunrise: next + String(event.status),
-            sunset:  String(previousState.status)
-        };
-    }
-    }
-}
 
 export const render = (p) => {
     return (
