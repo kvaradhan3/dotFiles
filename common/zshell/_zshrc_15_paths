@@ -23,6 +23,7 @@ local _i
 for _i in /usr/local     \
          /opt            \
          /opt/homebrew   \
+         $HOME/.local    \
          $HOME
 do
     test -d "$_i"       || continue

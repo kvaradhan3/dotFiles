@@ -31,3 +31,6 @@ alias -g .mine="-A 'currentuser()'"
 alias -g .rmine="-R 'currentuser()'"
 
 alias j-fzf='fzf --header-lines=1 --preview="jira clean {1}"'
+
+export VCPKG_ROOT=$HOME/src/vcpkg
+path+=( $VCPKG_ROOT )
