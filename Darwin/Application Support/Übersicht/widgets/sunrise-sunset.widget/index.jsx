@@ -15,55 +15,55 @@ const API       = `/VisualCrossingWebServices/rest/services/timeline/${location}
 
 export const refreshFrequency = 1000 * 60 * 60;
 
-export const command = (dispatch) => run(`cat ${keyFile}`)
+export const command = (dispatch) => run(`cat "${keyFile}"`)
     .then((output) => {
-	let obj = JSON.parse(output)
-	return obj.key;
+        let obj = JSON.parse(output);
+        return obj.key;
     })
     .then((key) => {
-	const weather = new URL(API, baseURL);
-	weather.searchParams.set("key", key);
-	weather.searchParams.set("contentType", "json");
+        const weather = new URL(API, baseURL);
+        weather.searchParams.set("key", key);
+        weather.searchParams.set("contentType", "json");
 
-	return weather.href;
+        return weather.href;
     })
     .then((href) => {
-	fetch(href)
-	    .then((response) => {
-		response.json().then((resp) => {
-		    var queryDateTime =
-			resp.days[0].datetime + "T" +
-			resp.currentConditions.datetime;
-		    dispatch({ status: 'SUCCESS',
-			       datetime: queryDateTime,
-			       data: resp.currentConditions,
-			     });
-		});
-	    });
+        fetch(href)
+            .then((response) => {
+                response.json().then((resp) => {
+                    var queryDateTime =
+                        resp.days[0].datetime + "T" +
+                        resp.currentConditions.datetime;
+                    dispatch({ status: 'SUCCESS',
+                               datetime: queryDateTime,
+                               data: resp.currentConditions,
+                             });
+                });
+            });
     })
     .catch((error) => {
-	dispatch({ status: 'FAILURE',
-		   error: String(error)
-		 });
+        dispatch({ status: 'FAILURE',
+                   error: String(error)
+                 });
     });
 
 export const updateState = (event, previousState) => {
     switch (event.status) {
     case 'SUCCESS':
-	return {
-	    datetime: event.datetime,
+        return {
+            datetime: event.datetime,
             sunrise: event.data.sunrise,
             sunset:  event.data.sunset,
-	};
+        };
     case 'FAILURE':
-	return {
-	    datetime: "",
+        return {
+            datetime: "",
             sunrise: "ERROR",
             sunset: "<" + event.error + ">",
-	};
+        };
     default:
-	console.log("unknown status code: " + String(event.status) +
-		    " previous? " + String(previousState.status));
+        console.log("unknown status code: " + String(event.status) +
+                    " previous? " + String(previousState.status));
         return previousState;
     }
 }
@@ -80,13 +80,13 @@ export const render = (p) => {
                 <div className={timeStamp_color}>[{p.datetime}] </div>
             </div>
             <div className={symbol}>
-		<div className={sunRise}> {legend.sunrise} </div>
+                <div className={sunRise}> {legend.sunrise} </div>
             </div>
             <div className={timeStamp}>
                 <div className={sunRise}>{p.sunrise} </div>
             </div>
             <div className={symbol}>
-		<div className={sunSet}> {legend.sunset} </div>
+                <div className={sunSet}> {legend.sunset} </div>
             </div>
             <div className={timeStamp}>
                 <div className={sunSet}>{p.sunset} </div>
