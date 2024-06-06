@@ -85,7 +85,7 @@ then
 
         bigH/git-fuzzy      path:bin kind:path
         wfxr/forgit
-        sindresorhus/pure
+        sindresorhus/pure   kind:fpath
 PLUGINS_LIST
 fi
 
