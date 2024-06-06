@@ -26,7 +26,7 @@
 		  ("ET"         . "https://confluence.corp.zscaler.com/display/ET/%(confluence-encode)")
 		  ("confluence" . "https://confluence.corp.zscaler.com/display/%(confluence-encode)")
 		  ("pageId"     . "https://confluence.corp.zscaler.com/pages/viewpage.action?pageId="))
-		  ))))
+		  )))
 
 ;
 ;;; Local Variables:
