@@ -55,7 +55,8 @@ function tsw {
                 ;|
             login)
                 if (( ${${(k)_teleport_clusters}[(I)$2]} )); then
-                    tsh --proxy $proxy "$@"
+                    local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
+                    tsh --proxy "${_deets[1]}" login "${@:2}"
                 else
                     tsh "$@"
                 fi
