@@ -122,7 +122,7 @@ const timeStamp_color = css`
     color:                  0077FF;
 `
 const sunRise = css`
-    color:                  blue;
+    color:                  yellow;
 `
 const sunSet = css`
     color:                  orange;
