@@ -11,8 +11,8 @@ function tsw {
     local -A _teleport_clusters=(
         #env         proxy                    fqdn              friendly
         'prod'      'prod.tpt.zpath.net     prod.zpath.net      Production'
-        'mod'       'tpt.zpagovc.us         zpagov.us           Fed (Moderate)'
-        'moderate'  'tpt.zpagovc.us         zpagov.us           Fed (Moderate)'
+        'mod'       'tpt.zpagov.us          zpagov.us           Fed (Moderate)'
+        'moderate'  'tpt.zpagov.us          zpagov.us           Fed (Moderate)'
         'gov'       'tpt.zpagov.net         zpagov.net          Gov'
         'beta'      'beta.tpt.zpath.net     zpabeta.net         Beta'
         'eng'       'eng.tpt.zpath.net      zpath.net           Engineering'
