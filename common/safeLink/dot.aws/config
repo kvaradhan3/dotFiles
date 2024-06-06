@@ -1,5 +1,9 @@
-[profile wootcloud-prism-stg]
+[profile dev-zpath-dev]
+sso_session = dev-zpath-dev-sso
+sso_account_id = 966017130552
+sso_role_name = ET-Engineering
 region = us-west-2
-output = json
-role_arn = arn:aws:iam::286501683088:role/prism-migration-sa
-source_profile = prism
+[sso-session dev-zpath-dev-sso]
+sso_start_url = https://d-9267024070.awsapps.com/start/#
+sso_region = us-west-2
+sso_registration_scopes = sso:account:access
