@@ -110,8 +110,8 @@ function tsw {
                               aws/Owner=$USER@zscaler.com | \
                           jq -r '.[].spec.hostname')
                 ;;
-            list-raw)
-                tsh ls --format=json 
+            ls-r)
+                tsh ls --format=json
                 ;;
 
 	    # Generally do not disrupt these two being together...
