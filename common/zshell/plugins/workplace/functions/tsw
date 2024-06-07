@@ -28,7 +28,7 @@ function tsw {
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
         'goto-mine' 'Goto my machine, assuming exactly one'
-        'list-raw'  'tsh ls --format=json... $@'
+        'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
     )
 
@@ -49,6 +49,8 @@ function tsw {
 
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
         case "$1" in
+	    # Do not disrupt the next two. The third block (login) can move
+	    # but it would be better to-not-to...
             logout)
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
@@ -67,6 +69,7 @@ function tsw {
                 fi
                 _tsw_friendly=$(tsh status --format=json | jq .active.profile)
                 ;;
+
             clusters)
                 local cluster params
                 print "cluster,proxy FQDN,FQDN,Name"
@@ -75,9 +78,6 @@ function tsw {
                     print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
                 done
                 ;;
-            status)
-                tsh "$@"
-                ;&
             labels)
                 tsh ls --format=json                      | \
                 jq -C '.[] 
@@ -97,17 +97,34 @@ function tsw {
                          )'
                 ;;
             mine)
-                tsh ls --format=json aws/Owner=$USER@zscaler.com
-                ;;
+		print "hostname,Private IP,instance-id,HW Type,expiry";
+                tsh ls --format=json aws/Owner=$USER@zscaler.com |\
+		    jq -r '.[]
+ 		           | [ .spec.hostname,
+                               ( .spec.cmd_labels |
+                                   .ip_private.result,
+                                   .aws_instance_id.result,
+                                   .hwtype.result[:7]
+                               ),
+                               .metadata.expires[:10]
+                             ]
+                           | @csv'
+
+		;;
             goto-mine)
                 tsh ssh $(tsh ls                            \
                               --format=json                 \
                               aws/Owner=$USER@zscaler.com | \
                           jq -r '.[].spec.hostname')
                 ;;
-            list-raw)
-                tsh ls --format=json 
+            ls-r)
+                tsh ls --format=json
                 ;;
+
+	    # Generally do not disrupt these two being together...
+            status)
+                tsh "$@"
+                ;&
             help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
