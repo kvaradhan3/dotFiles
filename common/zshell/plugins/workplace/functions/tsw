@@ -53,7 +53,6 @@ function tsw {
             # Do not disrupt the next two. The third block (login) can move
             # but it would be better to-not-to...
             logout)
-            logout)
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
@@ -71,6 +70,7 @@ function tsw {
                 fi
                 _tsw_friendly=$(tsh status --format=json | jq .active.profile)
                 ;;
+
             clusters)
                 local cluster params
                 print "cluster,proxy FQDN,FQDN,Name"
@@ -113,6 +113,11 @@ function tsw {
             list-raw)
                 tsh ls --format=json 
                 ;;
+
+	    # Generally do not disrupt these two being together...
+            status)
+                tsh "$@"
+                ;&
             help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
