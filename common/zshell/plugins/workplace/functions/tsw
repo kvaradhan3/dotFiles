@@ -28,7 +28,7 @@ function tsw {
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
         'goto-mine' 'Goto my machine, assuming exactly one'
-        'list-raw'  'tsh ls --format=json... $@'
+        'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
     )
 
@@ -105,8 +105,8 @@ function tsw {
                               aws/Owner=$USER@zscaler.com | \
                           jq -r '.[].spec.hostname')
                 ;;
-            list-raw)
-                tsh ls --format=json 
+            ls-r)
+                tsh ls --format=json
                 ;;
 
 	    # Generally do not disrupt these two being together...
