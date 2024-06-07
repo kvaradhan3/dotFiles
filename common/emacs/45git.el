@@ -3,7 +3,12 @@
 (require 'magit)
 
 (use-package magit-delta
-  :hook (magit-mode . magit-delta-mode))
+  :hook (magit-mode . magit-delta-mode)
+  :config
+  (setq magit-delta-delta-args (append magit-delta-delta-args
+                                       '("--features"
+                                         "magit-delta")))
+  )
 
 (use-package forge
   :after magit
