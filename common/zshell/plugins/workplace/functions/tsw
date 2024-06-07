@@ -49,6 +49,8 @@ function tsw {
 
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
         case "$1" in
+	    # Do not disrupt the next two. The third block (login) can move
+	    # but it would be better to-not-to...
             logout)
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
@@ -67,6 +69,7 @@ function tsw {
                 fi
                 _tsw_friendly=$(tsh status --format=json | jq .active.profile)
                 ;;
+
             clusters)
                 local cluster params
                 print "cluster,proxy FQDN,FQDN,Name"
@@ -75,9 +78,6 @@ function tsw {
                     print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
                 done
                 ;;
-            status)
-                tsh "$@"
-                ;&
             labels)
                 tsh ls --format=json                      | \
                 jq -C '.[] 
@@ -108,6 +108,11 @@ function tsw {
             list-raw)
                 tsh ls --format=json 
                 ;;
+
+	    # Generally do not disrupt these two being together...
+            status)
+                tsh "$@"
+                ;&
             help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
