@@ -83,6 +83,36 @@ function tsw {
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
+            labels)
+                tsh ls --format=json                      | \
+                jq -C '.[] 
+                       | .metadata.labels + .spec.labels 
+                       | keys 
+                       | .[]'                             | \
+                sort                                      | \
+                uniq
+                ;;
+            my-labels)
+                tsh ls --format=json aws/Owner=$USER@zscaler.com | \
+                jq -r '.[] 
+                       | .metadata.labels 
+                       + ( .spec.cmd_labels
+                         | .[] 
+                         |= .result
+                         )'
+                ;;
+            mine)
+                tsh ls --format=json aws/Owner=$USER@zscaler.com
+                ;;
+            goto-mine)
+                tsh ssh $(tsh ls                            \
+                              --format=json                 \
+                              aws/Owner=$USER@zscaler.com | \
+                          jq -r '.[].spec.hostname')
+                ;;
+            list-raw)
+                tsh ls --format=json 
+                ;;
             help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
