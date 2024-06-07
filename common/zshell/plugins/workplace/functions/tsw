@@ -30,12 +30,13 @@ function tsw {
         'goto-mine' 'Goto my machine, assuming exactly one'
         'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
+	'-statusHelp' 'NO'
     )
 
     _tsw_friendly=""
 
     if [[ $1 = "" ]] ; then
-        set -- status
+        set -- '-statusHelp'
     else
         set -- "${(L)@}"
     fi
@@ -122,16 +123,23 @@ function tsw {
                 ;;
 
 	    # Generally do not disrupt these two being together...
-            status)
-                tsh "$@"
-                ;&
-            help)
+            status|-statusHelp)
+		shift;
+                tsh status "$@"
+                ;|
+
+            help|-statusHelp)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
+		    if [[ $key = -* ]] ; then
+			continue
+		    fi
                     print "    $key\t\t$help"
                 done
+		print "  defaults with no arguments, prints status and help"
+		print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
         esac
     else
