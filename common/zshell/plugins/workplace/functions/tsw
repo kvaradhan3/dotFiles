@@ -24,6 +24,11 @@ function tsw {
         'logout'    'Logout (and clear) current configuration'
         'login'     'Login to specified cluster'
         'clusters'  'List current known clusters'
+        'labels'    'Show labels that can be used in tsh search'
+        'my-labels' 'Show label settings for my machines'
+        'mine'      'List my machines'
+        'goto-mine' 'Goto my machine, assuming exactly one'
+        'list-raw'  'tsh ls --format=json... $@'
         'help'      'Print this help menu'
     )
 
@@ -73,6 +78,36 @@ function tsw {
             status)
                 tsh "$@"
                 ;&
+            labels)
+                tsh ls --format=json                      | \
+                jq -C '.[] 
+                       | .metadata.labels + .spec.labels 
+                       | keys 
+                       | .[]'                             | \
+                sort                                      | \
+                uniq
+                ;;
+            my-labels)
+                tsh ls --format=json aws/Owner=$USER@zscaler.com | \
+                jq -r '.[] 
+                       | .metadata.labels 
+                       + ( .spec.cmd_labels
+                         | .[] 
+                         |= .result
+                         )'
+                ;;
+            mine)
+                tsh ls --format=json aws/Owner=$USER@zscaler.com
+                ;;
+            goto-mine)
+                tsh ssh $(tsh ls                            \
+                              --format=json                 \
+                              aws/Owner=$USER@zscaler.com | \
+                          jq -r '.[].spec.hostname')
+                ;;
+            list-raw)
+                tsh ls --format=json 
+                ;;
             help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
@@ -91,10 +126,6 @@ function tsw {
  # some aliases that we care about, once we are logged in...
  #
  alias tssh='tsh ssh'
- alias tsh-list-mine='tsh ls --format=json aws/Owner=$USER@zscaler.com'
- alias tsh-goto-mine='tsh ssh $(tsh ls \
-                                    --format=json aws/Owner=$USER@zscaler.com | \
-                                jq -r .[].spec.hostname)'
 
 
 tsw
