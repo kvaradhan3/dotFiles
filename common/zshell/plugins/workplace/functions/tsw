@@ -124,22 +124,21 @@ function tsw {
 
 	    # Generally do not disrupt these two being together...
             status|-statusHelp)
-		shift;
+                shift;
                 tsh status "$@"
                 ;|
-
             help|-statusHelp)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
-		    if [[ $key = -* ]] ; then
-			continue
-		    fi
+                    if [[ $key = -* ]] ; then
+                        continue
+                    fi
                     print "    $key\t\t$help"
                 done
-		print "  defaults with no arguments, prints status and help"
-		print "  Commands not understood are sent to tsh, as tsh $@"
+                print "  defaults with no arguments, prints status and help"
+                print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
         esac
     else
