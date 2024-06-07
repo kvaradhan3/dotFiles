@@ -102,7 +102,7 @@ function tsw {
                          )'
                 ;;
             mine)
-		print "hostname,Private IP,instance-id,HW Type,expiry";
+   	            print "hostname,Private IP,instance-id,HW Type,expiry";
                 tsh ls --format=json aws/Owner=$USER@zscaler.com |\
 		    jq -r '.[]
  		           | [ .spec.hostname,
@@ -127,16 +127,23 @@ function tsw {
                 ;;
 
 	    # Generally do not disrupt these two being together...
-            status)
-                tsh "$@"
-                ;&
-            help)
+            status|-statusHelp)
+		shift;
+                tsh status "$@"
+                ;|
+
+            help|-statusHelp)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
+		    if [[ $key = -* ]] ; then
+			continue
+		    fi
                     print "    $key\t\t$help"
                 done
+		print "  defaults with no arguments, prints status and help"
+		print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
         esac
     else
