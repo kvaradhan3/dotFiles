@@ -56,7 +56,7 @@ function tsw {
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
-            login|clear)
+            login|clear)	# clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
                 info clear cluster environments for ${_tsw_friendly}
                 _tsw_friendly=""
@@ -81,20 +81,21 @@ function tsw {
                 ;;
             labels)
                 tsh ls --format=json                      | \
-                jq -C '.[] 
-                       | .metadata.labels + .spec.labels 
-                       | keys 
+                jq -C '.[]
+                       | .metadata.labels + .spec.labels
+                       | keys
                        | .[]'                             | \
                 sort                                      | \
                 uniq
                 ;;
             my-labels)
                 tsh ls --format=json aws/Owner=$USER@zscaler.com | \
-                jq -r '.[] 
-                       | .metadata.labels 
-                       + ( .spec.cmd_labels
-                         | .[] 
-                         |= .result
+                jq -r '.[]
+                       | .metadata.labels
+                         +
+                         ( .spec.cmd_labels
+                           | .[]
+                           |= .result
                          )'
                 ;;
             mine)
@@ -153,4 +154,3 @@ function tsw {
 
 
 tsw
-
