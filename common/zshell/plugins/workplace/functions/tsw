@@ -112,18 +112,37 @@ function tsw {
                              ]
                            | @csv'
 
-		;;
-            goto-mine)
-                tsh ssh $(tsh ls                            \
-                              --format=json                 \
-                              aws/Owner=$USER@zscaler.com | \
-                          jq -r '.[].spec.hostname')
+                ;;
                 ;;
             ls-r)
                 tsh ls --format=json
                 ;;
 
-	    # Generally do not disrupt these two being together...
+            goto-mine)
+                set -- "aws/Owner=$USER@zscaler.com"
+                if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
+                    tsh ssh $(tsh ls                            \
+                                  --format=json                 \
+                                  aws/Owner=$USER@zscaler.com | \
+                              jq -r '.[].spec.hostname')
+                    return
+                fi
+                ;&
+
+            goto)
+                 tsh ssh $(
+                     tsh ls --format=json "$@"                  | \
+                     jq -r '.[].spec.hostname'                  | \
+                     fzf --preview="tsh ls --format=json --search {} | \
+                                    jq -r '.[]
+                                           | .metadata.labels
+                                             + ( .spec.cmd_labels
+                                                 | .[]
+                                                 |= .result
+                                                )'")
+                 ;;
+
+            # Generally do not disrupt these two being together...
             status|-statusHelp)
                 shift;
                 tsh status "$@"
