@@ -30,7 +30,7 @@ function tsw {
         'goto-mine' 'Goto my machine, assuming exactly one'
         'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
-	'-statusHelp' 'NO'
+        '-statusHelp' 'NO'
     )
 
     _tsw_friendly=""
@@ -50,13 +50,13 @@ function tsw {
 
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
         case "$1" in
-	    # Do not disrupt the next two. The third block (login) can move
-	    # but it would be better to-not-to...
+            # Do not disrupt the next two. The third block (login) can move
+            # but it would be better to-not-to...
             logout)
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
-            login|clear)
+            login|clear)        # clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
                 info clear cluster environments for ${_tsw_friendly}
                 _tsw_friendly=""
@@ -81,27 +81,28 @@ function tsw {
                 ;;
             labels)
                 tsh ls --format=json                      | \
-                jq -C '.[] 
-                       | .metadata.labels + .spec.labels 
-                       | keys 
+                jq -C '.[]
+                       | .metadata.labels + .spec.labels
+                       | keys
                        | .[]'                             | \
                 sort                                      | \
                 uniq
                 ;;
             my-labels)
                 tsh ls --format=json aws/Owner=$USER@zscaler.com | \
-                jq -r '.[] 
-                       | .metadata.labels 
-                       + ( .spec.cmd_labels
-                         | .[] 
-                         |= .result
+                jq -r '.[]
+                       | .metadata.labels
+                         +
+                         ( .spec.cmd_labels
+                           | .[]
+                           |= .result
                          )'
                 ;;
             mine)
-		print "hostname,Private IP,instance-id,HW Type,expiry";
+                print "hostname,Private IP,instance-id,HW Type,expiry";
                 tsh ls --format=json aws/Owner=$USER@zscaler.com |\
-		    jq -r '.[]
- 		           | [ .spec.hostname,
+                    jq -r '.[]
+                           | [ .spec.hostname,
                                ( .spec.cmd_labels |
                                    .ip_private.result,
                                    .aws_instance_id.result,
@@ -111,18 +112,37 @@ function tsw {
                              ]
                            | @csv'
 
-		;;
-            goto-mine)
-                tsh ssh $(tsh ls                            \
-                              --format=json                 \
-                              aws/Owner=$USER@zscaler.com | \
-                          jq -r '.[].spec.hostname')
+                ;;
                 ;;
             ls-r)
                 tsh ls --format=json
                 ;;
 
-	    # Generally do not disrupt these two being together...
+            goto-mine)
+                set -- "aws/Owner=$USER@zscaler.com"
+                if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
+                    tsh ssh $(tsh ls                            \
+                                  --format=json                 \
+                                  aws/Owner=$USER@zscaler.com | \
+                              jq -r '.[].spec.hostname')
+                    return
+                fi
+                ;&
+
+            goto)
+                 tsh ssh $(
+                     tsh ls --format=json "$@"                  | \
+                     jq -r '.[].spec.hostname'                  | \
+                     fzf --preview="tsh ls --format=json --search {} | \
+                                    jq -r '.[]
+                                           | .metadata.labels
+                                             + ( .spec.cmd_labels
+                                                 | .[]
+                                                 |= .result
+                                                )'")
+                 ;;
+
+            # Generally do not disrupt these two being together...
             status|-statusHelp)
                 shift;
                 tsh status "$@"
@@ -153,4 +173,3 @@ function tsw {
 
 
 tsw
-
