@@ -56,7 +56,7 @@ function tsw {
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
-            login|clear)	# clear function, also done before login.
+            login|clear)        # clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
                 info clear cluster environments for ${_tsw_friendly}
                 _tsw_friendly=""
@@ -105,8 +105,8 @@ function tsw {
             mine)
    	            print "hostname,Private IP,instance-id,HW Type,expiry";
                 tsh ls --format=json aws/Owner=$USER@zscaler.com |\
-		    jq -r '.[]
- 		           | [ .spec.hostname,
+                    jq -r '.[]
+                           | [ .spec.hostname,
                                ( .spec.cmd_labels |
                                    .ip_private.result,
                                    .aws_instance_id.result,
