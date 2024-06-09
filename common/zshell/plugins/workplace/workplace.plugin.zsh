@@ -17,10 +17,13 @@ then
     fpath+=( "${0:h}/functions" )
 fi
 
+local flist="${0:h}/functions"
+
 workplace_plugin_unload() {
-    for i in jf spr
+    local _i
+    for _i in $flist/*
     do
-        whence -w $i &>/dev/null && unfunction $i
+        whence -w ${_i#$flist/} &>/dev/null && unfunction ${_i#$flist/}
     done
     whence -w work_plugin_unload &>/dev/null && work_plugin_unload
 
