@@ -28,6 +28,7 @@ function tsw {
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
         'goto-mine' 'Goto my machine, assuming exactly one'
+        'goto'      'use fzf to find a machine to log into'
         'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
         '-statusHelp' 'NO'
@@ -115,8 +116,6 @@ function tsw {
                                .metadata.expires[:10]
                              ]
                            | @csv'
-
-                ;;
                 ;;
             ls-r)
                 tsh ls --format=json
