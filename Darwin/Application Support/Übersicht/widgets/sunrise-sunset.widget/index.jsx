@@ -1,79 +1,133 @@
-import { css } from "uebersicht";
+{/*
+  * VisualCrossing uses US ZIP codes,
+  * or "City,Country" format for location,
+  * Country is in ISO-3166-2 ALPHA-2 format
+  * (https://www.iban.com/country-codes)
+  */}
 
-/** weather codes list can eb fetched from https://weather.codes.
-    For the US, you can use the zip code as the default weather code.
-    For most countries, you can go to https://weather.codes/{{country}}
-    or check at the bottom of https://weather.codes for the list of countries.
- **/
-const location = "95129";
+import { css } from "uebersicht"
+import { run } from "uebersicht"
 
-/************** UI Settings **************/
-const fontColor   = "white";
-const itemPadding = "15px";
-const fontSize    = "25px";
-const fontFamily  = "Helvetica";
-const fontSizeTxt = $fontSize;
-const fontFamText = $fontFamily;
-const fontSizeSym = $fontSize;
-const fontFamSymb = "Lucida-Sans Unicode";
+const location  = 95129
+const keyFile   = '$HOME/.VisualCrossingKey'
+const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
+const API       = `/VisualCrossingWebServices/rest/services/timeline/${location}`
 
-export const className = `
-    bottom: 1%;
-    left: 1%;
-	z-index: 1;
-`;
+export const refreshFrequency = 1000 * 60 * 60;
 
-const container = css`
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-`;
+export const command = (dispatch) => run(`cat "${keyFile}"`)
+    .then((output) => {
+        let obj = JSON.parse(output);
+        return obj.key;
+    })
+    .then((key) => {
+        const weather = new URL(API, baseURL);
+        weather.searchParams.set("key", key);
+        weather.searchParams.set("contentType", "json");
 
-const unicode = css`
-  font-family: Lucida-Sans Unicode;
-  font-size:   "25px";
-  color:       ${fontColor};
-  border: 0 none;
-  padding: 5px;
-`;
-  
-const time = css`
-  font-family: "Helvetica";
-  font-size:   "25px";
-  color:       ${fontColor};
-  border: 0 none;
-  padding: 5px;
-`;
-  
-/************** UI Settings **************/
-
-export const refreshFrequency = 1000 * 15;
-
-export const command = "\
-  curl --silent --no-buffer https://weather.com/today/l/${location} |\
-  grep SunriseSunset |\
-  grep -E --only-matching '((1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm]))'";
-
-const sunRiseSymbol = "\u263C";
-const sunRise = () => {
-  return "06:20 am";
-}
-const sunSetSymbol  = "\u2600";
-const sunSet = () => {
-  return "04:x3 pm";
-}
+        return weather.href;
+    })
+    .then((href) => {
+        fetch(href)
+            .then((response) => {
+                response.json().then((resp) => {
+                    var queryDateTime =
+                        resp.days[0].datetime + "T" +
+                        resp.currentConditions.datetime;
+                    dispatch({ status: 'SUCCESS',
+                               datetime: queryDateTime,
+                               data: resp.currentConditions,
+                             });
+                });
+            });
+    })
+    .catch((error) => {
+        dispatch({ status: 'FAILURE',
+                   error: String(error)
+                 });
+    });
 
 export const updateState = (event, previousState) => {
-  return event;
+    switch (event.status) {
+    case 'SUCCESS':
+        return {
+            datetime: event.datetime,
+            sunrise: event.data.sunrise,
+            sunset:  event.data.sunset,
+        };
+    case 'FAILURE':
+        return {
+            datetime: "",
+            sunrise: "ERROR",
+            sunset: "<" + event.error + ">",
+        };
+    default:
+        console.log("unknown status code: " + String(event.status) +
+                    " previous? " + String(previousState.status));
+        return previousState;
+    }
+}
+
+const legend = {
+    sunrise: "\u263C",
+    sunset:  "\u2600"
 };
 
-export const render = ({ output }) => {
-  return (
-    <div className={container}>
-      <div className="{unicode}">{sunRiseSymbol}</div>
-      <div className="{time}">{sunRise()}</div>
-      <div className="{unicode}">{sunSetSymbol}</div>
-      <div className="{time}">{sunSet()}</div>
-    </div>
-  );
-};
+export const render = (p) => {
+    return (
+        <div className={container}>
+            <div className={timeStamp}>
+                <div className={timeStamp_color}>[{p.datetime}] </div>
+            </div>
+            <div className={symbol}>
+                <div className={sunRise}> {legend.sunrise} </div>
+            </div>
+            <div className={timeStamp}>
+                <div className={sunRise}>{p.sunrise} </div>
+            </div>
+            <div className={symbol}>
+                <div className={sunSet}> {legend.sunset} </div>
+            </div>
+            <div className={timeStamp}>
+                <div className={sunSet}>{p.sunset} </div>
+            </div>
+        </div>
+    )
+}
 
+export const className = `
+  left:    1%;
+  bottom:  1%;
+  z-index: 1;
+  color: grey;
+`
+const container = css`
+    display:               grid;
+    grid-template-columns: auto auto auto auto auto;
+    border:                0 none;
+    text-align:            center;
+    vertical-align:        middle;
+`
+const symbol = css`
+    padding:               8px;
+    font-family:           Lucida-Sans Unicode;
+    font-size:             25px;
+`
+const timeStamp = css`
+    padding:               8px;
+    font-family:           Helvetica Neue;
+    font-size:             25px;
+`
+const timeStamp_color = css`
+    color:                  0077FF;
+`
+const sunRise = css`
+    color:                  yellow;
+`
+const sunSet = css`
+    color:                  orange;
+`
+const debug = css`
+    font-family: Helvetica;
+    color: blue;
+`
