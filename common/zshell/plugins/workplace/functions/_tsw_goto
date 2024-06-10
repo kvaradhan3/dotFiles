@@ -1,0 +1,15 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+tsh ssh $(tsh ls --format=json "$@"                  | \
+          jq -r '.[].spec.hostname'                  | \
+          fzf --preview="tsh ls --format=json --search {} | \
+                         jq -r '.[]
+                                | .metadata.labels
+                                  + ( .spec.cmd_labels
+                                      | .[]
+                                      |= .result
+                                    )'"
+    )
+

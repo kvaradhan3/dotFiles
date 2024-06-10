@@ -168,6 +168,14 @@ function tsw {
 		print "  defaults with no arguments, prints status and help"
 		print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
+            *)
+		if [[ $(whence -w _tsw_${cmd}) == 'function' ]] ; then
+		    _tsw_${cmd} "$@"
+		    return
+		else
+		    error $cmd is not implemented.
+		fi
+	        ;;
         esac
     else
         tsh "$@"
@@ -182,5 +190,11 @@ function tsw {
  alias tsh-goto-mine='tsh ssh $(tsh ls \
        			            --format=json aws/Owner=$USER@zscaler.com | \
                                 jq -r .[].spec.hostname)'
+autoload -Uz _tsw_goto
+autoload -Uz _tsw_goto-mine
+autoload -Uz _tsw_labels
+autoload -Uz _tsw_ls-r
+autoload -Uz _tsw_mine
+autoload -Uz _tsw_my-labels
 
 tsw

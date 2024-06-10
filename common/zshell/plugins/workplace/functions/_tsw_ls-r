@@ -1,0 +1,5 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+tsh ls --format=json "$@"
