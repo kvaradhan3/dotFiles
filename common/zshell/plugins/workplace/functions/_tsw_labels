@@ -1,0 +1,11 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+tsh ls --format=json                      | \
+jq -C '.[]
+       | .metadata.labels + .spec.cmd_labels
+       | keys
+       | .[]'                             | \
+sort                                      | \
+uniq

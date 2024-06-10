@@ -1,0 +1,12 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+set -- $@ "aws/Owner=$USER@zscaler.com"
+
+if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
+    tsh ssh $(tsh ls --format=json "$@"    | \
+              jq -r '.[].spec.hostname')
+else
+    _tsw_goto "$@"
+fi

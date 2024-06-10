@@ -1,0 +1,18 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+local me=aws/Owner=$USER@zscaler.com
+
+print "hostname,Private IP,instance-id,HW Type,expiry";
+tsh ls --format=json $me                 | \
+    jq -r '.[]
+           | [ .spec.hostname,
+               ( .spec.cmd_labels |
+                   .ip_private.result,
+                   .aws_instance_id.result,
+                   .hwtype.result[:7]
+               ),
+               .metadata.expires[:10]
+             ]
+           | @csv'

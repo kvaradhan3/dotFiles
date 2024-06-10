@@ -1,0 +1,10 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+if [[ $# == 0 ]] ; then
+    set -- "aws/Owner=$USER@zscaler.com"
+fi
+
+tsh ls --format=json "$@"                  | \
+jq -r '.[] | .metadata.labels + ( .spec.cmd_labels | .[] |= .result)'
