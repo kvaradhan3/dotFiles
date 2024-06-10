@@ -1,0 +1,175 @@
+#! /bin/zsh
+
+emulate -L zsh -o pipe_fail -o err_return
+
+export TELEPORT_LOGIN=${TELEPORT_LOGIN:-eng}
+export TELEPORT_ADD_KEYS_TO_AGENT=no
+
+declare _tsw_friendly
+
+function tsw {
+    local -A _teleport_clusters=(
+        #env         proxy                    fqdn              friendly
+        'prod'      'prod.tpt.zpath.net     prod.zpath.net      Production'
+        'mod'       'tpt.zpagov.us          zpagov.us           Fed (Moderate)'
+        'moderate'  'tpt.zpagov.us          zpagov.us           Fed (Moderate)'
+        'gov'       'tpt.zpagov.net         zpagov.net          Gov'
+        'beta'      'beta.tpt.zpath.net     zpabeta.net         Beta'
+        'eng'       'eng.tpt.zpath.net      zpath.net           Engineering'
+    )
+
+    local -A _tsw_convenience=(
+        'clear'     'Clear teleport configurations'
+        'status'    'Print current teleport status'
+        'logout'    'Logout (and clear) current configuration'
+        'login'     'Login to specified cluster'
+        'clusters'  'List current known clusters'
+        'labels'    'Show labels that can be used in tsh search'
+        'my-labels' 'Show label settings for my machines'
+        'mine'      'List my machines'
+        'goto-mine' 'Goto my machine, assuming exactly one'
+        'ls-r'      'short for tsh ls --format=json'
+        'help'      'Print this help menu'
+        '-statusHelp' 'NO'
+    )
+
+    _tsw_friendly=""
+
+    if [[ $1 = "" ]] ; then
+        set -- '-statusHelp'
+    else
+        set -- "${(L)@}"
+    fi
+
+    if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
+        local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
+        export TELEPORT_PROXY=${_deets[1]}
+        export TSW_FQDN=${_deets[2]}
+        _tsw_friendly="${_deets:2}"
+        log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
+
+    elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
+        case "$1" in
+            # Do not disrupt the next two. The third block (login) can move
+            # but it would be better to-not-to...
+            logout)
+                tsh "$@"
+                info logout out of ${_tsw_friendly}
+                ;&
+            login|clear)        # clear function, also done before login.
+                unset TELEPORT_PROXY TSW_FQDN
+                info clear cluster environments for ${_tsw_friendly}
+                _tsw_friendly=""
+                ;|
+            login)
+                if (( ${${(k)_teleport_clusters}[(I)$2]} )); then
+                    local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
+                    tsh --proxy "${_deets[1]}" login "${@:2}"
+                else
+                    tsh "$@"
+                fi
+                _tsw_friendly=$(tsh status --format=json | jq .active.profile)
+                ;;
+
+            clusters)
+                local cluster params
+                print "cluster,proxy FQDN,FQDN,Name"
+                for cluster params in ${(kv)_teleport_clusters}; do
+                    local -a _deets=( ${(z)params} )
+                    print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
+                done
+                ;;
+            labels)
+                tsh ls --format=json                      | \
+                jq -C '.[]
+                       | .metadata.labels + .spec.labels
+                       | keys
+                       | .[]'                             | \
+                sort                                      | \
+                uniq
+                ;;
+            my-labels)
+                tsh ls --format=json aws/Owner=$USER@zscaler.com | \
+                jq -r '.[]
+                       | .metadata.labels
+                         +
+                         ( .spec.cmd_labels
+                           | .[]
+                           |= .result
+                         )'
+                ;;
+            mine)
+                print "hostname,Private IP,instance-id,HW Type,expiry";
+                tsh ls --format=json aws/Owner=$USER@zscaler.com |\
+                    jq -r '.[]
+                           | [ .spec.hostname,
+                               ( .spec.cmd_labels |
+                                   .ip_private.result,
+                                   .aws_instance_id.result,
+                                   .hwtype.result[:7]
+                               ),
+                               .metadata.expires[:10]
+                             ]
+                           | @csv'
+
+                ;;
+                ;;
+            ls-r)
+                tsh ls --format=json
+                ;;
+
+            goto-mine)
+                set -- "aws/Owner=$USER@zscaler.com"
+                if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
+                    tsh ssh $(tsh ls                            \
+                                  --format=json                 \
+                                  aws/Owner=$USER@zscaler.com | \
+                              jq -r '.[].spec.hostname')
+                    return
+                fi
+                ;&
+
+            goto)
+                 tsh ssh $(
+                     tsh ls --format=json "$@"                  | \
+                     jq -r '.[].spec.hostname'                  | \
+                     fzf --preview="tsh ls --format=json --search {} | \
+                                    jq -r '.[]
+                                           | .metadata.labels
+                                             + ( .spec.cmd_labels
+                                                 | .[]
+                                                 |= .result
+                                                )'")
+                 ;;
+
+            # Generally do not disrupt these two being together...
+            status|-statusHelp)
+                shift;
+                tsh status "$@"
+                ;|
+            help|-statusHelp)
+                echo
+                usage "[${(k)_teleport_clusters// /|}]"
+                print "  Additional convenience functions:"
+                for key help in ${(kv)_tsw_convenience}; do
+                    if [[ $key = -* ]] ; then
+                        continue
+                    fi
+                    print "    $key\t\t$help"
+                done
+                print "  defaults with no arguments, prints status and help"
+                print "  Commands not understood are sent to tsh, as tsh $@"
+                ;;
+        esac
+    else
+        tsh "$@"
+    fi
+}
+
+ #
+ # some aliases that we care about, once we are logged in...
+ #
+ alias tssh='tsh ssh'
+
+
+tsw

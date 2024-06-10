@@ -155,14 +155,16 @@
     textconv = openssl x509 -text -noout -in
 
 [delta]
-    features     = navigate side-by-side format-line-numbers decorations
+    navigate     = true
+    side-by-side = true
     light        = false   # set to true if you're in a terminal
-                           # w/ a light background color (e.g. the default macOS terminal)
+                           # w/ a light background color
     true-color   = always
     syntax-theme = Dracula
     # plus-style   = syntax "#003800"
     # minus-style  = syntax "#3f0001"
     whitespace-error-style = 1 reverse
+    features     = format-line-numbers decorations
 
 [delta "interactive"]
     keep-plus-minus-markers = true
@@ -192,6 +194,9 @@
     line-numbers-left-style = blue
     line-numbers-right-style = blue
 
+[delta "magit-delta"]
+    line-numbers = false
+    
 [interactive]
     diffFilter = delta --color-only --features=interactive
 

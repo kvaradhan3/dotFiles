@@ -31,3 +31,4 @@ workplace_plugin_unload() {
 autoload -Uz jf		# jira format definer
 autoload -Uz spr	# helper to generate github PR reference
 autoload -Uz work
+autoload -Uz tsw
