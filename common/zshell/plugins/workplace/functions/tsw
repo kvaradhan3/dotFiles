@@ -49,7 +49,7 @@ function tsw {
         _tsw_friendly="${_deets:2}"
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
 
-    elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
+    elif [[ ${${(k)_tsw_convenience}[(Ie)$1]} != 0 ]]; then
 
         local cmd=$1
         shift
@@ -103,7 +103,7 @@ function tsw {
                 print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
             *)
-                if [[ $(whence -w _tsw_${cmd}) == 'function' ]] ; then
+                if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
                     _tsw_${cmd} "$@"
                     return
                 else
