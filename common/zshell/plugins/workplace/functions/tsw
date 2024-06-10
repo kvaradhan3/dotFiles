@@ -50,20 +50,24 @@ function tsw {
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
 
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
-        case "$1" in
+
+	local cmd=$1
+	shift
+
+        case "$cmd" in
             # Do not disrupt the next two. The third block (login) can move
             # but it would be better to-not-to...
             logout)
-                tsh "$@"
+                tsh logout "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
             login|clear)        # clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
-                info clear cluster environments for ${_tsw_friendly}
+
                 _tsw_friendly=""
                 ;|
             login)
-                if (( ${${(k)_teleport_clusters}[(I)$2]} )); then
+                if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
                     local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
                     tsh --proxy "${_deets[1]}" login "${@:2}"
                 else
@@ -143,7 +147,6 @@ function tsw {
 
             # Generally do not disrupt these two being together...
             status|-statusHelp)
-                shift;
                 tsh status "$@"
                 ;|
             help|-statusHelp)
