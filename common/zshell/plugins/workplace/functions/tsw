@@ -51,8 +51,8 @@ function tsw {
 
     elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
 
-	local cmd=$1
-	shift
+        local cmd=$1
+        shift
 
         case "$cmd" in
             # Do not disrupt the next two. The third block (login) can move
@@ -103,13 +103,13 @@ function tsw {
                 print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
             *)
-		if [[ $(whence -w _tsw_${cmd}) == 'function' ]] ; then
-		    _tsw_${cmd} "$@"
-		    return
-		else
-		    error $cmd is not implemented.
-		fi
-	        ;;
+                if [[ $(whence -w _tsw_${cmd}) == 'function' ]] ; then
+                    _tsw_${cmd} "$@"
+                    return
+                else
+                    error $cmd is not implemented.
+                fi
+                ;;
         esac
     else
         tsh "$@"
