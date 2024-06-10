@@ -168,6 +168,8 @@ function tsw {
 		print "  defaults with no arguments, prints status and help"
 		print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
+            status)
+                ;;
             *)
                 if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
                     _tsw_${cmd} "$@"
