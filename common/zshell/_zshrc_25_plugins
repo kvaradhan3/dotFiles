@@ -15,10 +15,13 @@ autoload -Uz compinit
 # shellcheck disable=SC1072,SC1073
 () {
   if [[ $# -gt 0 ]]; then
-    compinit
+    compinit -d
   else
-      compinit -Cf
-
+    compinit -C
+  fi
+  if [[ ! -f ~/.zcompdump.zwc             ]] ||     \
+     [[ ~/.zcompdump -nt ~/.zcompdump.zwc ]] ;  then
+      zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   fi
 } ${ZDOTDIR:-$HOME}/.zcompdump(N.mh+24)
 
