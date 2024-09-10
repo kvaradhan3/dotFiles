@@ -28,6 +28,7 @@ function tsw {
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
         'goto-mine' 'Goto my machine, assuming exactly one'
+        'goto'      'use fzf to find a machine to log into'
         'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
         '-statusHelp' 'NO'
@@ -48,21 +49,25 @@ function tsw {
         _tsw_friendly="${_deets:2}"
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
 
-    elif (( ${${(k)_tsw_convenience}[(I)$1]} )); then
-        case "$1" in
+    elif [[ ${${(k)_tsw_convenience}[(Ie)$1]} != 0 ]]; then
+
+        local cmd=$1
+        shift
+
+        case "$cmd" in
             # Do not disrupt the next two. The third block (login) can move
             # but it would be better to-not-to...
             logout)
-                tsh "$@"
+                tsh logout "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
             login|clear)        # clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
-                info clear cluster environments for ${_tsw_friendly}
+
                 _tsw_friendly=""
                 ;|
             login)
-                if (( ${${(k)_teleport_clusters}[(I)$2]} )); then
+                if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
                     local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
                     tsh --proxy "${_deets[1]}" login "${@:2}"
                 else
@@ -79,6 +84,10 @@ function tsw {
                     print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
                 done
                 ;;
+            status)
+                tsh "$@"
+                info logout out of ${_tsw_friendly}
+                ;&
             labels)
                 tsh ls --format=json                      | \
                 jq -C '.[]
@@ -99,7 +108,7 @@ function tsw {
                          )'
                 ;;
             mine)
-                print "hostname,Private IP,instance-id,HW Type,expiry";
+   	            print "hostname,Private IP,instance-id,HW Type,expiry";
                 tsh ls --format=json aws/Owner=$USER@zscaler.com |\
                     jq -r '.[]
                            | [ .spec.hostname,
@@ -111,8 +120,6 @@ function tsw {
                                .metadata.expires[:10]
                              ]
                            | @csv'
-
-                ;;
                 ;;
             ls-r)
                 tsh ls --format=json
@@ -147,18 +154,29 @@ function tsw {
                 shift;
                 tsh status "$@"
                 ;|
+
             help|-statusHelp)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
-                    if [[ $key = -* ]] ; then
-                        continue
-                    fi
+		    if [[ $key = -* ]] ; then
+			continue
+		    fi
                     print "    $key\t\t$help"
                 done
-                print "  defaults with no arguments, prints status and help"
-                print "  Commands not understood are sent to tsh, as tsh $@"
+		print "  defaults with no arguments, prints status and help"
+		print "  Commands not understood are sent to tsh, as tsh $@"
+                ;;
+            status)
+                ;;
+            *)
+                if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
+                    _tsw_${cmd} "$@"
+                    return
+                else
+                    error $cmd is not implemented.
+                fi
                 ;;
         esac
     else
@@ -170,6 +188,15 @@ function tsw {
  # some aliases that we care about, once we are logged in...
  #
  alias tssh='tsh ssh'
-
+ alias tsh-list-mine='tsh ls --format=json aws/Owner=$USER@zscaler.com'
+ alias tsh-goto-mine='tsh ssh $(tsh ls \
+       			            --format=json aws/Owner=$USER@zscaler.com | \
+                                jq -r .[].spec.hostname)'
+autoload -Uz _tsw_goto
+autoload -Uz _tsw_goto-mine
+autoload -Uz _tsw_labels
+autoload -Uz _tsw_ls-r
+autoload -Uz _tsw_mine
+autoload -Uz _tsw_my-labels
 
 tsw
