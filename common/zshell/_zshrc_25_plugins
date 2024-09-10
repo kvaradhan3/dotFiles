@@ -9,7 +9,8 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-#zmodload zsh/zprof
+# zmodload zsh/zprof
+# zprof -c
 autoload -Uz compinit
 # From https://gist.github.com/ctechols/ca1035271ad134841284#gistcomment-2308206
 # shellcheck disable=SC1072,SC1073
@@ -106,5 +107,6 @@ source "${0:h}"/themes/pure.zsh-theme
 eval "$(gh completion -s zsh)"
 
 # shellcheck disable=SC2034
-COMPLETION_WAITING_DOTS="true"	# used in lib/completion.zsh
-#zprof
+COMPLETION_WAITING_DOTS="true" # used in lib/completion.zsh
+# zprof
+# zmodload -ui zsh/zprof
