@@ -9,16 +9,20 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-#zmodload zsh/zprof
+# zmodload zsh/zprof
+# zprof -c
 autoload -Uz compinit
 # From https://gist.github.com/ctechols/ca1035271ad134841284#gistcomment-2308206
 # shellcheck disable=SC1072,SC1073
 () {
   if [[ $# -gt 0 ]]; then
-    compinit
+    compinit -d
   else
-      compinit -Cf
-
+    compinit -C
+  fi
+  if [[ ! -f ~/.zcompdump.zwc             ]] ||     \
+     [[ ~/.zcompdump -nt ~/.zcompdump.zwc ]] ;  then
+      zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   fi
 } ${ZDOTDIR:-$HOME}/.zcompdump(N.mh+24)
 
@@ -53,23 +57,23 @@ if ! [[ -f ~/.zsh_plugins.zsh ]] ||
    ! antidote path ohmyzsh/ohmyzsh >/dev/null 2>&1
 then
     antidote bundle <<PLUGINS_LIST >~/.zsh_plugins.zsh
-    	ohmyzsh/ohmyzsh path:lib/git.zsh
+        ohmyzsh/ohmyzsh path:lib/git.zsh
         ohmyzsh/ohmyzsh path:lib/correction.zsh
         ohmyzsh/ohmyzsh path:lib/completion.zsh
         ohmyzsh/ohmyzsh path:lib/compfix.zsh
 
         ohmyzsh/ohmyzsh path:plugins/git
-    	ohmyzsh/ohmyzsh path:plugins/brew
-        ohmyzsh/ohmyzsh path:plugins/aws
-    	ohmyzsh/ohmyzsh path:plugins/gcloud
-    	ohmyzsh/ohmyzsh path:plugins/tmux
-    	ohmyzsh/ohmyzsh path:plugins/docker
-    	ohmyzsh/ohmyzsh path:plugins/vagrant
-    	ohmyzsh/ohmyzsh path:plugins/chucknorris
-    	ohmyzsh/ohmyzsh path:plugins/helm
-    	ohmyzsh/ohmyzsh path:plugins/kubectl
+        ohmyzsh/ohmyzsh path:plugins/brew
+        # ohmyzsh/ohmyzsh path:plugins/aws
+        # ohmyzsh/ohmyzsh path:plugins/gcloud
+        ohmyzsh/ohmyzsh path:plugins/tmux
+        ohmyzsh/ohmyzsh path:plugins/docker
+        # ohmyzsh/ohmyzsh path:plugins/vagrant
+        ohmyzsh/ohmyzsh path:plugins/chucknorris
+        ohmyzsh/ohmyzsh path:plugins/helm
+        ohmyzsh/ohmyzsh path:plugins/kubectl
 
-    	wting/autojump  path:bin/autojump.zsh
+        wting/autojump  path:bin/autojump.zsh
 
         zsh-users/zsh-completions
         zsh-users/zsh-autosuggestions
@@ -77,7 +81,7 @@ then
         zsh-users/zsh-history-substring-search
 
         kvaradhan3/dotFiles path:common/zshell/plugins/workplace  branch:darwin-work-updates
-        kvaradhan3/dotFiles path:common/zshell/plugins/nskc
+        # kvaradhan3/dotFiles path:common/zshell/plugins/nskc
         kvaradhan3/dotFiles path:common/zshell/plugins/batteryCharge
         kvaradhan3/dotFiles path:common/zshell/plugins/1p
         kvaradhan3/dotFiles path:common/zshell/plugins/emulators
@@ -103,5 +107,6 @@ source "${0:h}"/themes/pure.zsh-theme
 eval "$(gh completion -s zsh)"
 
 # shellcheck disable=SC2034
-COMPLETION_WAITING_DOTS="true"	# used in lib/completion.zsh
-#zprof
+COMPLETION_WAITING_DOTS="true" # used in lib/completion.zsh
+# zprof
+# zmodload -ui zsh/zprof

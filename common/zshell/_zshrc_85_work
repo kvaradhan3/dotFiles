@@ -34,3 +34,7 @@ alias j-fzf='fzf --header-lines=1 --preview="jira clean {1}"'
 
 export VCPKG_ROOT=$HOME/src/vcpkg
 path+=( $VCPKG_ROOT )
+
+if [[ -f "$HOME/.orbstack/shell/init.zsh" ]] ; then
+    source $HOME/.orbstack/shell/init.zsh 2>/dev/null
+fi
