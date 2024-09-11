@@ -33,7 +33,17 @@ esac
                    "$(basename "$0")" "$(uname -s)" "$(uname -r)"
             ;;
         esac
-        antidote update
+        () {
+            eval `ssh-agent -s`
+            if [[ -f "${ZDOTDIR:-$HOME}/.ssh/id_ed25519_github" ]] ; then
+                ssh-add "${ZDOTDIR:-$HOME}/.ssh/id_ed25519_github"
+            else
+                error "Cannot find github ssh keys: "  \
+                      "${ZDOTDIR:-$HOME}/.ssh/id_ed25519_github"
+            fi
+            antidote update
+            ssh-agent -k 2>/dev/null
+        }
         touch -m "$@"
     fi
 } $0(N.mh+192)
