@@ -52,7 +52,7 @@ cdpath=( . ..
          /mnt
 )
 
-export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,pickup_types='$"/?!=',boulder=0,name=Croesus,color
+export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,pickup_types='$"/?!=',boulder=0,name=Croesus-val-hum-law,color
 
 if [[ "$(uname -s)" = Linux ]]
 then
