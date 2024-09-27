@@ -1,6 +1,6 @@
 ###
 # slack only runon X.
-xwayland enable
+# xwayland enable
 
 ### Variables
 
@@ -46,7 +46,8 @@ client.urgent              $elegant    $magenta    $silver       $magenta    $ma
 client.placeholder         $elegant    $magenta    $silver       $white      $magenta
 
 exec {
-    firefox-developer-edition
+    # firefox-developer-edition
+    vivaldi
 
     $term --app-id __WORK__
     # slack
@@ -74,6 +75,7 @@ for_window {
     [app_id="speedtest"]    move container to workspace $wsMonitor, focus, split v
     [app_id="monitors"]     move container to workspace $wsMonitor, focus, split h
     [app_id=".*firefox.*"]  move container to workspace $wsBrowsers
+    [app_id=".*vivaldi.*"]  move container to workspace $wsBrowsers
     [class="Slack"]         move container to workspace $wsWork
     [app_id="__WORK__"]     move container to workspace $wsWork
 }
