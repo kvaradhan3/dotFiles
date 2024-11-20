@@ -91,7 +91,7 @@ function tsw {
             labels)
                 tsh ls --format=json                      | \
                 jq -C '.[]
-                       | .metadata.labels + .spec.labels
+                       | .metadata.labels + .spec.cmd_labels
                        | keys
                        | .[]'                             | \
                 sort                                      | \
