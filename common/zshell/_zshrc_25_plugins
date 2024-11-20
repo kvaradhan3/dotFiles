@@ -16,7 +16,7 @@ autoload -Uz compinit
 # shellcheck disable=SC1072,SC1073
 () {
   if [[ $# -gt 0 ]]; then
-    compinit -d
+    compinit && zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   else
     compinit -C
   fi
@@ -24,7 +24,7 @@ autoload -Uz compinit
      [[ ~/.zcompdump -nt ~/.zcompdump.zwc ]] ;  then
       zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   fi
-} ${ZDOTDIR:-$HOME}/.zcompdump(N.mh+24)
+} ${ZDOTDIR:-$HOME}/.zcompdump.zwc(N.mh+24)
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 for _25i in /usr/local/opt/antidote                    \
