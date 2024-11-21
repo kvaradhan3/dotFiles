@@ -1,4 +1,9 @@
 #! /bin/zsh
+#
+# Find my one machine and connect to it.   You can parameterise and specify
+# additional search parameters (use tsw labels to find possible search labels)
+# to narrow down to a single machine.
+#
 
 emulate -L zsh -o pipe_fail -o err_return
 

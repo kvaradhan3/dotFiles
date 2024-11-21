@@ -1,4 +1,7 @@
 #! /bin/zsh
+#
+# find all possible labels that can be used to search a machine.
+#
 
 emulate -L zsh -o pipe_fail -o err_return
 

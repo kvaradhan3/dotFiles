@@ -88,66 +88,6 @@ function tsw {
                 tsh "$@"
                 info logout out of ${_tsw_friendly}
                 ;&
-            labels)
-                tsh ls --format=json                      | \
-                jq -C '.[]
-                       | .metadata.labels + .spec.cmd_labels
-                       | keys
-                       | .[]'                             | \
-                sort                                      | \
-                uniq
-                ;;
-            my-labels)
-                tsh ls --format=json aws/Owner=$USER@zscaler.com | \
-                jq -r '.[]
-                       | .metadata.labels
-                         +
-                         ( .spec.cmd_labels
-                           | .[]
-                           |= .result
-                         )'
-                ;;
-            mine)
-   	            print "hostname,Private IP,instance-id,HW Type,expiry";
-                tsh ls --format=json aws/Owner=$USER@zscaler.com |\
-                    jq -r '.[]
-                           | [ .spec.hostname,
-                               ( .spec.cmd_labels |
-                                   .ip_private.result,
-                                   .aws_instance_id.result,
-                                   .hwtype.result[:7]
-                               ),
-                               .metadata.expires[:10]
-                             ]
-                           | @csv'
-                ;;
-            ls-r)
-                tsh ls --format=json
-                ;;
-
-            goto-mine)
-                set -- "aws/Owner=$USER@zscaler.com"
-                if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
-                    tsh ssh $(tsh ls                            \
-                                  --format=json                 \
-                                  aws/Owner=$USER@zscaler.com | \
-                              jq -r '.[].spec.hostname')
-                    return
-                fi
-                ;&
-
-            goto)
-                 tsh ssh $(
-                     tsh ls --format=json "$@"                  | \
-                     jq -r '.[].spec.hostname'                  | \
-                     fzf --preview="tsh ls --format=json --search {} | \
-                                    jq -r '.[]
-                                           | .metadata.labels
-                                             + ( .spec.cmd_labels
-                                                 | .[]
-                                                 |= .result
-                                                )'")
-                 ;;
 
             # Generally do not disrupt these two being together...
             status|-statusHelp)
@@ -159,23 +99,15 @@ function tsw {
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
-		    if [[ $key = -* ]] ; then
-			continue
-		    fi
+                    if [[ $key = -* ]] ; then
+                        continue
+                    fi
                     print "    $key\t\t$help"
                 done
-		print "  defaults with no arguments, prints status and help"
-		print "  Commands not understood are sent to tsh, as tsh $@"
+                print "  defaults with no arguments, prints status and help"
+                print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
             status)
-                ;;
-            *)
-                if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
-                    _tsw_${cmd} "$@"
-                    return
-                else
-                    error $cmd is not implemented.
-                fi
                 ;;
             *)
                 if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
@@ -197,7 +129,7 @@ function tsw {
  alias tssh='tsh ssh'
  alias tsh-list-mine='tsh ls --format=json aws/Owner=$USER@zscaler.com'
  alias tsh-goto-mine='tsh ssh $(tsh ls \
-       			            --format=json aws/Owner=$USER@zscaler.com | \
+                            --format=json aws/Owner=$USER@zscaler.com | \
                                 jq -r .[].spec.hostname)'
 autoload -Uz _tsw_goto
 autoload -Uz _tsw_goto-mine

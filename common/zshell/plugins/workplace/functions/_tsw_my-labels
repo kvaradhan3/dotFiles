@@ -1,4 +1,7 @@
 #! /bin/zsh
+#
+# list the labels affixed to machines that I am designated as owner.
+#
 
 emulate -L zsh -o pipe_fail -o err_return
 

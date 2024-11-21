@@ -1,4 +1,8 @@
 #! /bin/zsh
+#
+# List machines that I have created/am owner of.
+# Outputs a csv format that can be run through csvlook, in the csvkit package.
+#
 
 emulate -L zsh -o pipe_fail -o err_return
 

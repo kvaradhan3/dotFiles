@@ -1,4 +1,7 @@
 #! /bin/zsh
+#
+# Use fzf on the json generated hostnames to find a machine to connect to.
+#
 
 emulate -L zsh -o pipe_fail -o err_return
 
