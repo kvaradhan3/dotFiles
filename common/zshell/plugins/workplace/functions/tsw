@@ -4,6 +4,7 @@ emulate -L zsh -o pipe_fail -o err_return
 
 export TELEPORT_LOGIN=${TELEPORT_LOGIN:-eng}
 export TELEPORT_ADD_KEYS_TO_AGENT=no
+export TELEPORT_AUTH=okta_zscorp
 
 declare _tsw_friendly
 
@@ -137,5 +138,6 @@ autoload -Uz _tsw_labels
 autoload -Uz _tsw_ls-r
 autoload -Uz _tsw_mine
 autoload -Uz _tsw_my-labels
+autoload -Uz _tsw_cheatsheet
 
 tsw

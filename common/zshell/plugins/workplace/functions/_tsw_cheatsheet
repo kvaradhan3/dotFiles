@@ -1,0 +1,49 @@
+#! /bin/zsh
+#
+# Cheat sheet to setup teleport on a host
+#
+
+emulate -L zsh -o pipe_fail -o err_return
+
+#
+# https://confluence.corp.zscaler.com/display/ET/ZPA+Teleport+-+Adding+Your+Servers+to+the+Engineering+Cluster#ZPATeleportAddingYourServerstotheEngineeringCluster-PreparingYourServer:LabMachines,GCP,etc
+#
+
+function _tsw_cheatsheet {
+    cat <<EOF
+        sudo useradd eng
+        echo "eng     ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+#
+        export TPT_INVITE_TOKEN=${TPT_INVITE_TOKEN:-FILLME}
+        export TPT_NODE_HOSTNAME=${TPT_NODE_HOSTNAME:-$(hostname)}
+
+        export TPT_CLUSTER=eng.tpt.zpath.net
+        export TELEPATH=https://$TPT_CLUSTER:2443/telepath/telepath-lite
+        while ! curl -s -o /dev/null --connect-timeout 3 $TELEPATH; do
+            echo "`date -u` - Origin IP not recognized. Waiting 3 seconds before trying again. For help, contact Operations."
+            sleep 3
+        done
+        curl -s -O $TELEPATH.sh                                      && \
+            curl -s -O $TELEPATH.sh.sig                              && \
+            gpg --keyserver hkps://keys.openpgp.org                     \
+                --recv-keys C6C8563C47823633E2A16AFFAAB705E3FB3A2118 && \
+            gpg --verify telepath-lite.sh.sig telepath-lite.sh       && \
+            sudo -E bash telepath-lite.sh
+EOF
+}
+
+_tsw_cheatsheet
+
+
+
+tsh ssh $(tsh ls --format=json "$@"                  | \
+          jq -r '.[].spec.hostname'                  | \
+          fzf --preview="tsh ls --format=json --search {} | \
+                         jq -r '.[]
+                                | .metadata.labels
+                                  + ( .spec.cmd_labels
+                                      | .[]
+                                      |= .result
+                                    )'"
+    )
+
