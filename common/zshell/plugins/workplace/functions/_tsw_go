@@ -1,0 +1,17 @@
+#! /bin/zsh
+#
+# Use fzf on the json generated hostnames to find a machine to connect to.
+#
+
+emulate -L zsh -o pipe_fail -o err_return
+
+if (( $@[(i)--mine] )); then
+    set -- ${(@)@:#--mine} "aws/Owner=$USER@zscaler.com"
+fi
+
+if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
+    tsh ssh $(tsh ls --format=json "$@"    | \
+              jq -r '.[].spec.hostname')
+else
+    _tsw_goto "$@"
+fi
