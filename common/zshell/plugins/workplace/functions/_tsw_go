@@ -25,6 +25,9 @@ then
 fi
 
 case $(tsh ls --format=json "$@"  2>&- | jq length) in
+'')
+    echo "tsw go: unknown error" $(tsw ls --format=json "$@" 2>&1)
+    ;;
 0)
     echo "tsw go: " "No host matched for criteria:" "$@" >&2
     ;;
