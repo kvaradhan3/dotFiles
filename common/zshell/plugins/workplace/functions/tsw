@@ -28,8 +28,7 @@ function tsw {
         'labels'    'Show labels that can be used in tsh search'
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
-        'goto-mine' 'Goto my machine, assuming exactly one'
-        'goto'      'use fzf to find a machine to log into'
+        'go' ' [--mine] Find and go to a single host using attribute search'
         'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
         '-statusHelp' 'NO'
@@ -43,14 +42,14 @@ function tsw {
         set -- "${(L)@}"
     fi
 
-    if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
+    if [[ -v _teleport_clusters[$1] ]] ; then
         local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
         export TELEPORT_PROXY=${_deets[1]}
         export TSW_FQDN=${_deets[2]}
         _tsw_friendly="${_deets:2}"
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
 
-    elif [[ ${${(k)_tsw_convenience}[(Ie)$1]} != 0 ]]; then
+    elif [[ -v _tsw_convenience[$1] ]] ; then
 
         local cmd=$1
         shift
@@ -132,8 +131,8 @@ function tsw {
  alias tsh-goto-mine='tsh ssh $(tsh ls \
                             --format=json aws/Owner=$USER@zscaler.com | \
                                 jq -r .[].spec.hostname)'
+autoload -Uz _tsw_go
 autoload -Uz _tsw_goto
-autoload -Uz _tsw_goto-mine
 autoload -Uz _tsw_labels
 autoload -Uz _tsw_ls-r
 autoload -Uz _tsw_mine
