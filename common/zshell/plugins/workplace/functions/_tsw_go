@@ -1,17 +1,46 @@
 #! /bin/zsh
 #
-# Use fzf on the json generated hostnames to find a machine to connect to.
+# Find a host(s) to ssh into.
+#
+# Example searches include:
+#
+#   tsw go --mine               # find hosts that have
+#                               # aws/Owner=$USER.zscaler.com attrs.
+#   tsw go --search ...         # use tsh ls search on attributes...
+#   tsw go ip_private=1.1.1.1   # search by a specific attribute.  but then
+#   tsw go --search 1.1.1.1     # also would work...
+#
+#   If no hosts match, an error message is printed.
+#   if more than one host matches, we use fzf to allow the user to pick
+#   from the matched criteria.
+#
+#   tsw go                      # short form to search among all available hosts.
 #
 
 emulate -L zsh -o pipe_fail -o err_return
 
-if (( $@[(i)--mine] )); then
+if (( $@[(I)--mine] ))
+then
     set -- ${(@)@:#--mine} "aws/Owner=$USER@zscaler.com"
 fi
 
-if [[ $(tsh ls --format=json "$@"  | jq length) == 1 ]]; then
-    tsh ssh $(tsh ls --format=json "$@"    | \
-              jq -r '.[].spec.hostname')
-else
-    _tsw_goto "$@"
-fi
+case $(tsh ls --format=json "$@"  2>&- | jq length) in
+0)
+    echo "tsw go: " "No host matched for criteria:" "$@" >&2
+    ;;
+1)
+    tsh ssh $(tsh ls --format=json "$@" | jq -r '.[].spec.hostname')
+    ;;
+*)
+    tsh ssh $(tsh ls --format=json "$@"                  | \
+              jq -r '.[].spec.hostname'                  | \
+              fzf --preview="tsh ls --format=json --search {} | \
+                             jq -r '.[]
+                                    | .metadata.labels
+                                      + ( .spec.cmd_labels
+                                          | .[]
+                                          |= .result
+                                        )'"
+    )
+    ;;
+esac
