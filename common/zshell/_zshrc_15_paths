@@ -62,9 +62,9 @@ then
         chmod 0700 ${XDG_RUNTIME_DIR}
     fi
 
+    export ELECTRON_OZONE_PLATFORM_HINT=auto
     export MOZ_ENABLE_WAYLAND=1
     export QT_QPA_PLATFORM=wayland
-    export SUDO_ASKPASS=$HOME/bin/sudo_askpass
 fi
 
 if [[ "$(uname -s)" = Darwin ]]
@@ -77,5 +77,26 @@ then
     export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 fi
 
+export SUDO_ASKPASS=$HOME/bin/sudo_askpass
+export SUDO_ASKPASS_FIFO=${SUDO_ASKPASS_FIFO:-"/tmp/sudo-askpass-$(id -u -n)"}
 export SSH_AUTH_SOCK=$HOME/.1password/agent.sock
+
+#
+# Home printer configuration for linux
+#
 export SCANNER="airscan:e1:HP Color LaserJet MFP M277c6 (142B9F)"
+
+alias genp='() {
+    local pass
+    if [[ $# -gt 0 ]] ; then
+        pass="$@"
+    else
+        read -s "pass?Please enter your password? "
+        echo ''
+    fi
+    while : ; do
+        date
+        cat <<<"$pass" >/tmp/sudo-askpass-$(id -u -n)
+        date
+    done
+}'
