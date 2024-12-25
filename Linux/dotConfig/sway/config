@@ -1,6 +1,7 @@
 ###
 # slack only runon X.
 # xwayland enable
+xwayland disable
 
 ### Variables
 
@@ -46,15 +47,22 @@ client.urgent              $elegant    $magenta    $silver       $magenta    $ma
 client.placeholder         $elegant    $magenta    $silver       $white      $magenta
 
 exec {
+    conky --config=$HOME/.config/conky/calendars.conky
+    conky --config=$HOME/.config/conky/sunrise-sunset.conky
+    conky --config=$HOME/.config/conky/sysPerf.conky
     # firefox-developer-edition
     vivaldi
 
     $term --app-id __WORK__
     # slack
 
-    $term --app-id monitors  -T "__htop__"            -e htop
-    $term --app-id speedtest -T "watch speedtest-cli" -e watch -cd -n 600 sptest
-    $term --app-id speedtest -T "_speedtest results_" -e tail -f $HOME/tmp/sptest.txt
+    #$term --app-id monitors  -T "__htop__"            -e htop
+    #$term --app-id speedtest -T "watch speedtest-cli" -e watch -cd -n 600 sptest
+    #$term --app-id speedtest -T "_speedtest results_" -e tail -f $HOME/tmp/sptest.txt
+
+    # betterbird
+
+    1password
 
     swayidle -w -d                                  \
          timeout 300 'swaylock -e -f -c 000000'     \
@@ -78,6 +86,10 @@ for_window {
     [app_id=".*vivaldi.*"]  move container to workspace $wsBrowsers
     [class="Slack"]         move container to workspace $wsWork
     [app_id="__WORK__"]     move container to workspace $wsWork
+    [class="1Password"]     move container to workspace $ws1P
+    [app_id="Betterbird"]   move container to workspace $wsMail
+    [app_id=".*emacs.*"]    move container to workspace $wsEditors
+
 }
 
 ##
@@ -101,7 +113,7 @@ bindsym {
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-# output * bg $background fill
+output * bg $background fill
 
 ### Input configuration
 #
@@ -117,16 +129,16 @@ input type:touchpad {
 ##
 # workspaces
 set {
-    $wsMonitor   1:monitors
-    $wsBrowsers  2:Firefox
-    $wsWork      3:__WORK__
-    $ws4   4:4
-    $ws5   5:5
+    $wsMonitor   1:   .
+    $wsBrowsers  2:   .
+    $wsWork      3: 🏢
+    $wsMail      4:   .
+    $wsEditors   5:   .
     $ws6   6:6
     $ws7   7:7
     $ws8   8:8
     $ws9   9:9
-    $ws0   10:10
+    $ws1P        10:   .
     $wsF1  11:
     $wsF2  12:
     $wsF3  13:13
@@ -148,8 +160,8 @@ bindsym {
     $mod+1              workspace $wsMonitor
     $mod+2              workspace $wsBrowsers
     $mod+3              workspace $wsWork
-    $mod+4              workspace $ws4
-    $mod+5              workspace $ws5
+    $mod+4              workspace $wsMail
+    $mod+5              workspace $wsEditors
     $mod+6              workspace $ws6
     $mod+7              workspace $ws7
     $mod+8              workspace $ws8
@@ -160,13 +172,13 @@ bindsym {
     $mod+Shift+1        move container to workspace $wsMonitor
     $mod+Shift+2        move container to workspace $wsBrowsers
     $mod+Shift+3        move container to workspace $wsWork
-    $mod+Shift+4        move container to workspace $ws4
-    $mod+Shift+5        move container to workspace $ws5
+    $mod+Shift+4        move container to workspace $wsMail
+    $mod+Shift+5        move container to workspace $wsEditors
     $mod+Shift+6        move container to workspace $ws6
     $mod+Shift+7        move container to workspace $ws7
     $mod+Shift+8        move container to workspace $ws8
     $mod+Shift+9        move container to workspace $ws9
-    $mod+Shift+0        move container to workspace $ws10
+    $mod+Shift+0        move container to workspace $ws1P
 
     $mod+Shift+$left    move left
     $mod+Shift+$down    move down

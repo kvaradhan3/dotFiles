@@ -24,3 +24,5 @@ autoload -Uz error
 autoload -Uz info
 autoload -Uz log
 autoload -Uz usage
+
+autoload -Uz srand32
