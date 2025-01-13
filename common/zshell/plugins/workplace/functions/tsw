@@ -29,7 +29,6 @@ function tsw {
         'my-labels' 'Show label settings for my machines'
         'mine'      'List my machines'
         'go' ' [--mine] Find and go to a single host using attribute search'
-        'ls-r'      'short for tsh ls --format=json'
         'help'      'Print this help menu'
         '-statusHelp' 'NO'
     )

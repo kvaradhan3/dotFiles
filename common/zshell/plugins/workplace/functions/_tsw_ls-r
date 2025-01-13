@@ -1,8 +1,0 @@
-#! /bin/zsh
-#
-# List all machines in json format.  Very raw command.
-#
-
-emulate -L zsh -o pipe_fail -o err_return
-
-tsh ls --format=json "$@"
