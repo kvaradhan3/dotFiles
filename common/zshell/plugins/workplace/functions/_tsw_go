@@ -10,6 +10,8 @@
 #   tsw go ip_private=1.1.1.1   # search by a specific attribute.  but then
 #   tsw go --search 1.1.1.1     # also would work...
 #
+#   you can drop the --search, it is a tsh-ism....
+#
 #   If no hosts match, an error message is printed.
 #   if more than one host matches, we use fzf to allow the user to pick
 #   from the matched criteria.
@@ -19,9 +21,35 @@
 
 emulate -L zsh -o pipe_fail -o err_return
 
+#
+# Sanitize arguments to tsh
+#
+##
+# 1. remove --mine, if present and add aws/Owner.
 if (( $@[(I)--mine] ))
 then
-    set -- ${(@)@:#--mine} "aws/Owner=$USER@zscaler.com"
+    # Using $@ as array, remove '--mine' from it.
+    # Add aws/Owner as first argument
+    set -- "aws/Owner=$USER@zscaler.com" ${(@)@:#--mine} 
+fi
+
+##
+# 2. if there is more than 1 key/value pair, it has to be <comma> separated.
+kvpairs=
+for i in "$@" ; do
+    if [[ $i == *=* ]] && [[ $i != --* ]] ; then
+        # k=y and not --option=val
+        set -- ${(@)@:#$i}
+        kvpairs+=,$i
+    fi
+done
+set -- ${kvpairs//#,/} "$@"
+
+##
+# 3. convenience quirk, if only one arg, and it does not look like a key=val
+#    and not an option
+if [[ $# == 1 ]] && [[ $1 != *=* ]] && [[ $1 != --* ]] ; then
+    set -- --search "$@"
 fi
 
 case $(tsh ls --format=json "$@"  2>&- | jq length) in
@@ -38,7 +66,7 @@ case $(tsh ls --format=json "$@"  2>&- | jq length) in
     tsh ssh $(tsh ls --format=json "$@"                  | \
               jq -r '.[].spec.hostname'                  | \
               fzf --preview="tsh ls --format=json --search {} | \
-                             jq -r '.[]
+                             jq -C '.[]
                                     | .metadata.labels
                                       + ( .spec.cmd_labels
                                           | .[]

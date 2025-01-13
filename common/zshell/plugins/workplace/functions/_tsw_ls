@@ -6,10 +6,8 @@
 
 emulate -L zsh -o pipe_fail -o err_return
 
-local me=aws/Owner=$USER@zscaler.com
-
 print "hostname,Private IP,instance-id,HW Type,expiry";
-tsh ls --format=json $me                 | \
+tsh ls --format=json "$@"                | \
     jq -r '.[]
            | [ .spec.hostname,
                ( .spec.cmd_labels |

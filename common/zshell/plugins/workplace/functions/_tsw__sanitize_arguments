@@ -1,0 +1,37 @@
+#! /bin/zsh
+#
+
+emulate -L zsh -o pipe_fail -o err_return
+
+#
+# Sanitize arguments to tsh
+#
+##
+# 1. remove --mine, if present and add aws/Owner.
+if (( $@[(I)--mine] ))
+then
+    # Using $@ as array, remove '--mine' from it.
+    # Add aws/Owner as first argument
+    set -- "aws/Owner=$USER@zscaler.com" ${(@)@:#--mine} 
+fi
+
+##
+# 2. if there is more than 1 key/value pair, it has to be <comma> separated.
+kvpairs=
+for i in "$@" ; do
+    if [[ $i == *=* ]] && [[ $i != --* ]] ; then
+        # k=y and not --option=val
+        set -- ${(@)@:#$i}
+        kvpairs+=,$i
+    fi
+done
+set -- ${kvpairs//#,/} "$@"
+
+##
+# 3. convenience quirk, if only one arg, and it does not look like a key=val
+#    and not an option
+if [[ $# == 1 ]] && [[ $1 != *=* ]] && [[ $1 != --* ]] ; then
+    set -- --search "$@"
+fi
+
+echo "$@"

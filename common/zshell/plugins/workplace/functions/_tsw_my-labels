@@ -1,13 +1,23 @@
-#! /bin/zsh
+#! /usr/bin/env bash
 #
 # list the labels affixed to machines that I am designated as owner.
 #
 
 emulate -L zsh -o pipe_fail -o err_return
 
+##
+# 0. With no arguments, add a devbox owner label as default.
 if [[ $# == 0 ]] ; then
     set -- "aws/Owner=$USER@zscaler.com"
 fi
 
 tsh ls --format=json "$@"                  | \
-jq -r '.[] | .metadata.labels + ( .spec.cmd_labels | .[] |= .result)'
+jq --raw-output '.[] 
+                 | .metadata.labels
+                 + (
+                   .spec.cmd_labels
+                   | .[]
+                   |= .result
+                 )'
+
+
