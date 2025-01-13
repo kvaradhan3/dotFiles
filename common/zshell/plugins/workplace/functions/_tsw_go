@@ -20,6 +20,8 @@ then
 #   $CMD $OPT --search 1.1.1.1   # also would work...
 #   $CMD $OPT 1.1.1.1            # for a single attr search, this also works.
 #
+#   you can drop the --search, it is a tsh-ism....
+#
 #   If no hosts match, an error message is printed.
 #   if more than one host matches, we use fzf to allow the user to pick
 #   from the matched criteria.

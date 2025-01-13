@@ -24,7 +24,6 @@ then
 #
 #   $CMD $OPT              # prints labels on all devboxes owned by $USER
 #
-#
 USAGE
     return
 fi
@@ -55,4 +54,3 @@ case $(tsh ls --format=json "$@" 2>&- | jq length) in
                     )'
     ;;
 esac
-
