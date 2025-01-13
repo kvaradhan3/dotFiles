@@ -1,7 +1,33 @@
 #! /usr/bin/env bash
 #
+if (( $@[(I)--help] )) || (( $@[(I)-h] ))
+then
+    sed 's/^#/ /'  <<USAGE >&2
+
+# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
+#
 # list the labels affixed to machines that I am designated as owner.
 #
+# Example searches include:
+#
+#   tsw my-labels --mine               # find hosts that have
+#                               # aws/Owner=$USER.zscaler.com attrs.
+#   tsw my-labels --search ...         # use tsh ls search on attributes...
+#   tsw my-labels ip_private=1.1.1.1   # search by a specific attribute.  but then
+#   tsw my-labels --search 1.1.1.1     # also would work...
+#
+#   you can drop the --search, it is a tsh-ism....
+#
+#   If no hosts match, an error message is printed.
+#   if more than one host matches, we use fzf to allow the user to pick
+#   from the matched criteria.
+#
+#   tsw my-labels                      # short form to search among all available hosts.
+#
+#
+USAGE
+    return
+fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
