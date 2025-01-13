@@ -27,7 +27,7 @@ function tsw {
         'clusters'  'List current known clusters'
         'labels'    'Show labels that can be used in tsh search'
         'my-labels' 'Show label settings for my machines'
-        'mine'      'List my machines'
+        'ls'        'List my machines'
         'go' ' [--mine] Find and go to a single host using attribute search'
         'help'      'Print this help menu'
         '-statusHelp' 'NO'
