@@ -1,11 +1,37 @@
 #! /bin/zsh
 #
-# find all possible labels that can be used to search a machine.
+if (( $@[(I)--help] )) || (( $@[(I)-h] ))
+then
+    sed 's/^#/ /'  <<USAGE >&2
+
+# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
 #
+#        find all possible labels that can be used to search a machine.
+#
+# Example searches include:
+#
+#   tsw labels --mine               # find hosts that have
+#                               # aws/Owner=$USER.zscaler.com attrs.
+#   tsw labels --search ...         # use tsh ls search on attributes...
+#   tsw labels ip_private=1.1.1.1   # search by a specific attribute.  but then
+#   tsw labels --search 1.1.1.1     # also would work...
+#
+#   you can drop the --search, it is a tsh-ism....
+#
+#   If no hosts match, an error message is printed.
+#   if more than one host matches, we use fzf to allow the user to pick
+#   from the matched criteria.
+#
+#   tsw labels                      # short form to search among all available hosts.
+#
+#
+USAGE
+    return
+fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
-tsh ls --format=json                      | \
+tsh ls --format=json "$@"                 | \
 jq -C '.[]
        | .metadata.labels + .spec.cmd_labels
        | keys

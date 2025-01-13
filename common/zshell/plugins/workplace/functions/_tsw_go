@@ -1,6 +1,12 @@
 #! /bin/zsh
 #
-# Find a host(s) to ssh into.
+if (( $@[(I)--help] )) || (( $@[(I)-h] ))
+then
+    sed 's/^#/ /'  <<USAGE >&2
+
+# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
+#
+#        Find a host(s) to ssh into.
 #
 # Example searches include:
 #
@@ -10,19 +16,19 @@
 #   tsw go ip_private=1.1.1.1   # search by a specific attribute.  but then
 #   tsw go --search 1.1.1.1     # also would work...
 #
+#   you can drop the --search, it is a tsh-ism....
+#
 #   If no hosts match, an error message is printed.
 #   if more than one host matches, we use fzf to allow the user to pick
 #   from the matched criteria.
 #
 #   tsw go                      # short form to search among all available hosts.
 #
+USAGE
+    return
+fi
 
 emulate -L zsh -o pipe_fail -o err_return
-
-if (( $@[(I)--mine] ))
-then
-    set -- ${(@)@:#--mine} "aws/Owner=$USER@zscaler.com"
-fi
 
 case $(tsh ls --format=json "$@"  2>&- | jq length) in
 '')
@@ -38,7 +44,7 @@ case $(tsh ls --format=json "$@"  2>&- | jq length) in
     tsh ssh $(tsh ls --format=json "$@"                  | \
               jq -r '.[].spec.hostname'                  | \
               fzf --preview="tsh ls --format=json --search {} | \
-                             jq -r '.[]
+                             jq -C '.[]
                                     | .metadata.labels
                                       + ( .spec.cmd_labels
                                           | .[]

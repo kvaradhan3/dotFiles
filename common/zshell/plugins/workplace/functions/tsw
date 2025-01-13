@@ -27,19 +27,16 @@ function tsw {
         'clusters'  'List current known clusters'
         'labels'    'Show labels that can be used in tsh search'
         'my-labels' 'Show label settings for my machines'
-        'mine'      'List my machines'
-        'go' ' [--mine] Find and go to a single host using attribute search'
-        'ls-r'      'short for tsh ls --format=json'
+        'ls'        'List my machines'
+        'go'        'Find and go to a single host using attribute search'
         'help'      'Print this help menu'
-        '-statusHelp' 'NO'
     )
 
     _tsw_friendly=""
 
     if [[ $1 = "" ]] ; then
-        set -- '-statusHelp'
-    else
-        set -- "${(L)@}"
+        tsw help
+        set -- 'status'
     fi
 
     if [[ -v _teleport_clusters[$1] ]] ; then
@@ -48,8 +45,10 @@ function tsw {
         export TSW_FQDN=${_deets[2]}
         _tsw_friendly="${_deets:2}"
         log Switched to "$_tsw_friendly" Teleport Cluster, using $TELEPORT_PROXY
+        return
+    fi
 
-    elif [[ -v _tsw_convenience[$1] ]] ; then
+    if [[ -v _tsw_convenience[$1] ]] ; then
 
         local cmd=$1
         shift
@@ -58,8 +57,8 @@ function tsw {
             # Do not disrupt the next two. The third block (login) can move
             # but it would be better to-not-to...
             logout)
-                tsh logout "$@"
-                info logout out of ${_tsw_friendly}
+                tsh  $cmd "$@"
+                info $cmd ${_tsw_friendly}
                 ;&
             login|clear)        # clear function, also done before login.
                 unset TELEPORT_PROXY TSW_FQDN
@@ -69,9 +68,9 @@ function tsw {
             login)
                 if (( ${${(k)_teleport_clusters}[(I)$1]} )); then
                     local -a _deets=( ${(z)${_teleport_clusters[$1]}} )
-                    tsh --proxy "${_deets[1]}" login "${@:2}"
+                    tsh $cmd --proxy "${_deets[1]}" "${@:2}"
                 else
-                    tsh "$@"
+                    tsh $cmd "$@"
                 fi
                 _tsw_friendly=$(tsh status --format=json | jq .active.profile)
                 ;;
@@ -84,43 +83,35 @@ function tsw {
                     print "${cluster},${_deets[1]},${_deets[2]},${_deets:2}"
                 done
                 ;;
+
             status)
-                tsh "$@"
-                info logout out of ${_tsw_friendly}
-                ;&
+                tsh $cmd "$@"
+                ;;
 
-            # Generally do not disrupt these two being together...
-            status|-statusHelp)
-                tsh status "$@"
-                ;|
-
-            help|-statusHelp)
+            help)
                 echo
                 usage "[${(k)_teleport_clusters// /|}]"
                 print "  Additional convenience functions:"
                 for key help in ${(kv)_tsw_convenience}; do
-                    if [[ $key = -* ]] ; then
-                        continue
-                    fi
                     print "    $key\t\t$help"
                 done
                 print "  defaults with no arguments, prints status and help"
                 print "  Commands not understood are sent to tsh, as tsh $@"
                 ;;
-            status)
-                ;;
+
             *)
                 if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
-                    _tsw_${cmd} "$@"
+                    _tsw_${cmd} $(_tsw__sanitize_arguments "$@")
                     return
                 else
                     error $cmd is not implemented.
                 fi
                 ;;
         esac
-    else
-        tsh "$@"
+        return
     fi
+    
+    tsh "$@"
 }
 
  #
@@ -138,5 +129,6 @@ autoload -Uz _tsw_ls-r
 autoload -Uz _tsw_mine
 autoload -Uz _tsw_my-labels
 autoload -Uz _tsw_cheatsheet
+autoload -Uz _tsw__sanitize_arguments
 
 tsw
