@@ -2,13 +2,13 @@
 #
 
 CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
-OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/'"
+OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/')"
 
 if (( $@[(I)--help] )) || (( $@[(I)-h] ))
 then
     sed 's/^#/ /'  <<USAGE >&2
 
-# usage: "$CMD" "$OPT"
+# usage: $CMD $OPT [--mine | <tsh options> | search-attribute]
 #
 #        find all possible labels that can be used to search a machine.
 #
