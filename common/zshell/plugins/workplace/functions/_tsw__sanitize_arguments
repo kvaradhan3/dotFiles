@@ -17,7 +17,7 @@ fi
 
 ##
 # 2. if there is more than 1 key/value pair, it has to be <comma> separated.
-kvpairs=
+local kvpairs=
 for i in "$@" ; do
     if [[ $i == *=* ]] && [[ $i != --* ]] ; then
         # k=y and not --option=val
