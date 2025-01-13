@@ -1,15 +1,31 @@
 #! /bin/zsh
 #
+
+CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
+OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/')"
+
 if (( $@[(I)--help] )) || (( $@[(I)-h] ))
 then
     sed 's/^#/ /'  <<USAGE >&2
 
-# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
+# usage: $CMD $OPT [--mine | <tsh options> | search-attribute]
 #
 #        find all possible labels that can be used to search a machine.
 #
 # Example searches include:
 #
+<<<<<<< HEAD
+#   $CMD $OPT --mine               # find devboxes owned by $USER
+#   $CMD $OPT --search ...         # use tsh ls search on attributes...
+#   $CMD $OPT ip_private=1.1.1.1   # search by a specific attribute.  but then
+#   $CMD $OPT --search 1.1.1.1     # also would work...
+#   $CMD $OPT 1.1.1.1              # for a single attr search, this also works..
+#
+#   If no hosts match, an error message is printed.
+#
+#   $CMD $OPT                      # returns all possible labels on all hosts.
+||||||| a34c878
+=======
 #   tsw labels --mine               # find hosts that have
 #                               # aws/Owner=$USER.zscaler.com attrs.
 #   tsw labels --search ...         # use tsh ls search on attributes...
@@ -24,6 +40,7 @@ then
 #
 #   tsw labels                      # short form to search among all available hosts.
 #
+>>>>>>> origin/main
 #
 USAGE
     return
@@ -31,6 +48,33 @@ fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
+<<<<<<< HEAD
+case $(tsh ls --format=json "$@" 2>&- | jq length) in
+'')
+    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
+    ;;
+0)
+    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
+    ;;
+*)
+    tsh ls --format=json "$@"                 | \
+    jq -C '.[]
+           | .metadata.labels + .spec.cmd_labels
+           | keys
+           | .[]'                             | \
+    sort                                      | \
+    uniq
+    ;;
+esac
+||||||| a34c878
+tsh ls --format=json                      | \
+jq -C '.[]
+       | .metadata.labels + .spec.cmd_labels
+       | keys
+       | .[]'                             | \
+sort                                      | \
+uniq
+=======
 tsh ls --format=json "$@"                 | \
 jq -C '.[]
        | .metadata.labels + .spec.cmd_labels
@@ -38,3 +82,4 @@ jq -C '.[]
        | .[]'                             | \
 sort                                      | \
 uniq
+>>>>>>> origin/main
