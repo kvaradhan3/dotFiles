@@ -1,28 +1,28 @@
 #! /usr/bin/env bash
 #
+
+CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
+OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/'"
+
 if (( $@[(I)--help] )) || (( $@[(I)-h] ))
 then
     sed 's/^#/ /'  <<USAGE >&2
 
-# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
+# usage: "$CMD" "$OPT"
 #
 # list the labels affixed to machines that I am designated as owner.
 #
 # Example searches include:
 #
-#   tsw my-labels --mine               # find hosts that have
-#                               # aws/Owner=$USER.zscaler.com attrs.
-#   tsw my-labels --search ...         # use tsh ls search on attributes...
-#   tsw my-labels ip_private=1.1.1.1   # search by a specific attribute.  but then
-#   tsw my-labels --search 1.1.1.1     # also would work...
+#   $CMD $OPT --mine               # find devboxes owned by $USER
+#   $CMD $OPT --search ...         # use tsh ls search on attributes...
+#   $CMD $OPT ip_private=1.1.1.1   # search by a specific attribute.  but then
+#   $CMD $OPT --search 1.1.1.1     # also would work...
+#   $CMD $OPT 1.1.1.1              # for a single attr search, this also works..
 #
-#   you can drop the --search, it is a tsh-ism....
+#   If no hosts match, an error message is printed
 #
-#   If no hosts match, an error message is printed.
-#   if more than one host matches, we use fzf to allow the user to pick
-#   from the matched criteria.
-#
-#   tsw my-labels                      # short form to search among all available hosts.
+#   $CMD $OPT              # prints labels on all devboxes owned by $USER
 #
 #
 USAGE
@@ -37,13 +37,22 @@ if [[ $# == 0 ]] ; then
     set -- "aws/Owner=$USER@zscaler.com"
 fi
 
-tsh ls --format=json "$@"                  | \
-jq --raw-output '.[] 
-                 | .metadata.labels
-                 + (
-                   .spec.cmd_labels
-                   | .[]
-                   |= .result
-                 )'
-
+case $(tsh ls --format=json "$@" 2>&- | jq length) in
+'')
+    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
+    ;;
+0)
+    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
+    ;;
+*)
+    tsh ls --format=json "$@"                  | \
+    jq --raw-output '.[] 
+                    | .metadata.labels
+                    + (
+                    .spec.cmd_labels
+                    | .[]
+                    |= .result
+                    )'
+    ;;
+esac
 

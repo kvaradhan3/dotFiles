@@ -1,28 +1,31 @@
 #! /bin/zsh
 #
+
+CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
+OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/'"
+
 if (( $@[(I)--help] )) || (( $@[(I)-h] ))
 then
     sed 's/^#/ /'  <<USAGE >&2
 
-# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
+# usage: "$CMD" "$OPT"
 #
 #        Find a host(s) to ssh into.
 #
 # Example searches include:
 #
-#   tsw go --mine               # find hosts that have
-#                               # aws/Owner=$USER.zscaler.com attrs.
-#   tsw go --search ...         # use tsh ls search on attributes...
-#   tsw go ip_private=1.1.1.1   # search by a specific attribute.  but then
-#   tsw go --search 1.1.1.1     # also would work...
-#
-#   you can drop the --search, it is a tsh-ism....
+#   $CMD $OPT --mine             # find devboxes owned by $USER
+#   $CMD $OPT --search ...       # use tsh ls search on attributes...
+#   $CMD $OPT ip_private=1.1.1.1 # search by a specific attribute.  but then
+#   $CMD $OPT --search 1.1.1.1   # also would work...
+#   $CMD $OPT 1.1.1.1            # for a single attr search, this also works.
 #
 #   If no hosts match, an error message is printed.
 #   if more than one host matches, we use fzf to allow the user to pick
 #   from the matched criteria.
 #
-#   tsw go                      # short form to search among all available hosts.
+#   $CMD $OPT                    # is short form to search/pick
+#                                # among all available hosts.
 #
 USAGE
     return
@@ -32,10 +35,10 @@ emulate -L zsh -o pipe_fail -o err_return
 
 case $(tsh ls --format=json "$@"  2>&- | jq length) in
 '')
-    echo "tsw go: unknown error" $(tsw ls --format=json "$@" 2>&1)
+    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
     ;;
 0)
-    echo "tsw go: " "No host matched for criteria:" "$@" >&2
+    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
     ;;
 1)
     tsh ssh $(tsh ls --format=json "$@" | jq -r '.[].spec.hostname')
