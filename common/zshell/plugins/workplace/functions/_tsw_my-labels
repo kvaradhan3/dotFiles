@@ -14,7 +14,7 @@ then
 #
 # Example searches include:
 #
-#   $CMD $OPT --mine               # find devboxes owned by $USER
+#   $CMD $OPT --mine               # find devboxes owned by \$USER
 #   $CMD $OPT --search ...         # use tsh ls search on attributes...
 #   $CMD $OPT ip_private=1.1.1.1   # search by a specific attribute.  but then
 #   $CMD $OPT --search 1.1.1.1     # also would work...
@@ -22,7 +22,8 @@ then
 #
 #   If no hosts match, an error message is printed
 #
-#   $CMD $OPT              # prints labels on all devboxes owned by $USER
+#   $CMD $OPT              # prints labels on all devboxes owned by \$USER
+#
 #
 USAGE
     return
@@ -36,14 +37,6 @@ if [[ $# == 0 ]] ; then
     set -- "aws/Owner=$USER@zscaler.com"
 fi
 
-case $(tsh ls --format=json "$@" 2>&- | jq length) in
-'')
-    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
-    ;;
-0)
-    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
-    ;;
-*)
     tsh ls --format=json "$@"                  | \
     jq --raw-output '.[] 
                     | .metadata.labels
@@ -52,5 +45,4 @@ case $(tsh ls --format=json "$@" 2>&- | jq length) in
                     | .[]
                     |= .result
                     )'
-    ;;
-esac
+

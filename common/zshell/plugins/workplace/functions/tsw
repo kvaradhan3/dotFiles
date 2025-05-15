@@ -101,7 +101,10 @@ function tsw {
 
             *)
                 if [[ $(whence -w _tsw_${cmd}) = *function ]] ; then
-                    _tsw_${cmd} $(_tsw__sanitize_arguments "$@")
+                    set -- $(_tsw__sanitize_arguments "$@")
+                    if _tsw__sane $cmd "$@" ; then
+                        _tsw_${cmd} "$@"
+                    fi
                     return
                 else
                     error $cmd is not implemented.
@@ -114,14 +117,69 @@ function tsw {
     tsh "$@"
 }
 
- #
- # some aliases that we care about, once we are logged in...
- #
- alias tssh='tsh ssh'
- alias tsh-list-mine='tsh ls --format=json aws/Owner=$USER@zscaler.com'
- alias tsh-goto-mine='tsh ssh $(tsh ls \
-                            --format=json aws/Owner=$USER@zscaler.com | \
-                                jq -r .[].spec.hostname)'
+function _tsw__sanitize_arguments {
+    #
+    # Sanitize arguments to tsh
+    #
+    ##
+    # 1. remove --mine, if present and add aws/Owner.
+    if (( $@[(I)--mine] ))
+    then
+        # Using $@ as array, remove '--mine' from it.
+        # Add aws/Owner as first argument
+        set -- "aws/Owner=$USER@zscaler.com" ${(@)@:#--mine}
+    fi
+
+    ##
+    # 2. if there is more than 1 key/value pair, it has to be <comma> separated.
+    local kvpairs=
+    for i in "$@" ; do
+        if [[ $i == *=* ]] && [[ $i != --* ]] ; then
+            # k=y and not --option=val
+            set -- ${(@)@:#$i}
+            kvpairs+=,$i
+        fi
+    done
+    set -- ${kvpairs//#,/} "$@"
+
+    ##
+    # 3. convenience quirk, if only one arg, and it does not look like a key=val
+    #    and not an option
+    if [[ $# == 1 ]] && [[ $1 != *=* ]] && [[ $1 != --* ]] ; then
+        set -- --search "$@"
+    fi
+    
+    echo "$@"
+}
+
+function _tsw__sane {
+    #
+    # Check that the sanitized arguments dont cause additional errors.
+    # allow, no args, or arg == --help|-h.
+    # makes error messages consistent this way.
+    #
+    CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
+    OPT=$1 ; shift
+
+    if [[ $# = 0 ]] || [[ " $@ " =~ ' -h | --help ' ]] ; then
+        return 0
+    fi
+
+    case $(tsh ls --format=json "$@"  2>&- | jq length) in
+    '')
+        error " $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
+        return 1
+        ;;
+    0)
+        error " $OPT: No host matched for criteria:" "$@" >&2
+        return 1
+        ;;
+    *)
+        return 0
+        ;;
+    esac
+}
+
 autoload -Uz _tsw_go
 autoload -Uz _tsw_goto
 autoload -Uz _tsw_labels
@@ -129,6 +187,5 @@ autoload -Uz _tsw_ls-r
 autoload -Uz _tsw_mine
 autoload -Uz _tsw_my-labels
 autoload -Uz _tsw_cheatsheet
-autoload -Uz _tsw__sanitize_arguments
 
-tsw
+tsw "$@"

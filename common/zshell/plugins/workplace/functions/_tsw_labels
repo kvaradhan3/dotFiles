@@ -14,8 +14,7 @@ then
 #
 # Example searches include:
 #
-<<<<<<< HEAD
-#   $CMD $OPT --mine               # find devboxes owned by $USER
+#   $CMD $OPT --mine               # find devboxes owned by \$USER
 #   $CMD $OPT --search ...         # use tsh ls search on attributes...
 #   $CMD $OPT ip_private=1.1.1.1   # search by a specific attribute.  but then
 #   $CMD $OPT --search 1.1.1.1     # also would work...
@@ -24,23 +23,6 @@ then
 #   If no hosts match, an error message is printed.
 #
 #   $CMD $OPT                      # returns all possible labels on all hosts.
-||||||| a34c878
-=======
-#   tsw labels --mine               # find hosts that have
-#                               # aws/Owner=$USER.zscaler.com attrs.
-#   tsw labels --search ...         # use tsh ls search on attributes...
-#   tsw labels ip_private=1.1.1.1   # search by a specific attribute.  but then
-#   tsw labels --search 1.1.1.1     # also would work...
-#
-#   you can drop the --search, it is a tsh-ism....
-#
-#   If no hosts match, an error message is printed.
-#   if more than one host matches, we use fzf to allow the user to pick
-#   from the matched criteria.
-#
-#   tsw labels                      # short form to search among all available hosts.
-#
->>>>>>> origin/main
 #
 USAGE
     return
@@ -48,38 +30,10 @@ fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
-<<<<<<< HEAD
-case $(tsh ls --format=json "$@" 2>&- | jq length) in
-'')
-    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
-    ;;
-0)
-    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
-    ;;
-*)
     tsh ls --format=json "$@"                 | \
     jq -C '.[]
-           | .metadata.labels + .spec.cmd_labels
+           | .metadata.labels + .metadata.name + .spec.cmd_labels
            | keys
            | .[]'                             | \
     sort                                      | \
     uniq
-    ;;
-esac
-||||||| a34c878
-tsh ls --format=json                      | \
-jq -C '.[]
-       | .metadata.labels + .spec.cmd_labels
-       | keys
-       | .[]'                             | \
-sort                                      | \
-uniq
-=======
-tsh ls --format=json "$@"                 | \
-jq -C '.[]
-       | .metadata.labels + .spec.cmd_labels
-       | keys
-       | .[]'                             | \
-sort                                      | \
-uniq
->>>>>>> origin/main

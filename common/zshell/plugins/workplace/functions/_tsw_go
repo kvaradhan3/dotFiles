@@ -14,13 +14,11 @@ then
 #
 # Example searches include:
 #
-#   $CMD $OPT --mine             # find devboxes owned by $USER
+#   $CMD $OPT --mine             # find devboxes owned by \$USER
 #   $CMD $OPT --search ...       # use tsh ls search on attributes...
 #   $CMD $OPT ip_private=1.1.1.1 # search by a specific attribute.  but then
 #   $CMD $OPT --search 1.1.1.1   # also would work...
 #   $CMD $OPT 1.1.1.1            # for a single attr search, this also works.
-#
-#   you can drop the --search, it is a tsh-ism....
 #
 #   If no hosts match, an error message is printed.
 #   if more than one host matches, we use fzf to allow the user to pick
@@ -35,17 +33,9 @@ fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
-case $(tsh ls --format=json "$@"  2>&- | jq length) in
-'')
-    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
-    ;;
-0)
-    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
-    ;;
-1)
+if [[ $(tsh ls --format=json "$@"  2>&- | jq length) = 1 ]] ; then
     tsh ssh $(tsh ls --format=json "$@" | jq -r '.[].spec.hostname')
-    ;;
-*)
+else
     tsh ssh $(tsh ls --format=json "$@"                  | \
               jq -r '.[].spec.hostname'                  | \
               fzf --preview="tsh ls --format=json --search {} | \
@@ -56,5 +46,4 @@ case $(tsh ls --format=json "$@"  2>&- | jq length) in
                                           |= .result
                                         )'"
     )
-    ;;
-esac
+fi

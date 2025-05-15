@@ -1,6 +1,5 @@
 #! /bin/zsh
 #
-<<<<<<< HEAD
 
 CMD="${funcstack[2]:-"${FUNCNAME[2]}"}"
 OPT="$(echo ${funcstack[1]:-"${FUNCNAME[1]}"} | sed 's/.*_\([^_]*\)/\1/')"
@@ -32,14 +31,6 @@ fi
 
 emulate -L zsh -o pipe_fail -o err_return
 
-case $(tsh ls --format=json "$@" 2>&- | jq length) in
-'')
-    echo "$CMD $OPT: unknown error" $(tsh ls --format=json "$@" 2>&1)
-    ;;
-0)
-    echo "$CMD $OPT: No host matched for criteria:" "$@" >&2
-    ;;
-*)
     print "hostname,Private IP,instance-id,HW Type,expiry";
     tsh ls --format=json "$@"                | \
         jq -r '.[]
@@ -52,52 +43,3 @@ case $(tsh ls --format=json "$@" 2>&- | jq length) in
                    .metadata.expires[:10]
                  ]
                | @csv'
-    ;;
-esac
-||||||| a34c878
-=======
-if (( $@[(I)--help] )) || (( $@[(I)-h] ))
-then
-    sed 's/^#/ /'  <<USAGE >&2
-
-# usage: "${funcstack[2]:-"${FUNCNAME[2]}"}" "${funcstack[1]:-"${FUNCNAME[1]}"}"
-#
-#        List machines that match the arg spec. 
-#
-# Example searches include:
-#
-#   tsw ls --mine               # find hosts that have
-#                               # aws/Owner=$USER.zscaler.com attrs.
-#   tsw ls --search ...         # use tsh ls search on attributes...
-#   tsw ls ip_private=1.1.1.1   # search by a specific attribute.  but then
-#   tsw ls --search 1.1.1.1     # also would work...
-#
-#   you can drop the --search, it is a tsh-ism....
-#
-#   If no hosts match, an error message is printed.
-#   if more than one host matches, we use fzf to allow the user to pick
-#   from the matched criteria.
-#
-#   tsw ls                      # short form to search among all available hosts.
-#
-# Outputs a csv format that can be run through csvlook, in the csvkit package.
-#
-USAGE
-    return
-fi
-
-emulate -L zsh -o pipe_fail -o err_return
-
-print "hostname,Private IP,instance-id,HW Type,expiry";
-tsh ls --format=json "$@"                | \
-    jq -r '.[]
-           | [ .spec.hostname,
-               ( .spec.cmd_labels |
-                   .ip_private.result,
-                   .aws_instance_id.result,
-                   .hwtype.result[:7]
-               ),
-               .metadata.expires[:10]
-             ]
-           | @csv'
->>>>>>> origin/main
