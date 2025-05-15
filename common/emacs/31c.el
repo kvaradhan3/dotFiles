@@ -1,4 +1,4 @@
-;; 33c.el --- Emacs Initialization -- C bindings
+;; 31c.el --- Emacs Initialization -- C bindings
 ;;; Commentary:
 ;;
 
@@ -101,9 +101,9 @@
 ;;; file-precious-flag: nil
 ;;; End:
 
-(provide '33c)
+(provide '31c)
 
-;;; 25go.el ends here
+;;; 31c.el ends here
 
 ;;;
 ;;; Local Variables:
