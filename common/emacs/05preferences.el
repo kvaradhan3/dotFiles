@@ -134,24 +134,14 @@
 ;;;
 ;;; I like vertical splits
 ;;;
-(setq split-height-threshold 100
-      split-width-threshold  100)
+;;; defaults:
+;; (setq split-height-threshold 80
+;;       split-width-threshold 160)
+;; (setq split-height-threshold 100
+;;      split-width-threshold  100)
 
 (use-package info
   :mode (("\\.info\\'"            . Info-mode)))
-
-
-;;;
-;;; Keybindings that we care about, as defaults
-;;;
-(define-key     ctl-x-map               [?\C-m] #'manual-entry)
-(define-key     ctl-x-map               [?\C-b] #'electric-buffer-list)
-
-(define-key     esc-map         [?`]            #'shell-command-on-buffer)
-(define-key     esc-map         [?%]            #'query-replace-regexp)
-(define-key     esc-map         [?\C-^]         #'replace-regexp)
-(define-key     esc-map         [?\C-g]         #'goto-line)
-;; (define-key  esc-map         [?\C-r]         #'isearch-backward-regexp)
 
 ;
 ;;; Local Variables:
