@@ -3,7 +3,28 @@ sso_session = dev-zpath-dev-sso
 sso_account_id = 966017130552
 sso_role_name = ET-Engineering
 region = us-west-2
+
 [sso-session dev-zpath-dev-sso]
 sso_start_url = https://d-9267024070.awsapps.com/start/#
 sso_region = us-west-2
 sso_registration_scopes = sso:account:access
+
+[profile dev]
+region = us-west-2
+output = json
+sso_start_url = https://d-9267024070.awsapps.com/start#/
+sso_region = us-west-2
+sso_account_id = 966017130552
+sso_role_name = ET-Engineering
+
+[profile dev2]
+region = us-west-2
+output = json
+sso_start_url = https://d-9267024070.awsapps.com/start#/
+sso_region = us-west-2
+sso_account_id = 405621762711
+sso_role_name = ET-Engineering
+
+[default]
+region = us-west-2
+
