@@ -51,8 +51,8 @@ flist_init
 
 setopt nonomatch
 for i in common "$(uname -s)" ; do
-    for j in "$i"/dot.* ; do
-	if [[ "$j" = "$i/dot.*" ]] ; then
+    for j in "$i"/dot* ; do
+	if [[ "$j" = "$i/dot*" ]] ; then
 	    continue
 	fi
 
@@ -75,8 +75,8 @@ for i in common "$(uname -s)" ; do
 	fi
     done
 
-    for j in "$i"/safeLink/dot.* ; do
-	if [[ "$j" = "$i/safeLink/dot.*" ]] ; then
+    for j in "$i"/safeLink/dot* ; do
+	if [[ "$j" = "$i/safeLink/dot*" ]] ; then
 	    continue
 	fi
 	find "$j" -type f | while read -r _src ; do
