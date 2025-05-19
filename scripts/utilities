@@ -12,7 +12,7 @@ flist_init() {
     local _DESTDIR=${1:=$DESTDIR}
     local _HERE=${2:-$HERE}
 
-    find "$_DESTDIR" -lname "$_HERE"\* | while read -r _x ; do
+    find "$_DESTDIR" -maxdepth 3 -type l -lname "$_HERE"\* | while read -r _x ; do
 	_FLIST+=( "$_x" )
     done
 }
@@ -67,6 +67,7 @@ uninstall() {
     else
         log --warn skip "$2"
     fi
+    flist_processed "$2"
 }
 
 log() {
