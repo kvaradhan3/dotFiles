@@ -1,0 +1,17 @@
+# include "$XDG_CONFIG_HOME/kanshi/$(uname -n).conf"
+
+output "LG Electronics LG HDR WQHD 0x0001E191" {
+  mode          3440x1440@49.987000
+  position      0,0
+  transform     normal
+  scale         0.8
+  adaptive_sync off
+  alias         $LG_EXTERNAL
+}
+
+profile external-monitor {
+  output $LG_EXTERNAL   enable
+
+  # eDP-1 "LG Display 0x04DA (eDP-1)"  Internal diplay on laptop
+  output eDP-1          disable
+}
