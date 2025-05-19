@@ -1,0 +1,32 @@
+kanshi >/dev/null 2>&1 &
+
+# Set background color.
+pkill swaybg
+swaybg -c '#040404'             \
+       -i "/home/kannan/Pictures/2017-06-09-assets-natgeotv.fnghub.com:POD:7871.jpg" \
+       -m fit                   \
+>/dev/null 2>&1 &
+
+
+# Launch a panel such as yambar or waybar.
+waybar >/dev/null 2>&1 &
+
+conky --config=$HOME/.config/conky/calendars.conky &
+conky --config=$HOME/.config/conky/sunrise-sunset.conky &
+conky --config=$HOME/.config/conky/sysPerf.conky &
+
+# Lock screen after 5 minutes; turn off display after another 5 minutes.
+#
+# Note that in the context of idle system power management, it is *NOT* a good
+# idea to turn off displays by 'disabling outputs' for example by
+# `wlr-randr --output <whatever> --off` because this re-arranges views
+# (since a837fef). Instead use a wlr-output-power-management client such as
+# https://git.sr.ht/~leon_plickat/wlopm
+swayidle -w                                             \
+	 timeout 300 'swaylock -e -f -c 000000'             \
+	 timeout 600 'wlopm --off \*'                       \
+	      resume 'wlopm --on \*'                        \
+	before-sleep 'swaylock -e -f -c 000000' >/dev/null 2>&1 &
+
+
+foot
