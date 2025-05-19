@@ -35,11 +35,61 @@ export DESTDIR HERE
 
 flist_init
 
-. ./common/configure
+(
+    local RCBASE="$HERE"/common
+    pushd common || { log --error Unexpected error, directory '`common'"'" not found, exiting; exit 1; }
+    printf '(defconst emacs-rc-dir "%s/emacs")\n' "$RCBASE" > dot.emacs-rc-dir.el
+    {
+	printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
+	# shellcheck disable=SC2016
+	printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+               "${RCBASE}/zshell"
+	printf 'setopt NO_NOMATCH;'
+    } > dot.zinit
+    popd  || { log --error Unexpected error, pop directory failed, exiting; exit 1; }
+)
 
-. ./"$(uname -s)"/configure
+setopt nonomatch
+for i in common "$(uname -s)" ; do
+    for j in "$i"/dot.* ; do
+	if [[ "$j" = "$i/dot.*" ]] ; then
+	    continue
+	fi
 
-. ./"$(uname -s)"/software-install
+	if [[ -f "$j" ]] ; then
+	    ${INSTALLOP} "$HERE"/"$j" "$DESTDIR"/"${j/$i\/dot/}"
+	else
+	    find "$j" -type f | while read -r _src ; do
+		local DESTBASE="${_src/$i\/dot/}"
+
+		# shellcheck disable=SC2155
+		local DESTLINK="$(dirname "${DESTBASE}")"
+
+		if prefix_is_done "$DESTLINK" ; then
+		    continue
+		fi
+
+		mkdir -p "$DESTDIR"/"$(dirname "${DESTLINK}")"
+		${INSTALLOP} "$(dirname "$HERE"/"${_src}")" "${DESTDIR}"/"${DESTLINK}"
+	    done
+	fi
+    done
+
+    for j in "$i"/safeLink/dot.* ; do
+	if [[ "$j" = "$i/safeLink/dot.*" ]] ; then
+	    continue
+	fi
+	find "$j" -type f | while read -r _src ; do
+	    local DESTBASE="${_src/$i\/safeLink\/dot/}"
+	    mkdir -p "$DESTDIR"/"$(dirname "${DESTBASE}")"
+	    ${INSTALLOP} "$HERE"/"${_src}" "${DESTDIR}"/"${DESTBASE}"
+	done
+    done
+
+    if [[ -x "$i/software-install" ]]; then
+    	. "$i/software-install"
+    fi
+done
 
 #
 # Protect the repo

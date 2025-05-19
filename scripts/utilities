@@ -38,6 +38,18 @@ flist_done() {
 #
 # Utilities to (un)install
 #
+local _PREFIXES=()
+prefix_is_done() {
+    _newLink=$1 ;shift
+    for _i in ${_PREFIXES} ; do
+	if [[ "${_newLink#${_i}}" != "${_newLink}" ]]; then
+	    return 0
+	fi
+    done
+    _PREFIXES+=( ${_newLink} )
+    return 1
+}
+
 install() {
     if flist_processed "$2" ; then
         if [[ "$(readlink "$2")" = "$1" ]]; then

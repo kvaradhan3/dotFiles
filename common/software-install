@@ -1,0 +1,23 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2296
+#
+
+local _DESTDIR=${DESTDIR:-$HOME}
+
+# shellcheck disable=SC2155
+local _HERE="$(cd "$(dirname "$0")" && pwd)"
+
+#
+# setup defaults initilization
+pushd "$_HERE" || { log --error Direcotry "$_HERE" not found; exit 1; }
+
+#
+# binaries
+#
+mkdir -p "$_DESTDIR"/bin
+for __i in "$_HERE"/bin/*
+do
+    ${INSTALLOP} "$__i" "$_DESTDIR"/bin/"$(basename "$__i")"
+done
+popd || { log --error Direcotry "$_HERE" not found; exit 1; }
