@@ -74,6 +74,7 @@ then
         ohmyzsh/ohmyzsh path:plugins/kubectl
 
         wting/autojump  path:bin/autojump.zsh
+        atuinsh/atuin
 
         zsh-users/zsh-completions
         zsh-users/zsh-autosuggestions
