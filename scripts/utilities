@@ -12,7 +12,7 @@ flist_init() {
     local _DESTDIR=${1:=$DESTDIR}
     local _HERE=${2:-$HERE}
 
-    find "$_DESTDIR" -maxdepth 3 -type l -lname "$_HERE"\* | while read -r _x ; do
+    find "$_DESTDIR" -maxdepth 5 -type l -lname "$_HERE"\* | while read -r _x ; do
 	_FLIST+=( "$_x" )
     done
 }
