@@ -1,0 +1,97 @@
+#! /bin/sh
+#
+PROGNAME=$(basename "$0")
+REGION=         # '+unitedstatesofamerica'
+#
+:
+# DEBUG=true
+KEEPIMG=true
+:
+DEBUG=${DEBUG:=false}
+KEEPIMG=${KEEPIMG:-$DEBUG}
+
+REDDIT_URL="https://www.reddit.com/r/EarthPorn${REGION}/.json?limit=50"
+REDDIT_UA="Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+NOW="$(date +%FT%T)"
+SAVE=/tmp/${PROGNAME}.out
+touch "$SAVE"
+
+OUTPUT=$(mktemp /tmp/"$PROGNAME"-XXXXXXXX)
+mv "${OUTPUT}" "${OUTPUT}.out"
+
+ERRORS="${OUTPUT}.err"
+OUTPUT="${OUTPUT}.out"
+
+RANSTR=$( dd if=/dev/urandom bs=4 count=1 2>&- | tr -d '\n' )
+RUNID0=$( echo -n "$RANSTR" | hexdump -e '1/4 "%X"' )
+RANSTR=$( echo -n "$RANSTR" | od -t u | head -1 | cut -d' ' -f2 )
+PICK50=$(( RANSTR % 5 ))
+
+exec 2>"$ERRORS"
+
+PREAMBLE="$(jq -n                                           \
+               --arg datetime "$(date +%FT%T)"              \
+               --arg runid    "$RUNID0"                     \
+               --arg output   "$OUTPUT"                     \
+               --arg errors   "$ERRORS"                     \
+               --arg pick     "$PICK50"                     \
+               '$ARGS.named')"
+
+set -x
+curl -v -s -H"user-agent: $REDDIT_UA" -o"$OUTPUT" "$REDDIT_URL"
+
+IMAGE_REF=$( jq --compact-output ".data.children[$PICK50].data" "$OUTPUT" )
+IMAGE_URL=$( jq -r .url <<<"$IMAGE_REF" )
+
+if [[ "${IMAGE_REF:=null}" == null ]]; then
+    cat "$SAVE"
+    printf "\n%s %s: invalid return (%s) from reddit, check %s\n"   \
+           "$(date +%FT%T)"                                         \
+           "$(basename "$0")"                                       \
+           "$(jq -r .error "$OUTPUT")"                              \
+           "$ERRORS"
+    jq -nrc                                             \
+       --argjson preamble "$PREAMBLE"                   \
+       --arg     error    "$ERRORS"                     \
+       --arg     status   "$(jq -r .error "$OUTPUT")"   \
+       '$ARGS.named'                                    \
+    >>/tmp/lastRun.txt
+    rm -f "$OUTPUT"
+    exit
+fi
+
+sleep 1
+IMAGES=/tmp/"$(basename "$IMAGE_URL")"
+if ! [ -f "$IMAGES" ] ; then
+    curl -v -s -A"$REDDIT_UA" -o"$IMAGES" "$IMAGE_URL"
+else
+    CACHED=" (cached)"
+fi
+
+TITLE="$(  jq -r .title           <<<"$IMAGE_REF" )"
+AUTHOR="$( jq -r .author          <<<"$IMAGE_REF" )"
+pkill swaybg
+swaybg --color '#040404' --image "$IMAGES" --mode  fit >/dev/null 2>&1 &
+
+printf "%10s: %s\n" Title  "$TITLE"
+printf "%10s: %s\n" Author "$AUTHOR"
+printf "%s" "$NOW"
+
+(
+  printf "%10s: %s\n" Title  "$TITLE"
+  printf "%10s: %s\n" Author "$AUTHOR"
+  printf "%s" "$NOW"
+) >"$SAVE"
+
+${DEBUG} || rm -f "$ERRORS" "$OUTPUT"
+
+jq -nrc                                         \
+   --argjson preamble "${PREAMBLE}"             \
+   --arg     title    "${TITLE}"                \
+   --arg     author   "${AUTHOR}"               \
+   --arg     image    "${IMAGES}${CACHED}"      \
+   --arg     url      "${IMAGE_URL}"            \
+   '$ARGS.named'                                \
+>>/tmp/lastRun.txt
+
+${KEEPIMG} || ( sleep 5 ; rm -f "$IMAGES" ) &

@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+
+<labwc_config>
+
+  <theme>
+    <name></name>
+    <cornerRadius>8</cornerRadius>
+    <font name="sans" size="10" />
+  </theme>
+
+  <keyboard>
+    <default />
+  </keyboard>
+
+  <mouse>
+    <default />
+  </mouse>
+
+  <!--
+      Desktop Settings.
+  -->
+  <desktops number="4" popupTime="500" prefix="ws" />
+  <keyboard>
+    <keybind key="W-A-Right"
+	     name.action="GoToDesktop"
+	     to.action="right"
+	     wrap.action="yes"
+	     />
+    <keybind key="W-A-Left"
+	     name.action="GoToDesktop"
+	     to.action="left"
+	     wrap.action="yes"
+	     />
+    <keybind key="W-1"
+	     name.action="GoToDesktop"
+	     to.action="ws 1"
+	     />
+    <keybind key="W-2"
+	     name.action="GoToDesktop"
+	     to.action="ws 2"
+	     />
+    <keybind key="W-3"
+	     name.action="GoToDesktop"
+	     to.action="ws 3"
+	     />
+    <keybind key="W-4"
+	     name.action="GoToDesktop"
+	     to.action="ws 4"
+	     />
+    <keybind key="W-Tab"
+	     name.action="GoToDesktop"
+	     to.action="last"
+	     />
+    <keybind key="C-W-A-Right"
+	     name.action="SendToDesktop"
+	     to.action="right"
+	     wrap.action="yes"
+	     />
+    <keybind key="C-W-A-Left"
+	     name.action="SendToDesktop"
+	     to.action="left"
+	     wrap.action="yes"
+	     />
+    <keybind key="C-W-1"
+	     name.action="SendToDesktop"
+	     to.action="ws 1"
+	     />
+    <keybind key="C-W-2"
+	     name.action="SendToDesktop"
+	     to.action="ws 2"
+	     />
+    <keybind key="C-W-3"
+	     name.action="SendToDesktop"
+	     to.action="ws 3"
+	     />
+    <keybind key="C-W-4"
+	     name.action="SendToDesktop"
+	     to.action="ws 4"
+	     />
+  </keyboard>
+
+  <!--
+      Keyboard bindings and settings.
+  -->
+  <keyboard>
+    <keybind key="W-Return"
+	     name.action="Execute"
+	     command.action="foot"
+	     />
+    <keybind key="Super_L" onRelease="yes"
+	     name.action="Execute"
+	     command.action="wofi --show drun"
+	     />
+    <keybind key="W-d"
+	     name.action="Exit"
+	     />
+  </keyboard>
+
+  <!--
+      Mouse Configuration
+  -->
+  <focus>
+    <followMouse>yes</followMouse>
+    <followMouseRequiresMovement>no</followMouseRequiresMovement>
+    <raiseOnFocus>no</raiseOnFocus>
+  </focus>
+
+  <mouse>
+    <context name="Root">
+      <mousebind button="Right" action="Press">
+        <action name="ShowMenu" menu="some-custom-menu" />
+      </mousebind>
+    </context>
+  </mouse>
+
+</labwc_config>
