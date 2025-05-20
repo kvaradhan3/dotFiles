@@ -1,0 +1,129 @@
+-- Conky, a system monitor https://github.com/brndnmtthws/conky
+--
+-- This configuration file is Lua code. You can write code in here, and it will
+-- execute when Conky loads. You can use it to generate your own advanced
+-- configurations.
+--
+-- Try this (remove the `--`):
+--
+--   print("Loading Conky config")
+--
+-- For more on Lua, see:
+-- https://www.lua.org/pil/contents.html
+
+conky.config = {
+
+	-- Various settings
+    --
+    background    = false,
+    double_buffer = true,
+    
+    -- Placement
+    --
+    alignment      = 'top_left',
+    gap_x          = 100,
+    gap_y          = 100,
+    minimum_height = 5,
+    minimum_width  = 500,
+    maximum_width  = 500,
+
+    -- Outputs
+    --
+    out_to_console = false,
+    out_to_ncurses = false,
+    out_to_stderr  = false,
+    out_to_x       = false,
+    out_to_wayland = true,
+    use_spacer = 'none',
+    use_xft = true,
+
+    -- Window Params
+    --
+    own_window             = true,
+    own_window_class       = 'Conky',
+    own_window_transparent = true,
+    own_window_argb_visual = true,
+    own_window_type = 'desktop',
+    draw_borders = false,
+    border_width = 1,
+    stippled_borders = 0,
+    draw_outline = false,
+    draw_shades = false,
+
+    -- Sampling
+    --
+    cpu_avg_samples = 2,
+    net_avg_samples = 2,
+    update_interval = 1.0,
+
+    -- Fonts and Colors
+    --
+    font          = 'DejaVu Sans Mono:size=12',
+    default_color = 'blue',
+    default_outline_color = 'white',
+    default_shade_color   = 'white',
+
+    -- For timestamp, date +%T          orangish, biggish
+    color1 = '339966',
+    font1  = 'Noto Sans Mono:size=30',
+
+    -- calendar heading: date +%B\ %Y
+    font2  = 'Noto Sans Mono:size=22',                       -- hugefont
+    color2 = '0077FF',
+
+    -- highlight today's date,          bold yellow
+    color3 = 'yellow',
+    font3  = 'Noto Sans Mono:style=Bold:size=16',
+
+    -- reduce intensity on week numbe display
+    color4 = '0066CC',
+    font4  = 'Noto Sans Mono:size=16',
+
+    -- explicit defaults
+    color9 = '1177FF',
+    font9  = 'Noto Sans Mono:size=16',
+
+    -- Graph Settings
+    --
+    no_buffers = true,
+    draw_graph_borders = true,
+    show_graph_range = false,
+    show_graph_scale = false,
+    extra_newline = false,
+    uppercase = false,
+}
+
+-- swap
+-- load
+-- top 10
+-- cpu stats
+-- external ping
+-- network util
+
+-- bssid
+-- sorted signal strength
+-- swap
+-- smem top 10 output
+--
+conky.text = [[
+${color grey}Info:$color ${scroll 32 Conky $conky_version - $sysname $nodename $kernel $machine}
+$hr
+${color grey}Uptime:$color $uptime
+${color grey}Frequency (in MHz):$color $freq
+${color grey}Frequency (in GHz):$color $freq_g
+${color grey}RAM Usage:$color $mem/$memmax - $memperc% ${membar 4}
+${color grey}Swap Usage:$color $swap/$swapmax - $swapperc% ${swapbar 4}
+${color grey}CPU Usage:$color $cpu% ${cpubar 4}
+${color grey}Processes:$color $processes  ${color grey}Running:$color $running_processes
+$hr
+${color grey}File systems:
+ / $color${fs_used /}/${fs_size /} ${fs_bar 6 /}
+${color grey}Networking:
+Up:$color ${upspeed} ${color grey} - Down:$color ${downspeed}
+$hr
+${color grey}Name              PID     CPU%   MEM%
+${color lightgrey} ${top name 1} ${top pid 1} ${top cpu 1} ${top mem 1}
+${color lightgrey} ${top name 2} ${top pid 2} ${top cpu 2} ${top mem 2}
+${color lightgrey} ${top name 3} ${top pid 3} ${top cpu 3} ${top mem 3}
+${color lightgrey} ${top name 4} ${top pid 4} ${top cpu 4} ${top mem 4}
+]]

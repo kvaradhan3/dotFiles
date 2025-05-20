@@ -1,0 +1,89 @@
+-- Conky, a system monitor https://github.com/brndnmtthws/conky
+--
+-- This configuration file is Lua code. You can write code in here, and it will
+-- execute when Conky loads. You can use it to generate your own advanced
+-- configurations.
+--
+-- Try this (remove the `--`):
+--
+--   print("Loading Conky config")
+--
+-- For more on Lua, see:
+-- https://www.lua.org/pil/contents.html
+
+--
+-- THese should become lua driven configs.
+--
+conky.config = {
+
+	-- Various settings
+    --
+    background    = false,
+    double_buffer = true,
+    
+    -- Placement
+    --
+    alignment      = 'bottom_left',
+    minimum_height = 100,
+    minimum_width  = 1000,
+    maximum_width  = 1000,
+
+    -- Outputs
+    --
+    out_to_console = false,
+    out_to_ncurses = false,
+    out_to_stderr  = false,
+    out_to_x       = false,
+    out_to_wayland = true,
+    use_spacer     = 'none',
+    use_xft        = true,
+
+    -- Window Params
+    --
+    own_window              = true,
+    own_window_class        = 'Conky',
+    own_window_transparent  = true,
+    own_window_argb_visual  = true,
+    own_window_type         = 'desktop',
+    draw_borders            = false,
+    border_width            = 1,
+    stippled_borders        = 0,
+    draw_outline            = false,
+    draw_shades             = false,
+
+    -- Sampling
+    --
+    update_interval = 900,
+
+    -- Fonts and Colors
+    --
+    default_color         = '0077FF',   -- cyanish
+    default_outline_color = 'white',
+    default_shade_color   = 'white',
+
+    font1  = 'Noto Sans Mono:style=Bold:size=18',
+    color1 = 'blue',
+    font2  = 'Noto Sans Mono:size=10',
+    color2 = 'yellow',
+
+    color3 = 'grey',
+    color4 = 'yellow',
+    color5 = 'orange',
+
+    -- Graph Settings
+    --
+    gap_x               = 15,
+    gap_y               = 15,
+    no_buffers          = true,
+    draw_graph_borders  = true,
+    show_graph_range    = false,
+    show_graph_scale    = false,
+    extra_newline       = false,
+    uppercase           = false,
+}
+
+
+conky.text = [[
+${font1}${color1}${execpi 900 $HOME/bin/weather}
+${font2}${color2}${execpi 900 $HOME/bin/swbg}
+]]
