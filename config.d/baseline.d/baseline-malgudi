@@ -1,7 +1,0 @@
-#! /bin/sh -x
-
-# other
-pac_install postgresql
-
-aur_install paperless-ngx
-pac_install paperless-ngx

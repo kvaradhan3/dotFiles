@@ -15,7 +15,7 @@ exit
 # 
 #    % paclist AUR
 #
-
+if false; then
 awk '{print $1}' << AURLIST | xargs aur sync --no-view --no-confirm --reset
     1password-beta 8.10.26_11.BETA-11
     1password-cli 2.24.0-2
@@ -155,6 +155,7 @@ sudo systemctl enable docker.service
 sudo usermod --append		        \
              --groups docker		\
 	     "$USER"
+fi
 
 # pac_install kubeadm
 ##
@@ -205,11 +206,4 @@ if false; then
   aur_install paperless-ngx
 fi
 
-pwd
-if [[ -f ./$(uname -s)/software-install-$(uname -n) ]]
-then
-    # shellcheck disable=SC1090
-    source ./"$(uname -s)"/"software-install-$(uname -n)"
-fi
-
-sudo pacman -Syu --noconfirm --needed
+# sudo pacman -Syu --noconfirm --needed
