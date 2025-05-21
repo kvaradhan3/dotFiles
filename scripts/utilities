@@ -29,10 +29,8 @@ flist_processed() {
 }
 
 flist_done() {
-    for _i in "${_FLIST[@]}"
-    do
-	rm "${_i}"
-    done
+    local arr=$1; shift
+    eval $arr'=("${_FLIST[@]}")'
 }
 
 #

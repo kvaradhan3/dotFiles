@@ -10,5 +10,3 @@ if [[ -f ./$(uname -s)/Brewfile ]] ; then
     brew bundle install
     popd || { log --error Directory "$(uname -s)" not found; exit 1; }
 fi
-
-exit

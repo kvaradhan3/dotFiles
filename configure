@@ -96,4 +96,6 @@ done
 #
 pre-commit install --install-hooks
 
-flist_done
+list_remaining=()
+flist_done list_remaining
+rm -f "${list_remaining[@]}"

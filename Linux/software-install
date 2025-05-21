@@ -8,7 +8,6 @@ set -eu
 aur repo -l | aur vercmp
 checkupdates
 
-exit
 #
 #
 # fetch/upgrade aurutils.   This list is generated using:
