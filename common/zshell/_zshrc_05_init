@@ -10,6 +10,7 @@
 #
 
 typeset -F SECONDS
+local TIMINGS=()
 
 prtiming() {
     #
@@ -31,8 +32,42 @@ prtiming() {
     e="$3"
     e="${e:-$SECONDS}"
     if [ -t 0 ] ; then
-        print -f ": %25s\t%8.6f -- %8.6f\t%8.6f\n" "$1" "$2" "$e" $(( e - $2))
+        print -f ": %25s\t%8.6f -- %8.6f\t%8.6f\n"  "$1" "$2" "$e" $(( e - $2))
     fi
+    TIMINGS+=( "$1 $2 $e $(( e - $2 ))" )
+}
+
+plot() {
+    local DATA
+    clean() { true; }
+    if [[ -f "$1" ]]; then
+        DATA="$1"
+    elif [[ -f "$HOME/data" ]]; then
+        DATA="$HOME/data"
+    else
+        local __i
+        DATA="$HOME/data"
+        for __i in "${TIMINGS[@]}" ; do
+            echo $__i
+        done > "$DATA"
+        cleanup() { rm "$DATA" ; }
+    fi
+
+    gnuplot <<EOF
+set terminal qt 0 font "SF Mono,12" noenhanced
+unset key
+set xrange [-0.1:]
+unset ytics
+set yzeroaxis
+set yrange [-1:]
+set style arrow 2 nohead linecolor rgb "#56b4e9" linewidth 5 dashtype solid size screen 0.020,15.000,90.000 fixed
+set multiplot
+plot '$DATA' using (column(2)):(column(0)):(column(3)-column(2)):(0.0):yticlabel(1) with vector as 2
+plot '$DATA' using (column(2)):(column(0)):1  with labels right offset -1
+pause mouse
+EOF
+
+    cleanup
 }
 
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"

@@ -9,9 +9,10 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-# zmodload zsh/zprof
-# zprof -c
+zmodload zsh/zprof
+zprof -c
 autoload -Uz compinit
+local ___START=$SECONDS
 # From https://gist.github.com/ctechols/ca1035271ad134841284#gistcomment-2308206
 # shellcheck disable=SC1072,SC1073
 () {
@@ -25,6 +26,7 @@ autoload -Uz compinit
       zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   fi
 } ${ZDOTDIR:-$HOME}/.zcompdump.zwc(N.mh+24)
+prtiming ">_zcompdump" $___START
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 for _25i in /usr/local/opt/antidote                    \
@@ -64,6 +66,7 @@ then
 
         ohmyzsh/ohmyzsh path:plugins/git
         ohmyzsh/ohmyzsh path:plugins/brew
+	ohmyzsh/ohmyzsh path:plugins/gh
         # ohmyzsh/ohmyzsh path:plugins/aws
         # ohmyzsh/ohmyzsh path:plugins/gcloud
         ohmyzsh/ohmyzsh path:plugins/tmux
@@ -94,20 +97,19 @@ then
 PLUGINS_LIST
 fi
 
+_START="$SECONDS"
 
 #shellcheck source=/Users/kvaradhan/.zsh_plugins.zsh
 source ~/.zsh_plugins.zsh
+prtiming " >_s_plugins"	"$_START"
 
+_START="$SECONDS"
 # shellcheck source=/Users/kvaradhan/.gitsy.zsh-theme
 # source "${0:h}"/themes/gitsy.zsh-theme
 source "${0:h}"/themes/pure.zsh-theme
-
-#
-# completions
-#
-eval "$(gh completion -s zsh)"
+prtiming " >_s_pure"	"$_START"
 
 # shellcheck disable=SC2034
 COMPLETION_WAITING_DOTS="true" # used in lib/completion.zsh
-# zprof
-# zmodload -ui zsh/zprof
+zprof
+zmodload -ui zsh/zprof
