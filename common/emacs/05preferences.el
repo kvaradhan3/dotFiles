@@ -83,8 +83,12 @@
   ;; (powerline-nano-theme)
   )
 
-(use-package eclipse-theme)
-(require 'eclipse-theme)
+;; (use-package eclipse-theme)
+;; (require 'eclipse-theme)
+
+(use-package ahungry-theme
+  :config
+  (load-theme 'ahungry t))
 
 
 ;;;
