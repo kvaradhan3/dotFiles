@@ -19,7 +19,8 @@
               (c-add-style "k&r-plus" c-k&r-plus t)))
 
   :hook
-  ((c-mode-common      .       cscope-setup))
+  ((c-mode-common      .       cscope-setup)
+   (c-mode-common      .       hs-minor-mode))
 )
 
 
