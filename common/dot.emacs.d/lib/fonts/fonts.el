@@ -45,6 +45,8 @@
     (apple-menlo-16     . (fonts-get-font-name "Menlo"            16))
     (monaco-16          . (fonts-get-font-name "Monaco"           16))
     (sfmono-18          . (fonts-get-font-name "SF Mono"          18))
+    (sauce-11		. (fonts-get-font-name "SauceCodePro NFM Light" 11))
+    (hacknerd-11	. (fonts-get-font-name "Hack Nerd Font Mono"  10))
     ))
 (defvar fonts-expansion
   '((source-code	. "Source Code Pro")
