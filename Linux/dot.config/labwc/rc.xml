@@ -87,10 +87,13 @@
 	     name.action="Execute"
 	     command.action="foot"
 	     />
-    <keybind key="Super_L" onRelease="yes"
-	     name.action="Execute"
-	     command.action="wofi --show drun"
-	     />
+
+    <keybind key="Super_L" onRelease="yes">
+      <action name="Execute">
+	<command>sh -c 'pkill wofi || wofi --show drun'</command>
+      </action>
+    </keybind>
+
     <keybind key="W-d"
 	     name.action="Exit"
 	     />
