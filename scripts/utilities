@@ -29,8 +29,9 @@ flist_processed() {
 }
 
 flist_done() {
-    local arr=$1; shift
-    eval $arr'=("${_FLIST[@]}")'
+    # stackexchange questions/535118
+    set -A "${1:-reply}" "${_FLIST[@]}"
+    _FLIST=()
 }
 
 #

@@ -96,6 +96,14 @@ done
 #
 pre-commit install --install-hooks
 
-list_remaining=()
-flist_done list_remaining
-rm -f "${list_remaining[@]}"
+local stale_remaining=()
+local __f
+
+flist_done stale_remaining
+
+# shellcheck disable=SC2068
+for __f in in ${stale_remaining[@]} ; do
+    log --info remove stale file "${__f}" point to "$(readlink "${__f}")"
+done
+
+rm -f "${stale_remaining[@]}"
