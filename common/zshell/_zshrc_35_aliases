@@ -50,3 +50,12 @@ alias -g del=delete
 #
 alias kl='kubectl logs -f'
 alias kls='kubectl -n kube-system logs -f'
+
+
+gal() {
+    git aliases
+    for i in "$@" ; do
+        echo "--"
+        alias | grep -E "git $i|forgit::.*$i"
+    done
+}
