@@ -22,6 +22,7 @@
 	  ("M-<f2>"    . cscope-pop-mark)
 	  ("C-<f3>"    . cscope-find-this-symbol)
 	  ("M-<f3>"    . cscope-find-this-symbol)
+      ("C-S-<f6>"  . cscope-find-functions-calling-this-function)
 	  ("C-<f12>"   . cscope-display-buffer-toggle)
 	  ("M-<f12>"   . cscope-display-buffer-toggle)
 	  ("C-<f8>"    . cscope-history-backward-line)

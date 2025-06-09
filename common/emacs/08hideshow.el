@@ -63,10 +63,12 @@
      (run-hooks 'hs-hide-hook)))
 
   (let ((custom-keyvals
-	 '(("C-M-<left>"    . hs-hide-level)
+	 '(("C-M-<left>"    . hs-hide-block)
 	   ("C-M-<right>"   . hs-show-block)
-	   ("C-M-S-<left>" . hs-hide-all)
-	   ("C-M-S-<right>"  . hs-show-all)
+	   ("C-M-S-<left>"  . hs-hide-all)
+	   ("C-M-S-<right>" . hs-show-all)
+	   ("s-<down>"      . hs-hide-level)
+	   ("C-s-<down>"    . hs-hide-level-recursive)
 	   ("C-+"	    . toggle-hiding)
 	   ("C-="	    . toggle-selective-display)
 	   ("C-M-s-l"       . hs-hide-leafs)))
