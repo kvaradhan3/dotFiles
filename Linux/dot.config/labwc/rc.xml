@@ -97,6 +97,15 @@
     <keybind key="W-d"
 	     name.action="Exit"
 	     />
+
+    <keybind key="W-Minus"
+	     name.action="ToggleShade"
+	     />
+
+    <keybind key="W-="
+	     name.action="Iconify"
+	     />
+
   </keyboard>
 
   <!--
