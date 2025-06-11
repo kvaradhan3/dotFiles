@@ -75,6 +75,11 @@ update: (output, domEl) ->
     $domEl.find('div').addClass 'old'
     $div = $('<div class="container" />')
     $div.css 'background-image', 'url("' + img.src + '")'
+    $div.css 'background-size', 'contain'
+    $div.css 'background-repeat', 'no-repeat'
+    $div.css 'background-position', 'center'
+    $div.css 'background-color', '#010307'
+
     $div.css 'display', 'none'
     $div.fadeIn 'slow', ->
       $domEl.find('div.old').remove()
