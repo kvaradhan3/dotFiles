@@ -8,6 +8,8 @@
     <font name="sans" size="10" />
   </theme>
 
+  <placement policy="automatic" />
+
   <keyboard>
     <default />
   </keyboard>
