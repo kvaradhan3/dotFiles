@@ -90,13 +90,22 @@
 
     <keybind key="Super_L" onRelease="yes">
       <action name="Execute">
-	<command>sh -c 'pkill wofi || wofi --show drun'</command>
+        <command>sh -c 'pkill wofi || wofi --show drun'</command>
       </action>
     </keybind>
 
     <keybind key="W-d"
 	     name.action="Exit"
 	     />
+
+    <keybind key="W-Minus"
+	     name.action="ToggleShade"
+	     />
+
+    <keybind key="W-="
+	     name.action="Iconify"
+	     />
+
   </keyboard>
 
   <!--
