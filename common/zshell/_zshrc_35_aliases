@@ -50,3 +50,27 @@ alias -g del=delete
 #
 alias kl='kubectl logs -f'
 alias kls='kubectl -n kube-system logs -f'
+
+gal() {
+    if [[ "$1" = '-h' ]] ; then
+	echo "gal: print aliases set for a specific git operation" >&1
+	return
+    fi
+    printf '#\n# git config --get-regexp "^alias\."\n#\n'
+    git config --get-regexp '^alias\.'  | grep "${1:-.}" | \
+        sed -e 's/^alias\.\([[:alpha:]][[:alpha:]]*\)[[:space:]][[:space:]]*/\1\t/'
+
+    printf '\n#\n# zshell git plugins\n#\n'
+    alias | grep "git ${1:-.}"
+
+    printf '\n#\n# zshell fuzzy plugins\n#\n'
+    alias | grep "forgit::${1:-.}"
+}
+
+grfu() {
+    if [[ "$1" = '-h' ]] ; then
+	echo "grfu: apply fixup to previous commits" >&2
+	return
+    fi
+    git rebase --interactive --autosquash --autostash ${1:-HEAD}~1
+}
