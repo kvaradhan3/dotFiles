@@ -7,7 +7,9 @@ ALIGN: TOP
 
 ORDER:
   - 'Acer Technologies B277 E 331604C5B3W01'
+  - 'LG Electronics LG HDR WQHD 0x0001E191'
   - 'BOE 0x0928'
+  - 'LG Display 0x04DA'
 
 
 SCALING: TRUE
@@ -17,9 +19,11 @@ AUTO_SCALE_MIN: 1.0
 
 SCALE:
   - NAME_DESC: 'Acer Technologies B277 E 331604C5B3W01'
-    SCALE: 0.7
+    SCALE: 0.75
+  - NAME_DESC: 'LG Electronics LG HDR WQHD 0x0001E191'
+    SCALE: 0.75
   - NAME_DESC: 'BOE 0x0928'
-    SCALE: 0.8
+    SCALE: 0.75
 
 ## Override the preferred mode.
 ## WARNING: this may result in an unusable display. See https://github.com/alex-courtis/way-displays#known-issues-with-workarounds
