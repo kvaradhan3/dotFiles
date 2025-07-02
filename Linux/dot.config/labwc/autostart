@@ -1,4 +1,4 @@
-kanshi >/dev/null 2>&1 &
+way-displays >/dev/null 2>&1 &
 
 # Set background color.
 pkill swaybg
