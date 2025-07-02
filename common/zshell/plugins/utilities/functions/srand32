@@ -1,0 +1,44 @@
+#! /bin/zsh
+
+emulate -L zsh
+
+# Returns a random 32-bit number.
+# If /dev/urandom is cryptographically secure, so is srand32.
+#
+# If zsh is compiled with 64-bit number support, the result
+# is non-negative. Otherwise it may be negative and the value
+# is governed by the rules of unsigned-to-signed conversion in C.
+#
+# Examples:
+#
+#   % print -r -- $(( srand32() ))
+#   263510467
+#
+#   % local -i x='srand32()'
+#   % typeset -p x
+#   typeset -i x=858148951
+#
+# Performance: ~30us per call.
+#
+#   % time ( repeat 1000000 srand32 )
+#   user=19.95s system=6.95s cpu=99% total=26.934
+#
+#   % uname -srm
+#   Linux 5.4.0-58-generic x86_64
+#
+#   % grep 'model name' /proc/cpuinfo | head -1
+#   model name      : AMD Ryzen 7 3700X 8-Core Processor
+
+function srand32() {
+  emulate -L zsh -o no_multi_byte
+  local bytes
+  while (( $#bytes < 4 )); do
+    sysread -s$((4-$#bytes)) 'bytes[$#bytes+1]' </dev/urandom || return
+  done
+  local b1=$bytes[1] b2=$bytes[2] b3=$bytes[3] b4=$bytes[4]
+  return '#b1 << 24 | #b2 << 16 | #b3 << 8 | #b4'
+}
+functions -M srand32 0 0
+zmodload zsh/system
+
+srand32
