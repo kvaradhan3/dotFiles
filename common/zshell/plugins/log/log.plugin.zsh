@@ -11,7 +11,7 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-if [[ ${zsh_loaded_plugins[-1]} != */batteryCharge ]] && \
+if [[ ${zsh_loaded_plugins[-1]} != */log ]] && \
        [[ -z ${fpath[(r)${0:h}/functions]} ]]
 then
     fpath+=( "${0:h}/functions" )
@@ -24,5 +24,3 @@ autoload -Uz error
 autoload -Uz info
 autoload -Uz log
 autoload -Uz usage
-
-autoload -Uz srand32
