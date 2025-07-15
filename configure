@@ -37,14 +37,29 @@ flist_init
 
 (
     local RCBASE="$HERE"/common
+    local AUTOTAG=()
+    AUTOTAG+=(
+      "Auto-generated on $(date) by $USER"
+      "               running $(basename "$0") in $(pwd)"
+      "               git-sha $(git rev-parse --short HEAD)"
+      ""
+    )
+
     pushd common || { log --error Unexpected error, directory '`common'"'" not found, exiting; exit 1; }
-    printf '(defconst emacs-rc-dir "%s/emacs")\n' "$RCBASE" > dot.emacs-rc-dir.el
     {
-	printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
-	# shellcheck disable=SC2016
-	printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
+        # shellcheck disable=SC2027,SC2086
+        print  " ;;;\n" ";;; "${^AUTOTAG}"\n"
+        printf '(defconst emacs-rc-dir "%s/emacs")\n' "$RCBASE"
+    } > dot.emacs-rc-dir.el
+
+    {
+        # shellcheck disable=SC2027,SC2086
+        print  " ###\n" "# "${^AUTOTAG}"\n"
+        printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
+        # shellcheck disable=SC2016
+        printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
                "${RCBASE}/zshell"
-	printf 'setopt NO_NOMATCH;'
+        printf 'setopt NO_NOMATCH;'
     } > dot.zinit
     popd  || { log --error Unexpected error, pop directory failed, exiting; exit 1; }
 )
