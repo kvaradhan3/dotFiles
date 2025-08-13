@@ -49,7 +49,7 @@ flist_init
     {
         # shellcheck disable=SC2027,SC2086
         print  " ;;;\n" ";;; "${^AUTOTAG}"\n"
-        printf '(defconst emacs-rc-dir "%s/emacs")\n' "$RCBASE"
+        printf '(defconst emacs-rc-dir "%s/dot.emacs.d/lib/init")\n' "$RCBASE"
     } > dot.emacs-rc-dir.el
 
     {
