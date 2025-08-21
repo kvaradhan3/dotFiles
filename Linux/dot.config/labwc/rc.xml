@@ -96,6 +96,47 @@
       </action>
     </keybind>
 
+    <keybind key="Super_R" onRelease="yes">
+      <action name="Execute">
+        <command>sh -c 'pkill wofi || wofi --show drun'</command>
+      </action>
+    </keybind>
+
+    <keybind key="W-F4">
+      <action name="Execute">
+        <command>
+          sh -c 'grim
+                   -g "$(slurp)"
+                   "$(xdg-user-dir)/Pictures/screenshot-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
+        </command>
+      </action>
+    </keybind>
+
+    <keybind key="S-W-F4">
+      <action name="Execute">
+        <command>
+          sh -c 'grim
+                   "$(xdg-user-dir)/Pictures/desktop-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
+        </command>
+      </action>
+    </keybind>
+
+    <keybind key="C-W-F4">
+      <action name="Execute">
+        <command>
+          sh -c 'grim -g "$(slurp)" - |  wl-copy'
+        </command>
+      </action>
+    </keybind>
+
+    <keybind key="S-C-W-F4">
+      <action name="Execute">
+        <command>
+          sh -c 'grim - | wl-copy'
+        </command>
+      </action>
+    </keybind>
+
     <keybind key="W-d"
 	     name.action="Exit"
 	     />
