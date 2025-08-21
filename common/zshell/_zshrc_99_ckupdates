@@ -6,6 +6,7 @@ case "$(uname -rv | tr '[:upper:]' '[:lower:]')" in
         export AUR_PACMAN_AUTH="sudo --askpass"
         export AUR_PAGER=ranger
         export AUR_REPO=AUR
+        ;;
 esac
 
 # shellcheck disable=SC1072,SC1073
