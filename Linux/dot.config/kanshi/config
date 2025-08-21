@@ -9,9 +9,48 @@ output "LG Electronics LG HDR WQHD 0x0001E191" {
   alias         $LG_EXTERNAL
 }
 
-profile external-monitor {
+output "Acer Technologies B277 E 331604C5B3W01" {
+  mode         1920x1080@60.000000
+  position     0,0
+  transform    normal
+  scale        0.75
+  adaptive_sync off
+  alias         $ACER_EXTERNAL
+}
+
+output "BOE 0x0928" {
+  mode       1920x1080@60.00000000
+  position   1920,0
+  scale      1.0
+  adaptive_sync off
+  alias      $IDK_INTERNAL
+}
+
+output eDP-1 {
+  mode       1920x1080@60.00000000
+  position   2745,0
+  scale      0.8
+  adaptive_sync off
+  alias      $IDK2_INTERNAL
+}
+
+
+profile external-lg-monitor {
   output $LG_EXTERNAL   enable
 
   # eDP-1 "LG Display 0x04DA (eDP-1)"  Internal diplay on laptop
   output eDP-1          disable
 }
+
+profile external-acer-idk-combo-2 {
+  output $ACER_EXTERNAL enable
+  output $IDK2_INTERNAL enable
+}
+
+
+profile external-acer-idk-combo {
+  output $ACER_EXTERNAL enable
+  output eDP-1          enable
+  # output $IDK_INTERNAL  enable
+}
+

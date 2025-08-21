@@ -8,13 +8,14 @@ ALIGN: TOP
 ORDER:
   - 'Acer Technologies B277 E 331604C5B3W01'
   - 'LG Electronics LG HDR WQHD 0x0001E191'
+  - 'Panasonic Industry Company PANASONIC-TV 0x19040271'
   - 'BOE 0x0928'
   - 'LG Display 0x04DA'
 
 
 SCALING: TRUE
 AUTO_SCALE: TRUE
-AUTO_SCALE_MIN: 1.0
+AUTO_SCALE_MIN: 0.5
 # AUTO_SCALE_MAX: 2.0
 
 SCALE:
@@ -22,27 +23,19 @@ SCALE:
     SCALE: 0.75
   - NAME_DESC: 'LG Electronics LG HDR WQHD 0x0001E191'
     SCALE: 0.75
-  - NAME_DESC: 'BOE 0x0928'
+  - NAME_DESC: 'LG Display 0x04DA'
     SCALE: 0.75
+  - NAME_DESC: 'BOE 0x0928'
+    SCALE: 1.00
 
 ## Override the preferred mode.
 ## WARNING: this may result in an unusable display. See https://github.com/alex-courtis/way-displays#known-issues-with-workarounds
 ## for a possible workaround.
 # MODE:
-#   # Resolution and refresh
-#   - NAME_DESC: HDMI-A-1
+#   - NAME_DESC: 'Panasonic Industry Company PANASONIC-TV 0x19040271'
 #     WIDTH: 1920
 #     HEIGHT: 1080
 #     HZ: 60
-#
-#   # Resolution with highest refresh
-#   - NAME_DESC: 'monitor description'
-#     WIDTH: 2560
-#     HEIGHT: 1440
-#
-#   # Highest available
-#   - NAME_DESC: DP-2
-#     MAX: TRUE
 
 ## Rotate or translate the display.
 ## 90, 180, 270, FLIPPED, FLIPPED-90, FLIPPED-180, FLIPPED-270
@@ -51,9 +44,9 @@ SCALE:
 #     TRANSFORM: 270
 
 ## VRR / adaptive sync is enabled by default. Disable it per display.
-# VRR_OFF:
-#   - DP-2
-#   - '!.*my monitor.*'
+VRR_OFF:
+  - 'Acer Technologies B277 E 331604C5B3W01'
+  - 'BOE 0x0928'
 
 
 ## Sets a /bin/sh command to be executed following most events.
