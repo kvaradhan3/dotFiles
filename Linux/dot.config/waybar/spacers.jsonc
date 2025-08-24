@@ -1,0 +1,141 @@
+
+/*
+ * https://www.nerdfonts.com/cheat-sheet
+ *
+ * ^v u E0B0          nf-pl-left_hard_divider
+ * ^v u E0B1          nf-pl-left_soft_divider
+ * ^v u E0B2          nf-pl-right_hard_divider
+ * ^v u E0B3          nf-pl-right_soft_divider
+ * ^v u E0d7          nf-pl-left_hard_divider_inverse  @18pt
+ * ^v u E0d6          nf-pl-right_hard_divider_inverse @18pt
+ */
+{
+    // modules-left
+    "custom/workspaces-left": {
+        "format": "",
+        "tooptip": false
+    },
+
+    "custom/workspaces-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/taskbar-left": {
+        "format": "",
+            "tooptip": false
+        },
+
+        "custom/taskbar-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    // modules-right
+    "custom/sound-left": {
+        "format": "",
+        "Tooltip": false
+    },
+
+    "custom/sound-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/network-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/network-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/memory-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/memory-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/cpu-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/cpu-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/temperature-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/temperature-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/battery-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/battery-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/language-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/language-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/clockdate-left": {
+        "format": "",
+        "tooptip":false
+    },
+
+    "custom/clockdate-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/clocktime-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/clocktime-right": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/idle-inhibitor-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/idle-inhibitor-right": {
+        "format": " ",
+        "tooltip": false
+    }
+}
+
+// Local Variables:
+// mode: jsonc
+// tab-width: 2
+// End:
+
+// vi:ft=jsonc

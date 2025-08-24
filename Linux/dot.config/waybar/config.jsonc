@@ -1,0 +1,65 @@
+{
+    "layer": "top",
+    "position": "top",
+
+    "modules-left": [
+        "custom/workspaces-left",
+        "ext/workspaces",
+        "custom/workspaces-right",
+
+        "custom/taskbar-left",
+        "wlr/taskbar",
+        "custom/taskbar-right"
+    ],
+
+    "modules-right": [
+        "custom/sound-left",
+        "pulseaudio",
+        "custom/sound-right",
+
+        "custom/network-left",
+        "network",
+        "custom/network-right",
+
+        "custom/memory-left",
+        "memory",
+        "custom/memory-right",
+
+        "custom/cpu-left",
+        "cpu",
+        "custom/cpu-right",
+
+        "custom/temperature-left",
+        "temperature",
+        "custom/temperature-right",
+
+        "custom/battery-left",
+        "battery",
+        "custom/battery-right",
+
+        "custom/clockdate-left",
+        "tray",
+        "clock#date",
+        "custom/clockdate-right",
+
+        "custom/clocktime-left",
+        "clock#time",
+        "custom/clocktime-right",
+        "custom/idle-inhibitor-left",
+        "idle_inhibitor",
+        "custom/idle-inhibitor-right"
+    ],
+
+    "include": [
+        "~/.config/waybar/modules.jsonc",
+        "~/.config/waybar/spacers.jsonc",
+    ]
+
+}
+
+// Local Variables:
+// mode: jsonc
+// tab-width: 2
+// End:
+
+// vi:ft=jsonc

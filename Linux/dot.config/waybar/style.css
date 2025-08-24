@@ -45,6 +45,11 @@
 @define-color battery   @aqua;
 @define-color date      @black;
 @define-color time      @white;
+@define-color wkspaces  @brblue;
+@define-color taskbar   @braqua;
+@define-color idle      @time;
+
+@define-color spacer    transparent;
 
 /* Reset all styles */
 * {
@@ -74,7 +79,6 @@
 #cpu,
 #language,
 #memory,
-#mode,
 #network,
 #pulseaudio,
 #temperature,
@@ -89,7 +93,6 @@
 }
 
 /* Each critical module */
-#mode,
 #memory.critical,
 #cpu.critical,
 #temperature.critical,
@@ -112,19 +115,13 @@
 
 /* And now modules themselves in their respective order */
 
-/* Current sway mode (resize etc) */
-#mode {
-    color: @white;
-    background: @mode;
-}
-
 /* Workspaces stuff */
 #workspaces button {
     font-weight: bold;
     padding-left: 5pt;
     padding-right: 5pt;
-    color: @white;
-    background: @unfocused;
+    color: @black;
+    background: @wkspaces;
 }
 
 /* Inactive (on unfocused output) */
@@ -151,9 +148,16 @@
     color: @white;
 }
 
-#window {
-    margin-right: 35pt;
-    margin-left: 35pt;
+#ext-workspaces {
+    background: @wkspaces;
+    padding-left: 8pt;
+    padding-right: 8pt;
+}
+
+#taskbar {
+    background: @taskbar;
+    padding-left: 8pt;
+    padding-right: 8pt;
 }
 
 #pulseaudio {
@@ -176,23 +180,8 @@
     color: @white;
 }
 
-#idle_inhibitor {
-    background: @time;
-    color: @black;
-}
-
-#idle_inhibitor.activated {
-    background: @time;
-    color: @red;
-}
-
 #temperature {
     background: @temp;
-    color: @black;
-}
-
-#language {
-    background: @layout;
     color: @black;
 }
 
@@ -215,82 +204,212 @@
     color: @black;
 }
 
-#custom-rt-time-date {
-    font-size: 15pt;
-    color: @time;
-    background: @date;
+#idle_inhibitor {
+    background: @time;
+    color: @black;
+}
+
+#idle_inhibitor.activated {
+    background: @time;
+    color: @red;
+}
+
+/* The spacers */
+/*
+ * We are using these [ "", "" ] for the left and right,
+ * and use one on each sideonly.   Hence, see below...
+ */
+
+/* modules-left */
+#custom-workspaces-left {
+    color: @wkspaces;
+    background: @spacer;
+    font-size: 20pt;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-tray-keyb {
+#custom-workspaces-right {
+    color: @wkspaces;
+    background: @spacer;
     font-size: 15pt;
-    color: @date;
-    background: @layout;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-keyb-battery {
-    font-size: 15pt;
-    color: @layout;
-    background: @battery;
+#custom-taskbar-left {
+    color: @taskbar;
+    background: @spacer;
+    font-size: 20pt;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-battery-temp {
+#custom-taskbar-right {
+    color: @taskbar;
+    background: @spacer;
     font-size: 15pt;
-    color: @battery;
-    background: @temp;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-temp-cpu {
+/* modules-right */
+#custom-sound-left {
+    color: @sound;
+    background: @spacer;
     font-size: 15pt;
-    color: @temp;
-    background: @cpu;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-cpu-memory {
+#custom-sound-right {
+    color: @spacer;
+    background: @sound;
     font-size: 15pt;
-    color: @cpu;
-    background: @memory;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-memory-network {
-    font-size: 15pt;
-    color: @memory;
-    background: @network;
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px 0px 0px;
-}
-
-#custom-rt-network-sound {
-    font-size: 15pt;
+#custom-network-left {
     color: @network;
     background: @sound;
+    font-size: 15pt;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-rt-sound-end {
+#custom-network-right {
+    color: @spacer;
+    background: @network;
     font-size: 15pt;
-    color: @sound;
-    background: transparent;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
 
-#custom-left-ws-end {
+#custom-memory-left {
+    color: @memory;
+    background: @network;
     font-size: 15pt;
-    color: @unfocused;
-    background: transparent;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-memory-right {
+    color: @spacer;
+    background: @memory;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-cpu-left {
+    color: @cpu;
+    background: @memory;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-cpu-right {
+    color: @spacer;
+    background: @cpu;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-temperature-left {
+    color: @temp;
+    background: @cpu;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-temperature-right {
+    color: @spacer;
+    background: @temp;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-battery-left {
+    color: @battery;
+    background: @temp;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-battery-right {
+    color: @spacer;
+    background: @battery;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-language-left {
+    color: @layout;
+    background: @spacer;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-language-right {
+    color: @spacer;
+    background: @layout;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-clockdate-left {
+    color: @date;
+    background: @battery;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-clockdate-right {
+    color: @spacer;
+    background: @date;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-clocktime-left {
+    color: @time;
+    background: @date;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-clocktime-right {
+    color: @spacer;
+    background: @time;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-idle-inhibitor-left {
+    color: @idle;
+    background: @spacer;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-idle-inhibitor-right {
+    color: @spacer;
+    background: @idle;
+    font-size: 15pt;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }

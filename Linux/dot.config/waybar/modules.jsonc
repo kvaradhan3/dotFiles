@@ -1,46 +1,4 @@
 {
-    "layer": "top",
-    "position": "top",
-
-    "modules-left": [
-        "sway/mode",
-        "sway/workspaces",
-        "custom/left-ws-end",
-
-        "sway/window"
-    ],
-
-    "modules-right": [
-        "custom/rt-sound-end",
-        "pulseaudio",
-
-        "custom/rt-network-sound",
-        "network",
-
-        "custom/rt-memory-network",
-        "memory",
-
-        "custom/rt-cpu-memory",
-        "cpu",
-
-        "custom/rt-temp-cpu",
-        "temperature",
-
-        "custom/rt-battery-temp",
-        "battery",
-
-        "custom/rt-keyb-battery",
-        "sway/language",
-
-        "custom/rt-tray-keyb",
-        "tray",
-        "clock#date",
-
-        "custom/rt-time-date",
-        "clock#time",
-        "idle_inhibitor"
-    ],
-
     // Modules
 
     "battery": {
@@ -65,17 +23,17 @@
         "tooltip": false
     },
 
-    "clock#time": {
-        "interval": 10,
-        "format": "{:%H:%M}",
-        "tooltip": false
-    },
-
     "clock#date": {
         "interval": 20,
         "format": "{:%e %b %Y}",
         "tooltip": false
         //"tooltip-format": "{:%e %B %Y}"
+    },
+
+    "clock#time": {
+        "interval": 10,
+        "format": "{:%H:%M}",
+        "tooltip": false
     },
 
     "cpu": {
@@ -89,6 +47,12 @@
         }
     },
 
+    "ext/workspaces": {
+        "format": "[{name}]",
+        "sort-by-number": true,
+        "on-click": "activate",
+    },
+
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
@@ -96,13 +60,6 @@
             "deactivated": ""
         },
         "on-click-right": "loginctl lock-session",
-        "tooltip": false
-    },
-
-    "sway/language": {
-        "format": " {}",
-        "min-length": 5,
-        "on-click": "swaymsg 'input * xkb_switch_layout next'",
         "tooltip": false
     },
 
@@ -123,21 +80,6 @@
         "format-disconnected": "No connection",
         "format-alt": " {ipaddr}/{cidr}",
         "tooltip": false
-    },
-
-    "sway/mode": {
-        "format": "{}",
-        "tooltip": false
-    },
-
-    "sway/window": {
-        "format": "{}",
-        "max-length": 30,
-        "tooltip": false
-    },
-
-    "sway/workspaces": {
-        "format": "{icon}",
     },
 
     "pulseaudio": {
@@ -177,56 +119,20 @@
         //"spacing": 10
     },
 
-    "custom/rt-time-date": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-tray-keyb": {
-        "format": "",
-        "tooltip": false
-    },
-
-
-    "custom/rt-keyb-battery": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-battery-temp": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-temp-cpu": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-cpu-memory": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-memory-network": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-network-sound": {
-        "format": "",
-        "tooltip": false
-    },
-
-    "custom/rt-sound-end" : {
-        "format": "",
-        "tooltip": false
-    },
-
-
-    "custom/left-ws-end": {
-        "format": "",
-        "tooltip": false
+    "wlr/taskbar": {
+        "format": " /{name}/  ",
+        "icon-size": 10,
+        "icon-theme": "Numix-Circle",
+        "tooltip-format": "{title}",
+        "on-click": "minimize-raise",
+        "rewrite": {
+            "org.pulseaudio.pavucontrol": "pavucontrol",
+            "Foot": "{app_id}: {title}/ ",
+                        "WasistLos": "WhatsApp: IN",
+                        "WhatSie": "WhatsApp: US",
+                        "wasistlos": "WhatsApp: IN",
+                        "Firefox Web Browser": "FireFox",
+        }
     }
 }
 
