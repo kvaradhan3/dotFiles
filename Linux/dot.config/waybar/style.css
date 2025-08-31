@@ -48,6 +48,7 @@
 @define-color wkspaces  @brblue;
 @define-color taskbar   @braqua;
 @define-color idle      @time;
+@define-color bluetooth @blue;
 
 @define-color spacer    transparent;
 
@@ -75,6 +76,7 @@
 
 /* Each module */
 #battery,
+#bluetooth,
 #clock,
 #cpu,
 #language,
@@ -167,6 +169,16 @@
 
 #network {
     background: @network;
+    color: @white;
+}
+
+#bluetooth {
+    background: @blue;
+    color: @white;
+}
+
+#bluetooth.off {
+    background: @red;
     color: @white;
 }
 
@@ -286,9 +298,25 @@
     padding: 0px 0px 0px 0px;
 }
 
+#custom-bluetooth-left {
+    color: @bluetooth;
+    background: @network;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+#custom-network-right {
+    color: @spacer;
+    background: @bluetooth;
+    font-size: 15pt;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
 #custom-memory-left {
     color: @memory;
-    background: @network;
+    background: @bluetooth;
     font-size: 15pt;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;

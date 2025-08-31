@@ -21,6 +21,10 @@
         "network",
         "custom/network-right",
 
+        "custom/bluetooth-left",
+        "bluetooth",
+        "custom/bluetooth-right",
+
         "custom/memory-left",
         "memory",
         "custom/memory-right",

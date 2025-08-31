@@ -52,6 +52,16 @@
         "tooltip": false
     },
 
+    "custom/bluetooth-left": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "custom/bluetooth-right": {
+        "format": "",
+        "tooltip": false
+    },
+
     "custom/memory-left": {
         "format": "",
         "tooltip": false
