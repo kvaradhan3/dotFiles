@@ -26,105 +26,80 @@
 ;;
 ;; Variables
 ;;
-(defvar fonts-default-font 'monaco-14)
+(defvar fonts-default-font 'monaco@14)
 (defvar fonts-current-font nil)
-(defvar fonts-all-fonts-alist
-  '((fixed   . "fixed")
-    (clean   . "-Schumacher-Clean-Medium-R-Normal--12-120-75-75-C-60-ISO8859-1")
-    (bold1   . "lucidasanstypewriter-bold-14")
-    (source-code-14     . (fonts-get-font-name "source code pro"  14))
-    (source-sans-14     . (fonts-get-font-name "source sans pro"  14))
-    (source-serif-14    . (fonts-get-font-name "source serif pro" 14))
-    (inconsolata-12     . (fonts-get-font-name "inconsolata"      12))
-    (inconsolate-large  . (fonts-get-font-name "inconsolata"      18))
-    (menlo-14           . (fonts-get-font-name "menlo"            14))
-    (apple-menlo-14     . (fonts-get-font-name "Menlo"            14))
-    (monaco-14          . (fonts-get-font-name "Monaco"           14))
-    (sfmono-14          . (fonts-get-font-name "SF Mono"          14))
-    (menlo-16           . (fonts-get-font-name "menlo"            16))
-    (apple-menlo-16     . (fonts-get-font-name "Menlo"            16))
-    (monaco-16          . (fonts-get-font-name "Monaco"           16))
-    (sfmono-18          . (fonts-get-font-name "SF Mono"          18))
-    (sauce-11		. (fonts-get-font-name "SauceCodePro NFM Light" 11))
-    (hacknerd-11	. (fonts-get-font-name "Hack Nerd Font Mono"  10))
-    ))
-(defvar fonts-expansion
-  '((source-code	. "Source Code Pro")
-    (source-sans	. "Source Sans Pro")
-    (source-serif	. "Source Serif Pro")
-    ("sfmono"		. "SF Mono")
-    ("monaco"		. "Monaco")
-    ("menlo"		. "Menlo")
-    ))
+(defvar fonts-default-size "*")
 
-;; 
+(defvar fonts-all-abbrev-alist
+  '((fixed		. "fixed")
+    (clean		. "Schumacher-Clean-Medium")
+    (adwaita		. "Adwaita Mono")
+    (anonymouspro	. "Anonymous Pro")
+    (inconsolata	. "Inconsolata Nerd Font Mono")
+    (lucida		. "Lucida Sans Typewriter-Seml Condensed")
+    (menlo		. "Meslo LG L")
+    (notosans		. "Noto Sans Mono")
+    (noto		. "Noto Sans Mono")
+    (source-code	. "source code pro")
+    (source-sans	. "source sans pro")
+    (source-serif	. "source serif pro")
+    (apple-menlo	. "Menlo")
+    (monaco		. "Monaco")
+    (sfmono		. "SF Mono")
+    (sauce		. "SauceCodePro NFM Light")
+    (hacknerd		. "Hack Nerd Font Mono")))
+
+;;
 ;; Internal Functions
-;; 
+;;
+
+(defun fonts-format-font-name (font-name &optional point)
+  "Construct font-name using FONT-NAME and (optional) POINT."
+  (format "-*-%s-*-*-*-*-%s-*-*-*" font-name (or point fonts-default-size)))
+
+(defun fonts-canonicalize-font-internal (&optional font-name)
+  "Given a FONT-NAME, return a canonicalized version that can be set."
+  (let* ((font-name-full (or font-name fonts-default-font))
+	 (font-tokens (split-string (symbol-name font-name-full) "@"))
+	 (font-name (car  font-tokens))
+	 (font-size (cadr font-tokens)))
+    (fonts-format-font-name (or (cdr (assq (intern font-name) fonts-all-abbrev-alist))
+				font-name)
+			    (or font-size fonts-default-size))))
 
 (defun fonts-set-font-internal (font-name)
-  "Set this frame's font to FONT-NAME, and add to default frame alist."
-
-  (if (not font-name)
-      (setq font-name fonts-default-font))
-  (let* ((font-name-internal-guess
-	  (cdr (assq font-name fonts-all-fonts-alist)))
-	 font-name-internal)
-    (setq font-name-internal
-	  (cond
-	   ((not font-name-internal-guess)
-	    (let* ((tokens (split-string (symbol-name font-name) "-"))
-		   (fp (car (last tokens)))
-		   (fn (butlast tokens)))
-	      (if (or (not fp) (not fn))
-		  (error "Invalid font spec %s" font-name))
-	      (setq fn (mapconcat 'identity fn "-"))
-	      (if (assq fn fonts-expansion)
-		  (setq fn (assq fn fonts-expansion)))
-	      (fonts-get-font-name fn (string-to-number fp))))
-	   ((listp font-name-internal-guess)
-	    (eval font-name-internal-guess))
-	   (t font-name-internal-guess)))
-
-    (message "Set Font to %s [%s]" font-name font-name-internal)
-    (set-frame-font font-name-internal)
+  "Set the frame font to FONT-NAME.  Adjust the frame alist appropriately."
+  (let ((font-name-canonical (fonts-canonicalize-font-internal font-name)))
+    (set-frame-font font-name-canonical)
     (setq default-frame-alist (assq-delete-all 'font default-frame-alist))
-    (add-to-list 'default-frame-alist (cons 'font font-name-internal))
-    (setq fonts-current-font font-name)))
-
-(defun fonts-get-font-name (font-name &optional point)
-  "Construct font-name using FONT-NAME and (optional) POINT."
-  (if point
-      (format "-*-%s-*-*-*-*-%d-*-*-*-*-*-*-*" font-name point)
-    (format "-*-%s-*-*-*-*-*-*-*-*-*-*-*-*" font-name)
-    ))
+    (add-to-list 'default-frame-alist (cons 'font font-name-canonical))
+    (setq fonts-current-font (or font-name font-name-canonical))
+    font-name-canonical))
 
 (defun fonts-list-fonts-internal ()
    "Return a formatted string of all known fonts."
-   (concat (format "default font:\t%s\n" fonts-default-font)
-	   (format "current font:\t%s\n" fonts-current-font)
+   (concat (format "default font name:\t%s\n" fonts-default-font)
+	   (format "current font name:\t%s\n" fonts-current-font)
+	   (format "default font size:\t%s\n" fonts-default-size)
 	   "---\n"
-	   (string-join
-	    (mapcar (lambda (font)
-		      (let ((font-name (car font))
-			    (font-defn (cdr font)))
-			(format "%-16s\t%s"
-				font-name
-				(if (listp font-defn)
-				    (eval font-defn)
-				  font-defn))))
-		    fonts-all-fonts-alist)
-	    "\n")))
+	   (mapconcat (lambda (f)
+			(format "%15s\t%-20s\t%s"
+				(car f)
+				(cdr f)
+				(fonts-canonicalize-font-internal (car f))))
+		      fonts-all-abbrev-alist "\n")))
 
-;; 
+;;
 ;; Interactive functions
-;; 
+;;
 
 ;;;###autoload
 (defun fonts-set-font (&optional font-name)
   "* Set this frame's font to FONT-NAME, use `win:fonts:default' if not given."
   (interactive "Sfont-name? ")
   ;;; TODO interactive code completion hints on possible symbols
-  (fonts-set-font-internal font-name))
+  (message "Set font to %s[%s]" font-name
+	   (fonts-set-font-internal font-name)))
 
 ;;;###autoload
 (defun fonts-list-fonts ()
