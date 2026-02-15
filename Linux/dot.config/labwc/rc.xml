@@ -3,7 +3,7 @@
 <labwc_config>
 
   <theme>
-    <name></name>
+    <name>Raven-Cyan</name>
     <cornerRadius>8</cornerRadius>
     <font name="sans" size="10" />
   </theme>
@@ -23,6 +23,23 @@
   -->
   <desktops number="4" popupTime="500" prefix="ws" />
   <keyboard>
+
+    <keybind key="A-Tab">
+      <action name="NextWindow" workspace="all" />
+    </keybind>
+
+    <keybind key="A-S-Tab">
+      <action name="PreviousWindow" workspace="all" />
+    </keybind>
+
+    <keybind key="C-A-Tab">
+      <action name="NextWindow" workspace="current" />
+    </keybind>
+
+    <keybind key="C-A-S-Tab">
+      <action name="PreviousWindow" workspace="current" />
+    </keybind>
+
     <keybind key="W-A-Right"
 	     name.action="GoToDesktop"
 	     to.action="right"
@@ -102,6 +119,12 @@
       </action>
     </keybind>
 
+    <keybind key="W" onRelease="yes">
+      <action name="Execute">
+        <command>sh -c 'pkill wofi || wofi --show drun'</command>
+      </action>
+    </keybind>
+
     <keybind key="W-F4">
       <action name="Execute">
         <command>
@@ -141,11 +164,11 @@
 	     name.action="Exit"
 	     />
 
-    <keybind key="W-Minus"
+    <keybind key="W--"
 	     name.action="ToggleShade"
 	     />
 
-    <keybind key="W-="
+    <keybind key="W-0"
 	     name.action="Iconify"
 	     />
 

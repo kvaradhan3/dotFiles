@@ -1,36 +1,65 @@
 #! /bin/sh
 #
+DEBUG=:
+debug() {
+    _MODULE=$1; shift
+    ${DEBUG:-false} && printf "[%s] %s %s\n" "$_MODULE" "$(date +%FT%T)" "$@"
+    unset _MODULE
+}
+
+start-app() {
+    _APP=$1; shift
+    test -x "$_APP" && exec "$_APP" "$@" >/dev/null 2>&1 <&- &
+    debug start "$_APP"
+}
+
+APPS="/usr/bin/waybar
+      /usr/bin/betterbird
+      /usr/bin/firefox
+      /usr/local/bin/whatsit
+      /usr/bin/whatstux
+      /usr/bin/1password
+      "
+#     /usr/bin/whatsie
+#     /usr/bin/wasistlos
+
+DEFAULT_BACKGROUND="$HOME/Pictures/2017-06-09-assets-natgeotv.fnghub.com:POD:7871.jpg"
+
+#
+# Conky settings
+#
+CONKY_CONFIGS_DIR="$HOME/.config/conky"
+CONKY_OPTIONS="--daemonize
+	       --pause 5
+               --double-buffer
+               --quiet
+              "
+
+# First set the display
+start-app /usr/bin/way-displays
+sleep .5
+
 # Set background color.
 pkill swaybg
 swaybg -c '#040404'             \
-       -i "/home/kannan/Pictures/2017-06-09-assets-natgeotv.fnghub.com:POD:7871.jpg" \
-       -m fit                   \
->/dev/null 2>&1 &
+       -i "$DEFAULT_BACKGROUND"	\
+       -m fit                   			>/dev/null 2>&1 &
 
+for __i in $APPS ; do
+    start-app "$__i"
+done
 
-# Launch a panel such as yambar or waybar.
-waybar >/dev/null 2>&1 &
-
-conky --config=$HOME/.config/conky/calendars.conky &
-conky --config=$HOME/.config/conky/sunrise-sunset.conky &
-conky --config=$HOME/.config/conky/sysPerf.conky &
+# Kill previous instances of conky
+pkill -9 conky && sleep .5
+for __i in $CONKY_CONFIGS_DIR/*.conky ; do
+    debug conky "$(basename "$__i")"
+    conky --config="$__i" $CONKY_OPTIONS
+done
 
 # Lock screen after 5 minutes; turn off display after another 5 minutes.
 #
-swayidle -w                                             \
+exec swayidle -w                                        \
 	 timeout 300 'swaylock -e -f -c 000000'             \
 	 timeout 600 'wlopm --off \*'                       \
 	      resume 'wlopm --on \*'                        \
-	before-sleep 'swaylock -e -f -c 000000' >/dev/null 2>&1 &
-
-test -x /usr/bin/betterbird && /usr/bin/betterbird >/dev/null 2>&1 &
-test -x /usr/bin/firefox    && /usr/bin/firefox    >/dev/null 2>&1 &
-
-test -x /usr/bin/wasistlos  && /usr/bin/wasistlos  >/dev/null 2>&1 &
-test -x /usr/bin/whatsie    && /usr/bin/whatsie    >/dev/null 2>&1 &
-
-if [[ -x /usr/bin/way-displays ]] ; then
-    /usr/bin/way-displays >/dev/null 2>&1
-else
-    /usr/bin/foot 
-fi
+	before-sleep 'swaylock -e -f -c 000000'		>/dev/null 2>&1
