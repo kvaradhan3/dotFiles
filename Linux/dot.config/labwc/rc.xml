@@ -172,6 +172,39 @@
 	     name.action="Iconify"
 	     />
 
+
+    <keybind key="W-h">
+      <action name="SnapToEdge" direction="left" />
+    </keybind>
+
+    <keybind key="W-j">
+      <action name="SnapToEdge" direction="down" />
+    </keybind>
+
+    <keybind key="W-k">
+      <action name="SnapToEdge" direction="up" />
+    </keybind>
+
+    <keybind key="W-l">
+      <action name="SnapToEdge" direction="right" />
+    </keybind>
+
+    <keybind key="W-y">
+      <action name="SnapToEdge" direction="left-up" />
+    </keybind>
+
+    <keybind key="W-u">
+      <action name="SnapToEdge" direction="right-up" />
+    </keybind>
+
+    <keybind key="W-b">
+      <action name="SnapToEdge" direction="left-down" />
+    </keybind>
+
+    <keybind key="W-n">
+      <action name="SnapToEdge" direction="right-down" />
+    </keybind>
+
   </keyboard>
 
   <!--
