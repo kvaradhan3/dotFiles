@@ -7,10 +7,10 @@ ALIGN: TOP
 
 ORDER:
   - 'Acer Technologies B277 E 331604C5B3W01'
-  - 'LG Electronics LG HDR WQHD 0x0001E191'
+  - 'LG Display 0x04DA'
   - 'Panasonic Industry Company PANASONIC-TV 0x19040271'
   - 'BOE 0x0928'
-  - 'LG Display 0x04DA'
+  - 'LG Electronics LG HDR WQHD 0x0001E191'
 
 
 SCALING: TRUE
