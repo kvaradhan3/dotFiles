@@ -7,6 +7,7 @@
 (use-package tex-mode
   :mode
   ("\\.tex\\'" . latex-mode)
+  ("\\.skt\\'" . latex-mode)
 
   :bind
   (
@@ -29,8 +30,14 @@
   (add-hook 'latex-mode-hook
 	    (lambda ()
 	      (setq tex-compile-commands
-		    (append tex-compile-commands
-			    '(("evince %r.pdf" "%r.pdf"))))))
+		    (append '(("evince %r.pdf" "%r.pdf")
+			      ((concat "pdf" . #1=
+				       (tex-command " " tex-start-options " "
+						    (if (< 0 (length tex-start-commands))
+							(shell-quote-argument tex-start-commands))
+						    " %r.tex")))
+			      ("skt %r"        "%r.skt" "%r.tex"))
+			    tex-compile-commands))))
 
   )
 

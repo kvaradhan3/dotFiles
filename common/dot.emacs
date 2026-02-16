@@ -1,9 +1,3 @@
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/straight/build/benchmark-init"))
-(if (not (ignore-errors (require 'benchmark-init)))
-    (progn 
-      (add-hook 'after-init-hook #'benchmark-init/deactivate)
-      (add-hook 'after-init-hook #'(lambda () (require 'benchmark-init-modes)))))
-
 (setq package-enable-at-startup        nil)
 
 ;; Added by Package.el.  This must come before configurations of
@@ -16,9 +10,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(canlock-password "fbce9060bb6f2afd7e7fc4601bb20f3928bd0d39")
-;; '(package-selected-packages
-;;   (quote
-;;    (helm-org-rifle helm-org helm popwin async google org json-mode yaml-mode twittering-mode xcscope filladapt auto-org-md markdown-mode markdown-mode+ markdown-preview-mode markdown-toc exec-path-from-shell go-autocomplete flymake-go flycheck go-mode magit protobuf-mode)))
  '(safe-local-variable-values
    (quote
     ((prompt-to-byte-compile)
