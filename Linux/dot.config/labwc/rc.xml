@@ -174,35 +174,35 @@
 
 
     <keybind key="W-h">
-      <action name="SnapToEdge" direction="left" />
+      <action name="SnapToEdge" direction="left" combine="yes" />
     </keybind>
 
     <keybind key="W-j">
-      <action name="SnapToEdge" direction="down" />
+      <action name="SnapToEdge" direction="down" combine="yes" />
     </keybind>
 
     <keybind key="W-k">
-      <action name="SnapToEdge" direction="up" />
+      <action name="SnapToEdge" direction="up" combine="yes" />
     </keybind>
 
     <keybind key="W-l">
-      <action name="SnapToEdge" direction="right" />
+      <action name="SnapToEdge" direction="right" combine="yes" />
     </keybind>
 
     <keybind key="W-y">
-      <action name="SnapToEdge" direction="left-up" />
+      <action name="SnapToEdge" direction="up=left" combine="yes" />
     </keybind>
 
     <keybind key="W-u">
-      <action name="SnapToEdge" direction="right-up" />
+      <action name="SnapToEdge" direction="up-right" combine="yes" />
     </keybind>
 
     <keybind key="W-b">
-      <action name="SnapToEdge" direction="left-down" />
+      <action name="SnapToEdge" direction="down-left" combine="yes" />
     </keybind>
 
     <keybind key="W-n">
-      <action name="SnapToEdge" direction="right-down" />
+      <action name="SnapToEdge" direction="down-right" combine="yes" />
     </keybind>
 
   </keyboard>
