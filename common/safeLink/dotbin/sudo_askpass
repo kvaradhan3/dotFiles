@@ -1,0 +1,33 @@
+#! /bin/bash
+
+SUDO_ASKPASS_FIFO="/tmp/sudo-askpass-$(id -u -n)"
+
+is_protected() {
+    # Test not a link (%N), perms is 0600 (%a), is a fifo (%F), and owned by the current user (%U).
+    [[ "$(stat --format '%N,%a,%F,%U' "$1" 2>&-)" = "'$1',600,fifo,$(id -u -n)" ]] 
+}
+
+
+if ! is_protected "$SUDO_ASKPASS_FIFO"
+then
+    rm -f "$SUDO_ASKPASS_FIFO" && mkfifo --mode=600 "$SUDO_ASKPASS_FIFO"
+fi
+
+if ! is_protected "$SUDO_ASKPASS_FIFO"
+then
+    exec >&2
+
+    printf "%s: %s\n" "$(basename "$0")" "askpass fifo ($SUDO_ASKPASS_FIFO) is not created correctly"
+    # shellcheck disable=SC2183 # (warning): This format string has 7 variables, but is passed 1 argument.
+    # stat generates 7 arguments through word splitting, so...
+    # shellcheck disable=SC2046 # (warning): Quote this to prevent word splitting.
+    printf "%s:\tFile: %s\tAccess: ( %3d/%10s )\tUser: ( %4d/%8s )\tGroup: ( %4d/%8s )\n"    \
+           "Seen" $(stat --format "%N %a %A %u %U %g %G" "$SUDO_ASKPASS_FIFO")
+    printf "%s:\tFile: %s\tAccess: ( %3d/%10s )\tUser: ( %4d/%8s )\tGroup: ( %4d/%8s )\n"    \
+           "Expect" "'$SUDO_ASKPASS_FIFO'" "600" "prw-------" "$(id -u)" "$(id -n -u)" "$(id -g)" "$(id -n -g)"
+
+    exit 1
+fi
+
+printf " echo {{password}} >%s\n" "$SUDO_ASKPASS_FIFO" >&2
+exec cat < "$SUDO_ASKPASS_FIFO"
