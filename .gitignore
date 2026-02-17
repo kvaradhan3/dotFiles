@@ -34,6 +34,8 @@ dot.zinit
 # Exercise care in pushing up ssh
 # 
 id_*
+authorized_keys
+known_hosts*
 
 
 Brewfile.lock*
