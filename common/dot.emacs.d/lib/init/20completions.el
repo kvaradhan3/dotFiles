@@ -10,7 +10,13 @@
   (setq vertico-scroll-margin 0
 	vertico-count         16
 	vertico-resize        t
-	vertico-cycle         t)
+	vertico-cycle         t))
+
+(use-package vertico-reverse
+  :after vertico
+  :straight nil
+  :load-path "straight/repos/vertico/extensions/"
+  :config
   (vertico-reverse-mode t))
 
 ; makes file completions partial, can use it for more but need to work
