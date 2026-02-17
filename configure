@@ -74,12 +74,21 @@ for i in common "$(uname -s)" ; do
 	if [[ -f "$j" ]] ; then
 	    ${INSTALLOP} "$HERE"/"$j" "$DESTDIR"/"${j/$i\/dot/}"
 	else
+	    # This dot file is a directory, which might in turn
+	    # contain sub-directories.  We want to find and link the
+	    # leaf directories here, for instance,
+	    # $HERE/dot.emacs.d/lib/init to $DESTDIR/.emacs.d/lib/init.
+
 	    find "$j" -type f | while read -r _src ; do
 		local DESTBASE="${_src/$i\/dot/}"
 
 		# shellcheck disable=SC2155
 		local DESTLINK="$(dirname "${DESTBASE}")"
 
+		# since the leaf directory might have multiple files
+		# that trap here, and these can cause the shell to
+		# have conniptions, we check if we have finished this
+		# directory and skip if so.
 		if prefix_is_done "$DESTLINK" ; then
 		    continue
 		fi
@@ -90,6 +99,10 @@ for i in common "$(uname -s)" ; do
 	fi
     done
 
+    # These dot files are not directly linked.  They are directories
+    # which must exist as is, and the contents of the files only must
+    # be linked.  THis is to avoid things like erorneously creating
+    # secrets and checking them into the repo.
     for j in "$i"/safeLink/dot* ; do
 	if [[ "$j" = "$i/safeLink/dot*" ]] ; then
 	    continue
@@ -111,6 +124,10 @@ done
 #
 pre-commit install --install-hooks
 
+#
+# Finally, any file that still links into here, we assume is from an
+# earlier version of the repo and not needed any more.  Remove them.
+#
 local stale_remaining=()
 local __f
 
