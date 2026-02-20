@@ -1,5 +1,14 @@
 # include "$XDG_CONFIG_HOME/kanshi/$(uname -n).conf"
 
+output "Apple Computer Inc Color LCD" {
+  mode          1920x1080@60
+  position      0,0
+  transform     normal
+  scale         0.8
+  adaptive_sync off
+  alias         $APPLE_EXTERNAL
+}
+
 output "LG Electronics LG HDR WQHD 0x0001E191" {
   mode          3440x1440@49.987000
   position      0,0
@@ -54,3 +63,20 @@ profile external-acer-idk-combo {
   # output $IDK_INTERNAL  enable
 }
 
+profile apple-external {
+  output $APPLE_EXTERNAL enable
+}
+
+profile apple-internal-1 {
+  output "Apple Computer Inc Color LCD " enable
+}
+
+profile apple-internal-2 {
+  output eDP-1 enable {
+  mode          1920x1080
+  position      0,0
+  transform     normal
+  scale         0.85
+  adaptive_sync off
+  }
+}
