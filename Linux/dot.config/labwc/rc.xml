@@ -29,11 +29,11 @@
     </keybind>
 
     <keybind key="A-S-Tab">
-      <action name="PreviousWindow" workspace="all" />
+      <action name="NextWindow" workspace="current" />
     </keybind>
 
     <keybind key="C-A-Tab">
-      <action name="NextWindow" workspace="current" />
+      <action name="PreviousWindow" workspace="all" />
     </keybind>
 
     <keybind key="C-A-S-Tab">
@@ -190,7 +190,7 @@
     </keybind>
 
     <keybind key="W-y">
-      <action name="SnapToEdge" direction="up=left" combine="yes" />
+      <action name="SnapToEdge" direction="up-left" combine="yes" />
     </keybind>
 
     <keybind key="W-u">
