@@ -1,0 +1,17 @@
+#! /bin/zsh
+#
+
+local -A papersizes=(
+    'Letter(US)'    '215.9 x 279.4'
+    'Legal(US)'     '215.9 x 355.6'
+    'Ledger(US)'    '279.4 x 431.8'
+    'A0'            '841 x 1189'
+    'A1'            '594 x 841'
+    'A2'            '420 x 594'
+    'A3'            '297 x 420'
+    'A4'            '210 x 297'
+)
+
+for ppr siz ( "${(@kv)papersizes}" ) ;  do
+    printf '{"Paper":"%s", "Size":"%s"}' "$ppr" "$siz"
+done

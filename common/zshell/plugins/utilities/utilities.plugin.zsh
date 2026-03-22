@@ -20,3 +20,7 @@ fi
 # plugin unload https://github.com/agkozak/zsh-z/blob/16fba5e9d5c4b650358d65e07609dda4947f97e8/zsh-z.plugin.zsh#L680-L698
 
 autoload -Uz srand32
+
+if [[ $(uname -s) = 'Linux' ]]; then
+    autoload -Uz scim
+fi

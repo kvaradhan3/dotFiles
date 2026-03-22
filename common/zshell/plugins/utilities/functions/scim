@@ -1,0 +1,51 @@
+#! /bin/zsh
+
+DEVICE="${"$(scanimage --formatted-device-list='%d%n' | grep -E '^escl:')":-none}"
+pdfOptions='--mode color --resolution 600 --source ADF --format pdf'
+
+_scim_populate_commands() {
+  local _sc_name=$1
+  shift
+  set -A "$_sc_name"                                                        \
+    'list-devices'      'print device list in json format'                  \
+    'scan-pdf'          "sets: $pdfOptions"                                 \
+    'device-options'    "show optopns for specified device, $DEVICE, if none provided" \
+    'show-papersizes'   "dump current paper sizes for -x and -y settings"   \
+    'help'              'This help.'
+}
+
+typeset -A _CMDS=()
+_scim_populate_commands "_CMDS"
+for i ( "${(@k)_CMDS}" ) autoload -Uz _scim_$i
+
+scim() {
+
+    case $1 in
+    'help')
+       {
+           local -A _CMDS=()
+           _scim_populate_commands "_CMDS"
+
+           print "scim [command] [scanimage options]"
+           print "  command:"
+           for cmd help ( "${(@kv)_CMDS}" ) ; do
+               printf "    %16s %s\n" "$cmd" "$help"
+           done
+           printf "\n--\n\n"
+           scanimage --help
+       } >&2
+       ;;
+
+    'show-papersizes'|'list-devices'|'scan-pdf'|'device-options')
+        local _CMD=$1
+        shift;
+        _scim_${_CMD} "$@"
+        ;;
+
+    *)
+        scanimage "$@"
+        ;;
+    esac
+}
+
+scim "$@"

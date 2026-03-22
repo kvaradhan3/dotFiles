@@ -1,0 +1,4 @@
+#! /bin/zsh
+#
+
+scanimage --device "${1:-"$DEVICE"}" --all-options

@@ -1,0 +1,4 @@
+#! /bin/zsh
+#
+
+scanimage --device "$DEVICE" ${=pdfOptions} "$@"

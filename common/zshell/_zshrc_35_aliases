@@ -74,3 +74,4 @@ grfu() {
     fi
     git rebase --interactive --autosquash --autostash ${1:-HEAD}~1
 }
+

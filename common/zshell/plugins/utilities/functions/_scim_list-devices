@@ -1,0 +1,6 @@
+#! /bin/zsh
+#
+
+local jsonfmt='{"vendor":"%v","name":"%d","model":"%m","type":"%t"}%n'
+echo "Default Device: $DEVICE" >&2
+scanimage --formatted-device-list="$jsonfmt"
