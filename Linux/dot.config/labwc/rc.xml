@@ -128,9 +128,7 @@
     <keybind key="W-F4">
       <action name="Execute">
         <command>
-          sh -c 'grim
-                   -g "$(slurp)"
-                   "$(xdg-user-dir)/Pictures/screenshot-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
+          sh -c 'grim -g "$(slurp)" "$(xdg-user-dir)/Pictures/screenshot-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
         </command>
       </action>
     </keybind>
@@ -138,8 +136,7 @@
     <keybind key="S-W-F4">
       <action name="Execute">
         <command>
-          sh -c 'grim
-                   "$(xdg-user-dir)/Pictures/desktop-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
+          sh -c 'grim "$(xdg-user-dir)/Pictures/desktop-$(date +%FT%T.$(date +%N | cut -c1-3)).png"'
         </command>
       </action>
     </keybind>
