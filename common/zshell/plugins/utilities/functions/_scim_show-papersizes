@@ -13,5 +13,7 @@ local -A papersizes=(
 )
 
 for ppr siz ( "${(@kv)papersizes}" ) ;  do
+    local sz=( ${(@s: x :)siz} )
+    alias -g :${(L)ppr%"(US)"}="-x ${sz[1]} -y ${sz[2]}"
     printf '{"Paper":"%s", "Size":"%s"}' "$ppr" "$siz"
 done
