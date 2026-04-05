@@ -1,0 +1,110 @@
+{
+  "title": "M365 Copilot: Enter = new line, Cmd+Enter = submit",
+  "rules": [
+    {
+      "description": "M365 Copilot: Enter inserts newline (Shift+Enter), Cmd+Enter submits (Enter)",
+      "manipulators": [
+        {
+          "description": "Enter → Shift+Enter (new line) when M365 Copilot is frontmost",
+          "type": "basic",
+          "from": {
+            "key_code": "return_or_enter",
+            "modifiers": {
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "return_or_enter",
+              "modifiers": ["left_shift"]
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^com\\.microsoft\\.m365copilot$"
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Cmd+Enter → Enter (submit) when M365 Copilot is frontmost",
+          "type": "basic",
+          "from": {
+            "key_code": "return_or_enter",
+            "modifiers": {
+              "mandatory": ["left_command"],
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "return_or_enter"
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^com\\.microsoft\\.m365copilot$"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+# To use/enable this rule:
+# 1. brew install karabiner-elements
+# 2. open Karabiner-Elements
+# 3. Go to the Complex Modifications tab
+# 4. Add predefined rule
+# 5. Enable the mm365_copilot_enter_remap.json"
+#
+# For firefox:
+# for claude, 
+#   // @name         Claude: Enter = newline, Ctrl+Enter = submit
+#   // @namespace    https://claude.ai/
+#   // @match        https://claude.ai/*
+# for copilot, 
+#   // @name         CoPilot: Enter = newline, Ctrl+Enter = submit
+#   // @namespace    https://m365.cloud.microsoft/
+#   // @match        https://m365.cloud.microsoft/*
+#
+# 1. Install the ViolentMonkey extension and add this script:
+# // ==UserScript==
+# // @name         Claude: Enter = newline, Ctrl+Enter = submit
+# // @namespace    https://claude.ai/
+# // @match        https://claude.ai/*
+# // @grant        none
+# // @run-at       document-idle
+# // ==/UserScript==
+# 
+# (function () {
+#   document.addEventListener('keydown', function (e) {
+#     // Only act on Enter with no Ctrl/Cmd modifier
+#     if (e.key !== 'Enter') return;
+# 
+#     const isSubmit = e.ctrlKey || e.metaKey; // Ctrl+Enter or Cmd+Enter
+# 
+#     if (isSubmit) {
+#       // Let it through — {LLM}.ai already treats Ctrl+Enter as submit
+#       return;
+#     }
+# 
+#     // Plain Enter — find the active contenteditable ({LLM}'s input box)
+#     const target = e.target;
+#     const isInput = target.matches('[contenteditable]') ||
+#                     target.tagName === 'TEXTAREA';
+#     if (!isInput) return;
+# 
+#     e.stopPropagation();
+#     e.preventDefault();
+# 
+#     // Insert a newline at the cursor position
+#     document.execCommand('insertLineBreak');
+#   }, true); // capture phase to intercept before {LLM}'s own handlers
+# })();
