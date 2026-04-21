@@ -27,25 +27,56 @@ local JSON="$1"
 # | column -s, -t
 ) | tidy-viewer -eRD
 
-section_id="$(_1p__b64decode <<< "$JSON" |
-              jq -rc '.sections[]
-                     | select(.label == "ADDITIONAL QUESTIONS")
-                     | .id // empty' 2>&- )"
+#
+# see if this exists as a section:
+#   {
+#      "id": "security questions",
+#      "label": "Security Questions"
+#    }
+#
+local _security_qs_id="$(_1p__b64decode <<< "$JSON" |
+                         jq -rc '.sections[]
+                                 | select(.id == "security questions") // empty' 2>&- )"
 
-if [ -n "$section_id" ] ; then
+#
+# if it does, extract, and print questions and answers from that section.
+#
+if [ -n "$_security_qs_id" ] ; then
+
+    local __section_id="$(jq -r .id <<<"$_security_qs_id")"
+
     # shellcheck disable=SC2154
-    printf "\n        \e[%sm%s\e[%sm"		  \
-       "${color[reverse]}" "ADDITIONAL QUESTIONS" \
-       "${color[none]}"
+    printf "\n    \e[%sm%s\e[%sm"		\
+	   "${color[reverse]}"			\
+	   "$(jq -r .label <<<"$_security_qs_id")"	\
+	   "${color[none]}"
     {
       echo '__Challenge__,__Response__'
       _1p__b64decode <<< "$JSON"		| \
       jq -rc '.fields[]
-             | select(.section.id == "'"$section_id"'")
+             | select(.section.id == "'"$__section_id"'")
              | [ .label, .value ]
              | @csv'
     # | column -s, -t
     } | tidy-viewer -eRD
 fi
+
+#
+# see if there are OTPs
+#
+local _fields_otp="$(_1p__b64decode <<< "$JSON" |
+                     jq -rc '.fields[] 
+                             | select(.type == "OTP") // empty' 2>&- )"
+if [[ "$_fields_otp" ]] ; then
+    # shellcheck disable=SC2154
+    printf "\n    \e[%sm%s\e[%sm"                               \
+	       "${color[reverse]}"	"OTPs for MFA"  "${color[none]}"
+
+    {
+
+        printf "\nlabel,otp\n"
+        jq -rc '. | [ .label, .totp ] | @csv' <<<"$_fields_otp"
+    } | tidy-viewer -eRD
+fi 
 
 _1p__secret_to_clipboard "$JSON" id password

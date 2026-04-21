@@ -15,16 +15,26 @@ autoload -Uz compinit
 # From https://gist.github.com/ctechols/ca1035271ad134841284#gistcomment-2308206
 # shellcheck disable=SC1072,SC1073
 () {
-  if [[ $# -gt 0 ]]; then
+  if (( $# )) ; then
     compinit && zcompile ${ZDOTDIR:-$HOME}/.zcompdump
   else
     compinit -C
   fi
-  if [[ ! -f ~/.zcompdump.zwc             ]] ||     \
-     [[ ~/.zcompdump -nt ~/.zcompdump.zwc ]] ;  then
-      zcompile ${ZDOTDIR:-$HOME}/.zcompdump
-  fi
 } ${ZDOTDIR:-$HOME}/.zcompdump.zwc(N.mh+24)
+#                                 
+#                                 ││││││ └ implies st_mtime > 24hours back
+#                                 │││││└── greater then
+#                                 ││││└─── hours
+#                                 │││└──── modify (st_mtime)
+#                                 ││└───── plain files only
+#                                 │└────── set NULL_GLOB for this call
+#                                 └─────── shell glob
+# https://zsh.sourceforge.io/Doc/Release/Expansion.html#Filename-Expansion, 
+# section 14.8.7 Glob Qualifiers
+#
+# unicode u2500 ─
+#         u2502 │
+#         u2514 └
 
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 for _25i in /usr/local/opt/antidote                    \
@@ -38,12 +48,13 @@ do
     fi
 done
 if [[ $_25i = FAIL ]] ; then
-    # unwarranted chumminess alert here...
+    # unwarranted chumminess 
     echo 'antidote not found' >&2
 fi
 
 # Initialize a few things that OMZ did for you nicely...
-ZSH_CACHE_DIR="$(dirname "$(antidote home)")"/zshell
+local _ZSH_ANTIDOTE_HOME="$(antidote home)"
+ZSH_CACHE_DIR="$(dirname "$_ZSH_ANTIDOTE_HOME")"/zshell
 
 # ensure completions dir
 mkdir -p "$ZSH_CACHE_DIR"/completions
@@ -54,7 +65,7 @@ mkdir -p "$ZSH_CACHE_DIR"/completions
 # source <(antibody init)
 
 if ! [[ -f ~/.zsh_plugins.zsh ]] ||
-   ! antidote path ohmyzsh/ohmyzsh >/dev/null 2>&1
+   ! [[ -d "$_ZSH_ANTIDOTE_HOME/ohmyzsh/ohmyzsh" ]] ; 
 then
     antidote bundle <<PLUGINS_LIST >~/.zsh_plugins.zsh
         ohmyzsh/ohmyzsh path:lib/git.zsh
@@ -82,7 +93,7 @@ then
         zsh-users/zsh-syntax-highlighting
         zsh-users/zsh-history-substring-search
 
-        kvaradhan3/dotFiles path:common/zshell/plugins/workplace  branch:darwin-work-updates
+        kvaradhan3/dotFiles path:common/zshell/plugins/workplace
         # kvaradhan3/dotFiles path:common/zshell/plugins/nskc
         kvaradhan3/dotFiles path:common/zshell/plugins/batteryCharge
         kvaradhan3/dotFiles path:common/zshell/plugins/1p

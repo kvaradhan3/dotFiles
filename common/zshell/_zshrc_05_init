@@ -31,7 +31,45 @@ prtiming() {
     e="$3"
     e="${e:-$SECONDS}"
     if [ -t 0 ] ; then
-        print -f ": %25s\t%8.6f -- %8.6f\t%8.6f\n" "$1" "$2" "$e" $(( e - $2))
+        print -f ":[$$] %25s\t%8.6f -- %8.6f\t%8.6f\n" "$1" "$2" "$e" $(( e - $2)) | tee -a /tmp/timings.dat
+    fi
+}
+plotShellStats() {
+    local _PSS_DATA=${DATAFILE:-$(mktemp /tmp/ziXXXXXX)}
+
+    if ! [[ -s "$_PSS_DATA" ]] ; then
+        grep $$ /tmp/timings.dat > $_PSS_DATA
+    fi
+
+    local _PSS_XMAX=$(tail -1 $_PSS_DATA | cut -w -f5)
+    _PSS_XMAX=$(( _PSS_XMAX + 0.02 ))
+
+    local _PSS_YMAX=$(wc -l $_PSS_DATA | cut -w -f2)
+    _PSS_YMAX=$(( _PSS_YMAX + 1 ))
+
+    gnuplot <<END_GNUPLOT
+      set   terminal    qt 0 font "Monaco,12" noenhanced
+      unset key
+
+      set   xrange      [-.05:$_PSS_XMAS]
+
+      unset ytics
+      set   yzeroaxis
+      set   yrange      [-1:$_PSS_YMAX]
+
+      set   style arrow 2 nohead linecolor rgb "#56b4e9" linewidth 5 dashtype solid 
+      set   style arrow 2 size screen  0.020,15.000,90.000
+
+      # plot a vector from column(3), current row to column(5), current row
+      # use column(2) as label, at column(3), current row, right offset from point
+      #
+      plot '$_PSS_DATA' using 3:0:(column(5)-column(3)):(0.0) with vector as 2,   \\
+           ''           using 3:0:2 with labels right offset -1
+      unset multiplot
+      pause mouse
+END_GNUPLOT
+    if ! [[ "$DATAFILE" ]]; then
+        rm -f "$_PSS_DATA"
     fi
 }
 
