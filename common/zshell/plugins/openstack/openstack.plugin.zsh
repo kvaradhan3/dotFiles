@@ -1,23 +1,35 @@
 # general
-alias o='openstack'
-function osw {
+alias os='openstack'
+function oscl {
   export OS_CLOUD=$@
 }
+alias -g @J='--format json'
+alias -g @Y='--format yaml'
+alias -g @C='--format csv'
+alias -g @CSV='--format csv'
+alias -g @V='--format value'
+
+alias -g @Jp='--format json | jq -C .'
+alias -g @Yp='--format yaml | yq -C .'
+alias -g @Cp='--format csv  | tv -af '
+
+alias -g @Jq='--format json | jq'
+alias -g @Yq='--format yaml | yq'
 
 # compute
-alias oc='openstack compute'
-alias ocsl='openstack compute service list'
+alias osc='openstack compute'
+alias oscsl='openstack compute service list'
 
 # server
-alias os='openstack server'
-alias osl='openstack server list'
-alias ossh='openstack server show'
+alias oss='openstack server'
+alias ossl='openstack server list'
+alias osssh='openstack server show'
 alias ossta='openstack server start'
-alias ossto='openstack server stop'
-alias osr='openstack server reboot'
-alias osd='openstack server delete'
-alias osip='() { openstack server show $@ --format json | jq .addresses ; }'
-alias osc='() {
+alias osstp='openstack server stop'
+alias ossr='openstack server reboot'
+alias ossd='openstack server delete'
+alias ossip='() { openstack server show $@ --format json | jq .addresses ; }'
+alias ossc='() {
     local -A _osc_args=( --boot-from-volume 5
                          --key-name flow
                          --flavor   generic.2vcpu.2GBram.20GBdisk.perf
@@ -50,6 +62,11 @@ alias osc='() {
     fi
 }'
     
+# images
+alias osi='openstack image'
+alias osil='openstack image list'
+alias osis='openstack image show'
+
 # service
 alias osvc='openstack service'
 alias osvcl='openstack service list'
