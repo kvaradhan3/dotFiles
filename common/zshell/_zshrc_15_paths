@@ -20,17 +20,22 @@ path+=( . .. ./bin ./sbin ../bin ../sbin )
 infopath+=( ./info )
 
 local _i
-for _i in /usr/local     \
-         /opt            \
-         /opt/homebrew   \
-         $HOME/.local    \
-         $HOME
+for _i in /usr/local            \
+          /opt                  \
+          /opt/homebrew         \
+          /opt/homebrew/share   \
+          $HOME/.local          \
+          $HOME
 do
     test -d "$_i"       || continue
-    test -d "$_i/bin"   && path+=(     "$_i/bin"  )
-    test -d "$_i/sbin"  && path+=(     "$_i/sbin" )
-    test -d "$_i/man"   && manpath+=(  "$_i/man"  )
-    test -d "$_i/info"  && infopath+=( "$_i/info" )
+
+    #
+    # https://www.zsh.org/mla/users/2022/msg00300.html
+    #
+    test -d "$_i/bin"   && path[1,0]="$_i/bin"
+    test -d "$_i/sbin"  && path[1,0]="$_i/sbin"
+    test -d "$_i/man"   && manpath[1,0]="$_i/man"
+    test -d "$_i/info"  && infopath[1,0]="$_i/info"
 done
 manpath+=( "" )
 
@@ -52,51 +57,18 @@ cdpath=( . ..
          /mnt
 )
 
-export NETHACKOPTIONS=eight_bit_tty,hilite_pet,rest_on_space,showexp,time,!mail,pickup_types='$"/?!=',boulder=0,name=Croesus-val-hum-law,color
-
-if [[ "$(uname -s)" = Linux ]]
-then
-    if test -z "${XDG_RUNTIME_DIR}" ; then
-        export XDG_RUNTIME_DIR=/tmp/${UID}-runtime-dir
-        test -d ${XDG_RUNTIME_DIR} || mkdir ${XDG_RUNTIME_DIR}
-        chmod 0700 ${XDG_RUNTIME_DIR}
-    fi
-
-    export ELECTRON_OZONE_PLATFORM_HINT=auto
-    export MOZ_ENABLE_WAYLAND=1
-    export QT_QPA_PLATFORM=wayland
-fi
-
-if [[ "$(uname -s)" = Darwin ]]
-then
-    export HOMEBREW_PREFIX="/opt/homebrew";
-    export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
-    export HOMEBREW_REPOSITORY="/opt/homebrew";
-    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
-    export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
-    export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
-fi
-
-export SUDO_ASKPASS=$HOME/bin/sudo_askpass
-export SUDO_ASKPASS_FIFO=${SUDO_ASKPASS_FIFO:-"/tmp/sudo-askpass-$(id -u -n)"}
-export SSH_AUTH_SOCK=$HOME/.1password/agent.sock
-
-#
-# Home printer configuration for linux
-#
-export SCANNER="airscan:e1:HP Color LaserJet MFP M277c6 (142B9F)"
-
-alias genp='() {
-    local pass
-    if [[ $# -gt 0 ]] ; then
-        pass="$@"
-    else
-        read -s "pass?Please enter your password? "
-        echo ''
-    fi
-    while : ; do
-        date
-        cat <<<"$pass" >/tmp/sudo-askpass-$(id -u -n)
-        date
-    done
-}'
+typeset -xT NETHACKOPTIONS nethackoptions ,
+typeset -U  NETHACKOPTIONS nethackoptions
+nethackoptions=(
+    name=Croesus-val-hum-law
+    color
+    eight_bit_tty
+    hilite_pet
+    !mail
+    rest_on_space
+    showexp
+    time
+    !tutorial
+    pickup_types='$"/?!='
+    boulder=0
+)

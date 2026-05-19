@@ -41,10 +41,10 @@ plotShellStats() {
         grep $$ /tmp/timings.dat > $_PSS_DATA
     fi
 
-    local _PSS_XMAX=$(tail -1 $_PSS_DATA | cut -w -f5)
+    local _PSS_XMAX=$(tail -1 $_PSS_DATA | cut -f2 | cut -d' ' -f3)
     _PSS_XMAX=$(( _PSS_XMAX + 0.02 ))
 
-    local _PSS_YMAX=$(wc -l $_PSS_DATA | cut -w -f2)
+    local _PSS_YMAX=$(wc -l $_PSS_DATA | sed "s!$_PSS_DATA!!")
     _PSS_YMAX=$(( _PSS_YMAX + 1 ))
 
     gnuplot <<END_GNUPLOT

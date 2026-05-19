@@ -11,21 +11,49 @@
   :after org
   :ensure t
   :init
-  (setq org-gtd-update-ack "3.0.0"
-	org-gtd-directory  (expand-file-name "~/NOTES/TASKS")
-	org-reverse-note-order   t
-        org-edna-use-inheritance t)
+  (setq org-gtd-update-ack "4.0.0"
+	org-gtd-directory  "~/NOTES/TASKS")
+
+  :custom
+  (org-todo-keywords '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CNCL")))
+  (org-gtd-keyword-mapping '((todo . "TODO")       ; tasks not ready to act on
+			     (next . "NEXT")       ; tasks ready to act on immediately
+			     (wait . "WAIT")       ; tasks blocked or delegated
+			     (done . "DONE")       ; tasks successfully completed
+			     (canceled . "CNCL"))) ; tasks that won't be completed
+
+  ;; Enable per-type refile prompting (recommended)
+  ;; Without this, all items auto-refile to first target without prompting
+  (setq org-gtd-refile-to-any-target nil)
+  ;; Customize which types prompt vs auto-refile:
+  ;; (setq org-gtd-refile-prompt-for-types '(project-heading project-task ...))  :config
+
+  :config
+  (org-edna-mode 1)
+
+  ;; These only work after org-gtd loads (e.g. so org-gtd-directory is defined)
+  (with-eval-after-load 'org-gtd
+    (setq org-agenda-files (list org-gtd-directory))
+    (define-key org-gtd-clarify-mode-map (kbd "C-c c") 'org-gtd-organize))
+
+  ;; Quick task actions in agenda view
+  (with-eval-after-load 'org-agenda
+    (define-key org-agenda-mode-map (kbd "C-c .") 'org-gtd-agenda-transient))
 
   :bind
   (("C-c d c"		. org-gtd-capture)
    ("C-c d e"		. org-gtd-engage)
    ("C-c d p"		. org-gtd-process-inbox)
+   ("C-c d n"		. org-gtd-show-all-next)
+   ("C-c d s"		. org-gtd-reflect-stuck-projects)
 
-   ("C-c c"         . org-gtd-organize))
+   :map org-gtd-clarify-mode-map
+   ("C-c c"	. org-gtd-organize)
 
-  :config
-  (org-edna-mode)
-  (org-gtd-mode t))
+   :map org-agenda-mode-map
+   ("C-c ."	. org-gtd-agenda-transient))
+  )
+
 
 ;; ;; split GTD in four separate files:
 ;; ;; - [inbox.org]:   collect everything;
@@ -78,65 +106,6 @@
 ;;                            (org-agenda nil "a")
 ;;                            (org-save-all-org-buffers))))
 ;;   )
-
-;; ;;; https://github.com/progfolio/doct
-;; (use-package doct)
-
-;; (use-package org-capture
-;;   :straight nil
-;;   :after org
-;;   :bind
-;;    ("C-c c"       . org-capture)
-;;    ("C-c n"       . (lambda ()
-;;                       (interactive)
-;;                       (org-capture nil "n")))
-;;   :config
-;;   (setq org-capture-templates
-;; 	(append org-capture-templates
-;; 		(doct '(
-;; 			("(H) Todo [inbox]"
-;; 			 :keys "t"
-;; 			 :type entry
-;; 			 :file "~/Drives/Sync/Agenda/gtd-inbox.org"
-;; 			 :regexp "Tasks"
-;; 			 :clock t
-;; 			 :template ("* TODO %^{Task}"
-;; 				    "  SCHEDULED: %^{Due Date}T"
-;;                                     "  BLEAH"
-;; 				    "  %?")
-;; 			 )
-;; 			("(H) Tickler"
-;; 			 :keys "T"
-;; 			 :type entry
-;; 			 :file "~/Drives/Sync/Agenda/gtd-ticker.org"
-;; 			 :regexp "Tickler"
-;; 			 :template ("* %^{Reminder}i %^G"
-;; 				    "  SCHEDULED: %^{Next Due Date}T"
-;; 				    "  ADDED: %U"
-;; 				    "  "
-;; 				    "  %?")
-;; 			 )
-;; 			("(H) Home Project List"
-;; 			 :keys "h"
-;; 			 :type entry
-;; 			 :file "~/Drives/Sync/Agenda/gtd-inbox.org"
-;; 			 :regexp "Projects"
-;; 			 :template ("* Project: %^{Task} %^G"
-;; 				    "  "
-;; 				    "  %?")
-;; 			 )
-;; 			))))
-;;   )
-;; ;; (require 'org-capture)
-
-;; ;; (use-package helm-org-rifle
-;; ;;  :bind
-;; ;;  ("M-g r r"    . helm-org-rifle)               ;; Show results from all open Org buffers
-;; ;;  ("M-g r R"    . helm-org-rifle-occur)
-;; ;;  ("M-g r a"    . helm-org-rifle-agenda-files)  ;; Show results from Org agenda files
-;; ;;  ("M-g r A"    . helm-org-rifle-occur-agenda-files)
-;; ;;  )
-;; ;;(require 'helm-org-rifle)
 
 ;; (defun my/org-capture-add-tags (canned-tags)
 ;;   "Add CANNED-TAGS to an entry in the capture buffer."

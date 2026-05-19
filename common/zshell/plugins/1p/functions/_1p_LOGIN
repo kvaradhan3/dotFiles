@@ -22,7 +22,7 @@ local JSON="$1"
 
     totp="$(_1p__extract "$JSON" label "One-time password" totp)"
     if [ -n "$totp" ] ; then
-        printf "OTP:,%s\n"  "$totp"
+        printf "OTP:,%06d\n"  "$totp"
     fi
 # | column -s, -t
 ) | tidy-viewer -eRD

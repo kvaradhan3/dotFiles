@@ -74,7 +74,7 @@ then
         ohmyzsh/ohmyzsh path:lib/compfix.zsh
 
         ohmyzsh/ohmyzsh path:plugins/git
-	ohmyzsh/ohmyzsh path:plugins/gh
+        ohmyzsh/ohmyzsh path:plugins/gh
         ohmyzsh/ohmyzsh path:plugins/brew
         # ohmyzsh/ohmyzsh path:plugins/aws
         # ohmyzsh/ohmyzsh path:plugins/gcloud
@@ -100,6 +100,7 @@ then
         kvaradhan3/dotFiles path:common/zshell/plugins/emulators
         kvaradhan3/dotFiles path:common/zshell/plugins/log
         kvaradhan3/dotFiles path:common/zshell/plugins/utilities
+        kvaradhan3/dotFiles path:common/zshell/plugins/openstack
 
         bigH/git-fuzzy      path:bin kind:path
         wfxr/forgit

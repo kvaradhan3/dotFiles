@@ -1,0 +1,59 @@
+{
+  "title": "M365 Copilot: Enter = new line, Cmd+Enter = submit",
+  "rules": [
+    {
+      "description": "M365 Copilot: Enter inserts newline (Shift+Enter), Cmd+Enter submits (Enter)",
+      "manipulators": [
+        {
+          "description": "Enter → Shift+Enter (new line) when M365 Copilot is frontmost",
+          "type": "basic",
+          "from": {
+            "key_code": "return_or_enter",
+            "modifiers": {
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "return_or_enter",
+              "modifiers": ["left_shift"]
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^com\\.microsoft\\.m365copilot$"
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Cmd+Enter → Enter (submit) when M365 Copilot is frontmost",
+          "type": "basic",
+          "from": {
+            "key_code": "return_or_enter",
+            "modifiers": {
+              "mandatory": ["left_command"],
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "return_or_enter"
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^com\\.microsoft\\.m365copilot$",
+                "^com\\.microsoft\\.onenote\\.mac$",
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

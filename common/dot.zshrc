@@ -2,7 +2,7 @@
 
 # shellcheck source=/Users/kvaradhan/.zinit
 . "$HOME"/.zinit
-for i in "$ZDOTDIR_LOCAL"/*_zshrc_* ; do
+for i in "$ZDOTDIR_COMMON"/*_zshrc_* "$ZDOTDIR_PLATFORM"/*_zshrc_*; do
     if [ -f "$i" ] ; then
         START="$SECONDS"
         . "$i"

@@ -1,0 +1,43 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+#
+# prereqs:
+#   brew install go-jira
+#   go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest
+#
+
+#
+# These zshisms expand globally.
+#
+
+if [[ -f "$HOME/.orbstack/shell/init.zsh" ]] ; then
+    source $HOME/.orbstack/shell/init.zsh 2>/dev/null
+fi
+
+# alias os='openstack --os-cloud ${OS_CLOUD:-rco-pc4}'
+# 
+# # os() {
+# #     OPENSTACK_CLOUD=${OPENSTACK_CLOUD:-rco-pc4}
+# #     if ! [[ "$OPENSTACK_TOKEN" ]] ||
+# #        $( curl -s -X GET                                \
+# #                -H "X-Auth-Token: $OPENSTACK_TOKEN"      \
+# #                -H "X-Subject-Token: $OPENSTACK_TOKEN"   \
+# #           | jq -er '.error' >/dev/null )
+# #     then
+# #         export OPENSTACK_TOKEN="$(openstack token issue -c id -f value)"
+# #     fi
+# # 
+# #     openstack --os-auth-type token --os-token "$OPENSTACK_TOKEN" --os-cloud "$OPENSTACK_CLOUD" "$@"
+# # }

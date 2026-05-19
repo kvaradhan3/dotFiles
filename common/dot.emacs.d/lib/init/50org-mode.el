@@ -18,6 +18,8 @@
          ("C-c b"       . org-switchb))
   :config
 
+  (setq org-directory "~/NOTES")
+
   ;; (setq org-agenda-files        '()
   ;;       org-capture-templates   '()
   ;;       org-refile-targets      '((nil :maxlevel . 9))
@@ -39,6 +41,35 @@
   :hook
   ((org-mode    .    turn-on-auto-fill))
   )
+
+;; ;;; https://github.com/progfolio/doct
+(use-package doct)
+
+(use-package org-capture
+  :straight nil
+  :after org
+  :config
+  (setq org-capture-templates
+	(doct '(("Take a Note"
+		 :keys "n"
+		 :type entry
+		 :file (lambda ()
+			 (let* ((this-week
+				 (format-time-string "%Y/W %U.org"))
+				(notes-file-path (file-name-concat
+						  org-directory this-week)))
+			   (make-directory
+			    (file-name-directory notes-file-path)
+			    :parents)
+			   notes-file-path))
+		 :template ("* %?"
+			    "  :PROPERTIES:"
+			    "  :PREV: %^{PREV|null}p"
+			    "  :NEXT: %^{NEXT|null}p"
+			    "  :END:"
+			    ""
+			    "  %U"
+			    ""))))))
 
 (use-package org-crypt
   :straight nil

@@ -10,8 +10,9 @@ _1p__extract() {
     local val="${4:-"value"}"
 
     _1p__b64decode <<<"$JSON" | \
-	jq -r '.fields[] |
-                select(.'"$field"' == "'"$key"'").'"$val"
+	  jq -r '.fields[]
+             | select(.'"$field"' | test("'"$key"'"; "in"))
+             .'"$val"
 }
 
 _1p__validate() {

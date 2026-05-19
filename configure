@@ -36,7 +36,8 @@ export DESTDIR HERE
 flist_init
 
 (
-    local RCBASE="$HERE"/common
+    local RCCOMMON="$HERE"/common
+    local RCPLATFORM="$HERE"/"$(uname -s)"
     local AUTOTAG=()
     AUTOTAG+=(
       "Auto-generated on $(date) by $USER"
@@ -49,7 +50,7 @@ flist_init
     {
         # shellcheck disable=SC2027,SC2086
         print  " ;;;\n" ";;; "${^AUTOTAG}"\n"
-        printf '(defconst emacs-rc-dir "%s/dot.emacs.d/lib/init")\n' "$RCBASE"
+        printf '(defconst emacs-rc-dir "%s/dot.emacs.d/lib/init")\n' "$RCCOMMON"
     } > dot.emacs-rc-dir.el
 
     {
@@ -57,8 +58,10 @@ flist_init
         print  " ###\n" "# "${^AUTOTAG}"\n"
         printf 'export ZDOTDIR="%s";\n'   "${ZDOTDIR:="$DESTDIR"}"
         # shellcheck disable=SC2016
-        printf 'export ZDOTDIR_LOCAL="${ZDOTDIR_LOCAL:-"%s"}";\n' \
-               "${RCBASE}/zshell"
+        printf 'export ZDOTDIR_COMMON="${ZDOTDIR_COMMON:-"%s"}";\n' \
+               "${RCCOMMON}/zshell"
+        printf 'export ZDOTDIR_PLATFORM="${ZDOTDIR_PLATFORM:-"%s"}";\n' \
+               "${RCPLATFORM}/zshell"
         printf 'setopt NO_NOMATCH;'
     } > dot.zinit
     popd  || { log --error Unexpected error, pop directory failed, exiting; exit 1; }
