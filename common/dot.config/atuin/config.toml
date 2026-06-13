@@ -180,6 +180,7 @@ enter_accept = true
 ## Alternatively, set env NO_MOTION=true
 # prefers_reduced_motion = false
 prefers_reduced_motion = true
+search_mode = "daemon-fuzzy"
 
 [stats]
 ## Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
@@ -238,6 +239,8 @@ records = true
 # strategy = "auto"
 
 [daemon]
+enabled = true
+autostart = true
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
 # enabled = false
 
@@ -274,6 +277,9 @@ records = true
 # debug = true
 
 [search]
+
+[ai]
+enabled = false
 ## The list of enabled filter modes, in order of priority.
 ## The "workspace" mode is skipped when not in a workspace or workspaces = false.
 ## Default filter mode can be overridden with the filter_mode setting.
