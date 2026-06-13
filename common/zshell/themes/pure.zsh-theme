@@ -39,16 +39,21 @@ autoload -U promptinit; promptinit
 # optionally define some options
 PURE_CMD_MAX_EXEC_TIME=10
 
+zstyle :prompt:pure:environment:nix-shell show no
+
 # change the path color
 zstyle :prompt:pure:path color white
+zstyle :prompt:pure:path:separator dim yes
 
 # change the color for both `prompt:success` and `prompt:error`
-zstyle ':prompt:pure:prompt:*' color cyan
+zstyle :prompt:pure:prompt:error   color red
+zstyle :prompt:pure:prompt:success color green
+
+zstyle :prompt:pure:title     show no
 
 # turn on git stash status
 zstyle :prompt:pure:git:stash show yes
 
+local RPROMPT_SAVED="$RPROMPT"
 prompt pure
-
-
-RPROMPT="${RPROMPT/'%*'}"'%*'
+export RPROMPT="${RPROMPT_SAVED/'%*'/}"'%*'
