@@ -9,8 +9,16 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
+alias ?='alias | grep'
 alias c='clear'
 alias h='fc -l -d'
+
+# quit if one screen
+# ignore case on search, even if string has mixed case
+# display control characters, except ANSI color sequences
+# dont do term-init/de-init.  Hence preserve screen on exit
+#
+export LESS="--quit-if-one-screen --IGNORE-CASE --RAW-CONTROL-CHARS --no-init"
 
 export CLICOLOR=
 alias ls='/bin/ls -F --color=auto'
