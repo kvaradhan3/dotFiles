@@ -1,0 +1,65 @@
+#! /bin/zsh
+#
+# shellcheck disable=SC2278,SC2298,SC2296,SC2299
+# SC2086 (info): Double quote to prevent globbing and word splitting.
+# SC2296 (error): Parameter expansions can't start with (. Double check syntax.
+# SC2298 (error): ${${x}} is invalid. For expansion, use ${x}.
+#        For indirection, use arrays, ${!x} or (for sh) eval.
+# SC2278 (error): $0 can't be assigned in Ksh (but it does reflect the current function).
+# SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
+#
+
+emulate -L zsh -o pipe_fail -o err_return
+
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+#
+# Usage:
+#   -n #    count of words to emit, default 4
+#   -w      use words.txt
+#   -c      use codes.txt
+#   -a      use both words and codes (default)
+#
+emulate -L zsh -o pipe_fail -o err_return
+local caller="${funcstack[3]:-"${FUNCNAME[3]}"}"
+
+zparseopts -D -F        \
+    {n,-count}:=cnt     \
+    {w,-words}=dict     \
+    {c,-codes}=dict     \
+    {a,-all}=dict       \
+    {h,help}=help
+
+_COUNT_DEFAULT=4
+_COUNT=${cnt[-1]:-$_COUNT_DEFAULT}
+
+_SRC_DIR="$(dirname "$(dirname $0)")"/data
+_SRC_WORDS="$_SRC_DIR/words.txt"
+_SRC_CODES="$_SRC_DIR/codes.txt"
+_SOURCES=()
+
+if (( $dict[(Ie)-w] )) || (( $dict[(Ie)--words] )) ; then
+    _SOURCES+=( "$_SRC_WORDS" )
+fi
+if (( $dict[(Ie)-c] )) || (( $dict[(Ie)--codes] )) ; then
+    _SOURCES+=( "$_SRC_CODES" )
+fi
+if (( $dict[(Ie)-a] )) || (( $dict[(Ie)--all] ))  || \
+   [[ ${#_SOURCES[@]} -eq 0 ]]; then
+    _SOURCES+=( "$_SRC_WORDS" )
+    _SOURCES+=( "$_SRC_CODES" )
+fi
+
+if [[ ${#help} > 0 ]] ; then
+    printf "usage: %s [options] \n" "$(basename $0)"
+    printf "    -n # | --count #    # of words to fetch [default %d]\n" "$_COUNT_DEFAULT"
+    printf "    -w | --words        Use dictionary words from words.txt\n"
+    printf "    -c | --codes        Use code words from codes.txt\n"
+    printf "    -a | --all          Use both words and codes [default]\n"
+    printf "\n"
+    return 1
+fi
+    
+cat $_SOURCES | shuf -n $_COUNT | tr '\n' ' '
+echo

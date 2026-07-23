@@ -24,3 +24,5 @@ autoload -Uz srand32
 if [[ $(uname -s) = 'Linux' ]]; then
     autoload -Uz scim
 fi
+
+autoload -Uz gpw
