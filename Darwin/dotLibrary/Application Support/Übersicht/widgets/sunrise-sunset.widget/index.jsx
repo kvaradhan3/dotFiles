@@ -30,18 +30,20 @@ export const command = async (dispatch) => {
         url.searchParams.set("include", "days,current")
         url.searchParams.set("elements", "datetime,sunrise,sunset")
 
-        // 3. Fetch with curl instead of the WebView's fetch():
-        //    no CORS / WebKit network restrictions, and the HTTP status is visible.
-        const out = await run(
-            `curl -sS --max-time 20 -w '\\n%{http_code}' '${url.href}'`
-        )
-        const nl     = out.lastIndexOf("\n")
-        const body   = out.slice(0, nl)
-        const status = out.slice(nl + 1).trim()
+        // 3. Fetch natively, with a 20-second timeout (like curl --max-time 20)
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 20000)
+        let response
+        try {
+            response = await fetch(url.href, { signal: controller.signal })
+        } finally {
+            clearTimeout(timer)
+        }
 
-        // VisualCrossing returns plain-text errors (bad key, quota exceeded, ...)
-        if (status !== "200") {
-            throw new Error(`HTTP ${status}: ${body.slice(0, 200)}`)
+        // Read as text first: VisualCrossing sends plain-text errors
+        const body = await response.text()
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${body.slice(0, 200)}`)
         }
 
         const resp = JSON.parse(body)
