@@ -9,57 +9,68 @@ import { css } from "uebersicht"
 import { run } from "uebersicht"
 
 const location  = 95129
-const keyFile   = '$HOME/.VisualCrossingKey'
+const keyFile   = '$HOME/.VisualCrossingKey' // contents: {"key": "MY_KEY"}
 const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
-const API       = `/VisualCrossingWebServices/rest/services/timeline/${location}`
+const API       = `VisualCrossingWebServices/rest/services/timeline/`
 
 export const refreshFrequency = 1000 * 60 * 60;
+export const initialState = { datetime: "", sunrise: "…", sunset: "…" }
 
-export const command = (dispatch) => run(`cat "${keyFile}"`)
-    .then((output) => {
-        let obj = JSON.parse(output);
-        return obj.key;
-    })
-    .then((key) => {
-        const weather = new URL(API, baseURL);
-        weather.searchParams.set("key", key);
-        weather.searchParams.set("contentType", "json");
+export const command = async (dispatch) => {
+    try {
+        // 1. Read the API key
+        const keyData = await run(`cat "${keyFile}"`)
+        const { key } = JSON.parse(keyData)
+        if (!key) throw new Error(`no "key" file in "${keyFile}"`)
 
-        return weather.href;
-    })
-    .then((href) => {
-        fetch(href)
-            .then((response) => {
-                response.json().then((resp) => {
-                    var queryDateTime =
-                        resp.days[0].datetime + "T" +
-                        resp.currentConditions.datetime;
-                    dispatch({ status: 'SUCCESS',
-                               datetime: queryDateTime,
-                               data: resp.currentConditions,
-                             });
-                });
-            });
-    })
-    .catch((error) => {
-        dispatch({ status: 'FAILURE',
-                   error: String(error)
-                 });
-    });
+        // 2. Build the query URL (only request what we need, to lower query cost)
+        const url = new URL(API + encodeURIComponent(location), baseURL)
+        url.searchParams.set("key", key)
+        url.searchParams.set("contentType", "json")
+        url.searchParams.set("include", "days,current")
+        url.searchParams.set("elements", "datetime,sunrise,sunset")
+
+        // 3. Fetch with curl instead of the WebView's fetch():
+        //    no CORS / WebKit network restrictions, and the HTTP status is visible.
+        const out = await run(
+            `curl -sS --max-time 20 -w '\\n%{http_code}' '${url.href}'`
+        )
+        const nl     = out.lastIndexOf("\n")
+        const body   = out.slice(0, nl)
+        const status = out.slice(nl + 1).trim()
+
+        // VisualCrossing returns plain-text errors (bad key, quota exceeded, ...)
+        if (status !== "200") {
+            throw new Error(`HTTP ${status}: ${body.slice(0, 200)}`)
+        }
+
+        const resp = JSON.parse(body)
+        if (!resp.currentConditions) throw new Error("no currentConditions in response")
+
+        dispatch({
+            status:   "SUCCESS",
+            datetime: `${resp.days[0].datetime}T${resp.currentConditions.datetime}`,
+            data:     resp.currentConditions,
+        })
+    } catch (error) {
+        console.error("sunrise widget:", error)
+        dispatch({ status: "FAILURE", error: String(error) });
+    }
+}
 
 export const updateState = (event, previousState) => {
     switch (event.status) {
     case 'SUCCESS':
         return {
             datetime: event.datetime,
-            sunrise: event.data.sunrise,
-            sunset:  event.data.sunset,
+            sunrise:  event.data.sunrise,
+            sunset:   event.data.sunset,
         };
     case 'FAILURE':
         return {
             datetime: "",
-            sunrise: "ERROR",
-            sunset: "<" + event.error + ">",
+            sunrise:  event.error,
+            sunset:   "",
         };
     default:
         console.log("unknown status code: " + String(event.status) +
