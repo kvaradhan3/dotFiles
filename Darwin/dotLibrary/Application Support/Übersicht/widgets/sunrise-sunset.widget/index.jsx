@@ -13,8 +13,13 @@ const keyFile   = '$HOME/.VisualCrossingKey' // contents: {"key": "MY_KEY"}
 const baseURL   = new URL( "https://weather.VisualCrossing.Com/" )
 const API       = `VisualCrossingWebServices/rest/services/timeline/`
 
+const legend = {
+    sunrise: "\u263C",
+    sunset:  "\u2600"
+};
+
 export const refreshFrequency = 1000 * 60 * 60;
-export const initialState = { datetime: "", sunrise: "…", sunset: "…" }
+export const initialState = { datetime: "", sunrise: legend.sunrise, sunset: legend.sunset }
 
 export const command = async (dispatch) => {
     try {
@@ -80,11 +85,6 @@ export const updateState = (event, previousState) => {
         return previousState;
     }
 }
-
-const legend = {
-    sunrise: "\u263C",
-    sunset:  "\u2600"
-};
 
 export const render = (p) => {
     return (
