@@ -9,9 +9,8 @@
 # SC2299 (error): Parameter expansions can't be nested. Use temporary variables.
 #
 
-alias ?='alias | grep'
+alias ?='() { alias | grep "$@" | less }'
 alias c='clear'
-alias h='fc -l -d'
 
 # quit if one screen
 # ignore case on search, even if string has mixed case

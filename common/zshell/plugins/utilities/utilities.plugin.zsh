@@ -11,6 +11,8 @@
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
+DATA_DIR=${0:h}/data
+
 if [[ ${zsh_loaded_plugins[-1]} != */utilities ]] && \
        [[ -z ${fpath[(r)${0:h}/functions]} ]]
 then
@@ -25,4 +27,7 @@ if [[ $(uname -s) = 'Linux' ]]; then
     autoload -Uz scim
 fi
 
-autoload -Uz gpw
+autoload -Uz _gpw
+gpw() {
+    DATA_DIR="$DATA_DIR" _gpw "$@"
+}
