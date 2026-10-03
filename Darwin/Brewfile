@@ -1,213 +1,569 @@
-tap "koekeishiya/formulae"
+tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
+tap "koekeishiya/formulae", "https://github.com/asmvik/homebrew-formulae.git"
+# Any-to-PostScript filter
 brew "a2ps"
+# Run your GitHub Actions locally
 brew "act"
+# Core application library for C
 brew "glib"
-brew "icu4c@77"
+# TIFF library and utilities
+brew "libtiff"
+# OpenType text shaping engine
 brew "harfbuzz"
+# Library to render SVG files using Cairo
 brew "librsvg"
+# Icons for the GNOME project
 brew "adwaita-icon-theme"
+# Strip or convert ANSI codes into HTML, (La)Tex, RTF, or BBCode
+brew "ansifilter"
+# Plugin manager for zsh, inspired by antigen and antibody
 brew "antidote"
-brew "jpeg-xl"
+# Improved shell history for zsh, bash, fish and nushell
 brew "atuin"
+# Automatic configure script builder
 brew "autoconf"
+# Collection of over 500 reusable autoconf macros
 brew "autoconf-archive"
+# Shell extension to jump to frequently used directories
 brew "autojump"
+# Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
+# Integrated shell for working with the AWS CLI
 brew "aws-shell"
-brew "python@3.13"
+# Official Amazon AWS command-line interface
 brew "awscli"
-brew "balena-cli"
-brew "gtk4"
-brew "libadwaita"
-brew "baobab"
-brew "bind"
-brew "black"
-brew "ccache"
-brew "cmake"
-brew "colordiff"
-brew "coreutils"
-brew "cowsay"
-brew "cppcheck"
-brew "cscope"
-brew "csvkit"
-brew "daemonize"
-brew "dive"
-brew "docker-machine"
-brew "dos2unix"
-brew "doxygen"
-brew "duti"
-brew "enscript"
-brew "exiftool"
-brew "fakeroot"
-brew "tesseract"
-brew "x264"
-brew "ffmpeg"
-brew "figlet"
-brew "flake"
-brew "flake8"
-brew "libtool"
-brew "fontforge"
-brew "fortune"
-brew "fzf"
-brew "gh"
-brew "netpbm"
-brew "gts"
-brew "graphviz"
-brew "git-delta"
-brew "gitleaks"
-brew "gnu-sed"
-brew "gnu-tar"
-brew "gnupg"
-brew "gnuplot"
-brew "go"
-brew "go-jira", link: false
-brew "pkgconf"
-brew "gobject-introspection"
-brew "golangci-lint"
-brew "gsettings-desktop-schemas"
-brew "helm"
-brew "iperf"
-brew "ipmitool"
-brew "irssi"
-brew "ispell"
-brew "jc"
-brew "jfrog-cli"
-brew "jira-cli"
-brew "jq"
-brew "jwt-cli"
-brew "k3d"
-brew "k9s"
-brew "kubernetes-cli"
-brew "krew"
-brew "ldns"
-brew "lft"
-brew "libdvdcss"
-brew "libjwt"
-brew "librdkafka"
-brew "libxml2"
-brew "lynx"
-brew "make"
-brew "mas"
-brew "minikube"
-brew "ncdu"
-brew "netcat"
-brew "nethack"
-brew "nethogs"
-brew "nghttp2"
-brew "ninja"
-brew "nmap"
+# Open-source, cross-platform JavaScript runtime environment
 brew "node"
-brew "pandoc"
-brew "pdfcpu"
-brew "pipx"
-brew "postgresql@14"
-brew "pre-commit"
-brew "protoc-gen-go"
-brew "psftools"
-brew "pstree"
-brew "pv"
-brew "pylint"
-brew "pyright"
-brew "qemu"
+# Command-line tool for interacting with the balenaCloud and balena API
+brew "balena-cli"
+# Toolkit for creating graphical user interfaces
+brew "gtk4"
+# Building blocks for modern adaptive GNOME applications
+brew "libadwaita"
+# Gnome disk usage analyzer
+brew "baobab"
+# Implementation of the DNS protocols
+brew "bind"
+# Python code formatter
+brew "black"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
+# Object-file caching compiler wrapper
+brew "ccache"
+# Claude Code Commands Manager
+brew "claude-cmd"
+# Cross-platform make
+brew "cmake"
+# Color-highlighted diff(1) output
+brew "colordiff"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Apjanke's fork of the classic cowsay project
+brew "cowsay"
+# Static analysis of C and C++ code
+brew "cppcheck"
+# Tool for browsing source code
+brew "cscope"
+# Suite of command-line tools for converting to and working with CSV
+brew "csvkit"
+# Run a command as a UNIX daemon
+brew "daemonize"
+# Tool for exploring each layer in a docker image
+brew "dive"
+# Convert text between DOS, UNIX, and Mac formats
+brew "dos2unix"
+# Generate documentation for several programming languages
+brew "doxygen"
+# Select default apps for documents and URL schemes on macOS
+brew "duti"
+# Convert text to Postscript, HTML, or RTF, with syntax highlighting
+brew "enscript"
+# Perl lib for reading and writing EXIF metadata
+brew "exiftool"
+# Provide a fake root environment
+brew "fakeroot"
+# H.264/AVC encoder
+brew "x264"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
+# Banner-like program prints strings as ASCII art
+brew "figlet"
+# FLAC audio encoder
+brew "flake"
+# Lint your Python code for style and logical errors
+brew "flake8"
+# Generic library support script
+brew "libtool"
+# Command-line outline and bitmap font editor/converter
+brew "fontforge"
+# Infamous electronic fortune-cookie generator
+brew "fortune"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# OCR (Optical Character Recognition) engine
+brew "tesseract"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Audit git repos for secrets
+brew "gitleaks"
+# GNU implementation of the famous stream editor
+brew "gnu-sed"
+# GNU version of the tar archiving utility
+brew "gnu-tar"
+# GNU Privacy Guard (OpenPGP)
+brew "gnupg"
+# Command-driven, interactive function plotting
+brew "gnuplot"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
+# Simple jira command-line client in Go
+brew "go-jira", link: false
+# Package compiler and linker metadata toolkit
+brew "pkgconf"
+# Generate introspection data for GObject libraries
+brew "gobject-introspection"
+# Fast linters runner for Go
+brew "golangci-lint"
+# Image manipulation
+brew "netpbm"
+# GNU triangulated surface library
+brew "gts"
+# Graph visualization software from AT&T and Bell Labs
+brew "graphviz"
+# GSettings schemas for desktop components
+brew "gsettings-desktop-schemas"
+# Kubernetes package manager
+brew "helm"
+# Tools for and transforming and inspecting PDF files
 brew "qpdf"
+# Tool to measure maximum TCP and UDP bandwidth
+brew "iperf"
+# Utility for IPMI control with kernel driver or LAN interface
+brew "ipmitool"
+# Modular IRC client
+brew "irssi"
+# International Ispell
+brew "ispell"
+# Serializes the output of command-line tools to structured JSON output
+brew "jc"
+# Command-line interface for JFrog products
+brew "jfrog-cli"
+# Feature-rich interactive Jira CLI
+brew "jira-cli"
+# New file format for still image compression
+brew "jpeg-xl"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
+# Super fast CLI tool to decode and encode JWTs built in Rust
+brew "jwt-cli"
+# Little helper to run CNCF's k3s in Docker
+brew "k3d"
+# Kubernetes CLI To Manage Your Clusters In Style!
+brew "k9s"
+# Kubernetes command-line interface
+brew "kubernetes-cli"
+# Package manager for kubectl plugins
+brew "krew"
+# DNS library written in C
+brew "ldns"
+# Layer Four Traceroute (LFT), an advanced traceroute tool
+brew "lft"
+# Access DVDs as block devices without the decryption
+brew "libdvdcss"
+# JSON Web Token C library
+brew "libjwt"
+# Apache Kafka C/C++ library
+brew "librdkafka"
+# GNOME XML library
+brew "libxml2"
+# Text-based web browser
+brew "lynx"
+# Utility for directing compilation
+brew "make"
+# Mac App Store command-line interface
+brew "mas"
+# CLI for Mermaid library
+brew "mermaid-cli"
+# Run a Kubernetes cluster locally
+brew "minikube"
+# 'traceroute' and 'ping' in a single tool
+brew "mtr"
+# NCurses Disk Usage
+brew "ncdu"
+# Utility for managing network connections
+brew "netcat"
+# Single-player roguelike video game
+brew "nethack"
+# Net top tool grouping bandwidth per process
+brew "nethogs"
+# HTTP/2 C Library
+brew "nghttp2"
+# Small build system for use with gyp or CMake
+brew "ninja"
+# Port scanning utility for large networks
+brew "nmap"
+# Adds an OCR text layer to scanned PDF files
+brew "ocrmypdf"
+# Create, run, and share large language models (LLMs)
+brew "ollama"
+# General-purpose speech recognition model
+brew "openai-whisper"
+# Command-line client for OpenStack
+brew "openstackclient"
+# Swiss-army knife of markup format conversion
+brew "pandoc"
+# PDF processor written in Go
+brew "pdfcpu"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
+# Object-relational database system
+brew "postgresql@18"
+# Framework for managing multi-language pre-commit hooks
+brew "pre-commit"
+# Go support for Google's protocol buffers
+brew "protoc-gen-go"
+# Tools for fixed-width bitmap fonts
+brew "psftools"
+# Show ps output as a tree
+brew "pstree"
+# Monitor data's progress through a pipe
+brew "pv"
+# It's not just a linter that annoys you!
+brew "pylint"
+# Static type checker for Python
+brew "pyright"
+# Python implementation of Markdown
+brew "python-markdown"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
+# Generic machine emulator and virtualizer
+brew "qemu"
+# Ultra-fast CSV data-wrangling toolkit
+brew "qsv"
+# Unified tool to manage your Rancher server
 brew "rancher-cli"
+# Powerful, clean, object-oriented scripting language
 brew "ruby"
+# Extremely fast Python linter, written in Rust
 brew "ruff"
+# Safe, concurrent, practical language
 brew "rust"
+# Spreadsheet program for the terminal, using ncurses
 brew "sc-im"
+# Substitute for classic 'make' tool with autoconf/automake functionality
 brew "scons"
+# Semantic version control CLI with entity-level diffs and blame
+brew "sem-cli"
+# Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
+# Editor of encrypted files
 brew "sops"
-brew "speedtest-cli"
+# Tool to create intelligent and beautiful documentation
 brew "sphinx-doc"
+# Compressed read-only file system for Linux
+brew "squashfs"
+# State of the art linter for the Go programming language
 brew "staticcheck"
+# Version control system designed to be a better CVS
 brew "subversion"
+# User interface to the TELNET protocol
 brew "telnet"
+# Render Mermaid diagrams in the terminal
+brew "termaid"
+# Official documentation format of the GNU project
+brew "texinfo"
+# CLI csv pretty printer
 brew "tidy-viewer"
+# Terminal multiplexer
 brew "tmux"
+# Ultimate terminal divider powered by tmux
 brew "tmux-xpanes"
+# Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Vulnerability scanner for container images, file systems, and Git repos
 brew "trivy"
+# ASGI web server
+brew "uvicorn"
+# Tool for creating isolated virtual python environments
 brew "virtualenv"
+# Converts raw filesystems to VMDK files and vice versa
 brew "vmdktool"
+# Executes a program periodically, showing output fullscreen
 brew "watch"
+# Internet file retriever
 brew "wget"
+# Linter for YAML files
 brew "yamllint"
+# Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
+# UNIX shell (command interpreter)
 brew "zsh"
+# Password manager that keeps all passwords secure behind one password
 cask "1password"
+# Command-line interface for 1Password
 cask "1password-cli"
+# Touchless presentation and collaboration software
+cask "airmedia"
+# Transfer files from and to an Android smartphone
 cask "android-file-transfer"
+# Android SDK component
 cask "android-platform-tools"
+# Tool to flash OS images to SD cards & USB drives
 cask "balenaetcher"
+# Test and debug chat bots built with the Bot Framework SDK
 cask "bot-framework-emulator"
+# Web browser focusing on privacy
 cask "brave-browser"
+# Terminal-based AI coding assistant
+cask "claude-code"
+# Brings the power of Copilot coding agent directly to your terminal
+cask "copilot-cli"
+# Universal database tool and SQL client
 cask "dbeaver-community"
+# Virtual monitor for screen sharing
 cask "deskpad"
-cask "docker"
+# Online diagram software
 cask "drawio"
-cask "emacs"
+# GNU Emacs text editor
+cask "emacs-app"
+# Calendar software
 cask "fantastical"
+cask "font-0xproto-nerd-font"
+cask "font-3270-nerd-font"
+cask "font-adwaita-mono-nerd-font"
+cask "font-agave-nerd-font"
 cask "font-alegreya"
 cask "font-alegreya-sans"
+cask "font-anonymice-nerd-font"
+cask "font-arimo-nerd-font"
+cask "font-atkynson-mono-nerd-font"
+cask "font-aurulent-sans-mono-nerd-font"
 cask "font-awesome-terminal-fonts"
+cask "font-bellota-text"
+cask "font-big-shoulders-inline-text"
+cask "font-big-shoulders-inline-text-sc"
+cask "font-big-shoulders-stencil-text"
+cask "font-big-shoulders-stencil-text-sc"
+cask "font-big-shoulders-text"
+cask "font-big-shoulders-text-sc"
+cask "font-bigblue-terminal-nerd-font"
+cask "font-bitstream-vera-sans-mono-nerd-font"
+cask "font-blex-mono-nerd-font"
+cask "font-caskaydia-cove-nerd-font"
+cask "font-caskaydia-mono-nerd-font"
+cask "font-code-new-roman-nerd-font"
+cask "font-comic-shanns-mono-nerd-font"
+cask "font-commit-mono-nerd-font"
+cask "font-cossette-texte"
+cask "font-cousine-nerd-font"
+cask "font-crimson-pro"
+cask "font-crimson-text"
+cask "font-d2coding-nerd-font"
+cask "font-daddy-time-mono-nerd-font"
+cask "font-dejavu-sans-mono-nerd-font"
+cask "font-departure-mono-nerd-font"
+cask "font-dm-serif-text"
+cask "font-droid-sans-mono-nerd-font"
+cask "font-envy-code-r-nerd-font"
+cask "font-exile"
+cask "font-exo"
+cask "font-exo-2"
+cask "font-expletus-sans"
+cask "font-explora"
+cask "font-fantasque-sans-mono-nerd-font"
+cask "font-fanwood-text"
+cask "font-finlandica-text"
+cask "font-fira-code-nerd-font"
+cask "font-fira-mono-nerd-font"
 cask "font-fontawesome"
+cask "font-geist-mono-nerd-font"
+cask "font-go-mono-nerd-font"
+cask "font-gohufont-nerd-font"
+cask "font-golos-text"
 cask "font-hack-nerd-font"
-cask "font-humor-sans"
+cask "font-hasklug-nerd-font"
+cask "font-heavy-data-nerd-font"
+cask "font-hurmit-nerd-font"
+cask "font-im-writing-nerd-font"
 cask "font-inconsolata"
+cask "font-inconsolata-go-nerd-font"
+cask "font-inconsolata-lgc-nerd-font"
+cask "font-inconsolata-nerd-font"
+cask "font-intone-mono-nerd-font"
+cask "font-iosevka-nerd-font"
+cask "font-iosevka-term-nerd-font"
+cask "font-iosevka-term-slab-nerd-font"
+cask "font-jetbrains-mono-nerd-font"
 cask "font-lato"
+cask "font-lekton-nerd-font"
+cask "font-liberation-nerd-font"
+cask "font-libre-barcode-128-text"
+cask "font-libre-barcode-39-extended-text"
+cask "font-libre-barcode-39-text"
+cask "font-libre-barcode-ean13-text"
+cask "font-libre-caslon-text"
+cask "font-lilex-nerd-font"
+cask "font-linux-libertine"
+cask "font-m+-nerd-font"
+cask "font-markazi-text"
+cask "font-martian-mono-nerd-font"
+cask "font-meslo-lg-nerd-font"
+cask "font-monaspice-nerd-font"
+cask "font-monocraft-nerd-font"
+cask "font-monofur-nerd-font"
+cask "font-monoid-nerd-font"
+cask "font-mononoki-nerd-font"
+cask "font-mozilla-text"
+cask "font-noticia-text"
+cask "font-noto-nerd-font"
+cask "font-opendyslexic-nerd-font"
+cask "font-overpass-nerd-font"
+cask "font-profont-nerd-font"
+cask "font-proggy-clean-tt-nerd-font"
+cask "font-recursive-mono-nerd-font"
+cask "font-red-hat-text"
+cask "font-roboto-mono-nerd-font"
 cask "font-sauce-code-pro-nerd-font"
-cask "font-sf-compact"
 cask "font-sf-mono"
+cask "font-sf-mono-nerd-font-ligaturized"
 cask "font-sf-pro"
+cask "font-shure-tech-mono-nerd-font"
 cask "font-source-code-pro"
+cask "font-space-mono-nerd-font"
+cask "font-stack-sans-text"
+cask "font-stix-two-text"
+cask "font-symbols-only-nerd-font"
+cask "font-terminess-ttf-nerd-font"
+cask "font-tex-gyre-adventor"
+cask "font-tex-gyre-bonum"
+cask "font-tex-gyre-bonum-math"
+cask "font-tex-gyre-chorus"
+cask "font-tex-gyre-cursor"
+cask "font-tex-gyre-heros"
+cask "font-tex-gyre-pagella"
+cask "font-tex-gyre-pagella-math"
+cask "font-tex-gyre-schola"
+cask "font-tex-gyre-schola-math"
+cask "font-tex-gyre-termes"
+cask "font-tex-gyre-termes-math"
+cask "font-text-me-one"
+cask "font-texturina"
+cask "font-tinos-nerd-font"
+cask "font-ubuntu-mono-nerd-font"
+cask "font-ubuntu-nerd-font"
+cask "font-ubuntu-sans-nerd-font"
+cask "font-victor-mono-nerd-font"
+cask "font-wix-madefor-text"
+cask "font-zed-mono-nerd-font"
+# Set of tools to manage resources and applications hosted on Google Cloud
+cask "gcloud-cli"
+# Git GUI
 cask "gitx"
-cask "google-cloud-sdk"
+# GUI for the Dynamips Cisco router emulator
+cask "gns3"
+# Client for the Google Drive storage service
 cask "google-drive"
-cask "handbrake"
-cask "harmony"
+# Open-source video transcoder
+cask "handbrake-app"
+# Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
+# Keyboard customiser
+cask "karabiner-elements"
+# Password manager application and digital vault
 cask "keeper-password-manager"
+# Kubernetes desktop client
+cask "kubernetic"
+# Free cross-platform office suite, fresh version
+cask "libreoffice"
+# Window manager
+cask "loop"
+# Full TeX Live distribution with GUI applications
+cask "mactex"
+# Markdown editor
+cask "meridiem"
+# Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Simple application that will prevent iTunes or Apple Music from launching
+cask "notunes"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Identity verification provider
+cask "okta-verify"
+# Finds large, unwanted files and deletes them
 cask "omnidisksweeper"
+# Visual communication software
 cask "omnigraffle"
+# Android file transfer
 cask "openmtp"
+# JDK from Oracle
 cask "oracle-jdk"
+# Replacement for Docker Desktop
 cask "orbstack"
+# WebKit based web browser
 cask "orion"
+# Collaboration platform for API development
 cask "postman"
+# Productivity application
 cask "quicksilver"
+# Move and resize windows using keyboard shortcuts or snap areas
+cask "rectangle"
+# Centralises all remote connections on a single platform
+cask "remote-desktop-manager"
+# Print driver for printing documents directly to a pdf file
+cask "rwts-pdfwriter"
+# CLI to create, run, and deploy Slack apps
 cask "slack-cli"
+# Store, share and access files from anywhere
 cask "sync"
+# Developer-friendly browser for cloud infrastructure
 cask "teleport-connect"
+# Graphical user interface for TeX Live Manager
 cask "tex-live-utility"
+# Scientific editing platform
 cask "texmacs"
+# Run commands and display their output on the desktop
 cask "ubersicht"
+# Development environment
 cask "vagrant"
+# Open-source code editor
 cask "visual-studio-code"
+# Multimedia player
 cask "vlc"
+# Native desktop client for WhatsApp
 cask "whatsapp"
-cask "wireshark"
+# Connect to Windows
+cask "windows-app"
+# Network protocol analyzer
+cask "wireshark-app"
 mas "Amphetamine", id: 937984704
 mas "Avenue", id: 1523681067
+mas "GarageBand", id: 682658836
 mas "GPS Tracks", id: 425589565
-mas "Keynote", id: 409183694
+mas "iMovie", id: 408981434
+mas "Keynote", id: 361285480
 mas "Microsoft Excel", id: 462058435
 mas "Microsoft OneNote", id: 784801555
 mas "Microsoft Outlook", id: 985367838
 mas "Microsoft PowerPoint", id: 462062816
 mas "Microsoft Word", id: 462054704
-mas "Numbers", id: 409203825
+mas "Numbers", id: 361304891
+mas "Okta Extension App", id: 1439967473
 mas "Okta Verify", id: 490179405
 mas "OneDrive", id: 823766827
-mas "Pages", id: 409201541
+mas "Pages", id: 361309726
+mas "PDFgear", id: 6469021132
 mas "Sleep Control Center", id: 946798523
+mas "Telescopo", id: 6747908871
 mas "Windows App", id: 1295203466
 mas "Xcode", id: 497799835
 mas "Yubico Authenticator", id: 1497506650
+vscode "ms-azuretools.vscode-containers"
 vscode "ms-azuretools.vscode-docker"
 vscode "ms-vscode-remote.remote-containers"
 vscode "ms-vscode.cmake-tools"
+vscode "ms-vscode.cpp-devtools"
 vscode "ms-vscode.cpptools"
 vscode "ms-vscode.cpptools-extension-pack"
 vscode "ms-vscode.cpptools-themes"
