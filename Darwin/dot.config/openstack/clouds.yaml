@@ -5,7 +5,7 @@ clouds:
       project_id: caa0c75aa4a2441e9b104917af6525e3
       project_name: "RCO.PC4.IPO.Strike"
       username: kvaradhan
-      user_domain_name: Default
+      user_domain_name: Ribbon
       project_domain_id: 562a5eff6d8c452da5b76f233c306481
     region_name: regionOne
     interface: public
