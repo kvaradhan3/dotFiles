@@ -6,10 +6,10 @@ const itemPadding = "5px";
 const cities = [
   // See the bottom for the full list of time zones
   { name: "San Jose, CA, USA",       timezone: "America/Los_Angeles" },
-  { name: "Chicago, IL, USA",        timezone: "America/Chicago" },
-  { name: "West LaFayette, IN, USA", timezone: "America/New_York" },
   { name: "London, UK",  timezone: "Europe/London" },
+  { name: "Tel Aviv, IL", timezone: "Asia/Tel_Aviv"},
   { name: "Chennai, IN", timezone: "Asia/Calcutta" },
+  { name: "Shanghai, CN", timezone: "Asia/Shanghai" },
   { name: "Sydney, AU",  timezone: "Australia/Sydney" },
 ];
 

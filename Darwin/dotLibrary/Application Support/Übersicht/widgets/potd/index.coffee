@@ -1,8 +1,8 @@
 bing   = "http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=7&mkt=en-US"
 reddit = "https://www.reddit.com/r/EarthPorn/.json?limit=50"
 
-srcUrl    = reddit
-userAgent = "User-AgentMozilla/5.0 Gecko/20100101 Firefox/29.0"
+srcUrl    = bing
+userAgent = "User-AgentMozilla/5.0 Gecko/20100101 Firefox/152.0"
 debug     = 1
 
 command: "curl -s -A '#{userAgent}' '#{srcUrl}'"
