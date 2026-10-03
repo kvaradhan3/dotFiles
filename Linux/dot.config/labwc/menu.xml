@@ -39,15 +39,15 @@
   <menu id="client-list-combined-menu" label="Running..." />
   -->
   <item label="Web browser">
-    <action name="Execute" command="firefox" />
+    <action name="Execute" command="/usr/bin/firefox" />
   </item>
-  <item label="Terminal">
-    <action name="Execute" command="foot" />
+  <item label="Terminal (W-RET)">
+    <action name="Execute" command="/usr/bin/foot" />
   </item>
   <item label="Reconfigure">
     <action name="Reconfigure" />
   </item>
-  <item label="Exit">
+  <item label="Exit (W-d)">
     <action name="Exit" />
   </item>
   <item label="Poweroff">
@@ -62,6 +62,9 @@
     set label=" ", not label=""
   -->
   <separator label="custom menu" />
+  <item label="Waybar">
+    <action name="Execute" command="/usr/bin/waybar" />
+  </item>
   <item label="Reconfigure">
     <action name="Reconfigure" />
   </item>
